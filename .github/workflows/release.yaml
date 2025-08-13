@@ -27,7 +27,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/apple-home-strategy.js
-            dist/apple-home-strategy.js.LICENSE.txt
+            dist/apple-home-dashboard.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
