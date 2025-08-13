@@ -11,6 +11,21 @@ A pixel‑level Apple Home style dashboard for Home Assistant. Instantly turns y
 
 > Fully customizable per dashboard: every change you make (favorites, section order, hidden sections, per‑room layouts, tall/regular card toggles, background, included switches, scene & camera order, etc.) is saved inside that specific dashboard’s Lovelace config. Create multiple Apple Home dashboards (e.g. Family vs Wall Tablet vs Kids) – each keeps its own independent appearance & layout without extra YAML.
 
+## 🚀 Quick Start (2 minutes)
+1. Install
+   - HACS: Add custom repository (Dashboard), install "Apple Home Dashboard Strategy" (resource added automatically).  OR
+   - Manual: Download `apple-home-dashboard.js` to `/config/www/` and add a Lovelace resource: /local/apple-home-dashboard.js (Module).
+2. Create a new Dashboard (Settings → Dashboards → +) – give it a path like `apple-home` and switch it to YAML mode (Enable advanced mode in your profile if needed).
+3. Open Raw Configuration for that dashboard and paste ONLY:
+```yaml
+strategy:
+  type: custom:apple-home-strategy
+views: []
+```
+4. Save & refresh – the Home (My Home) view, Rooms, Groups, Scenes & Cameras generate automatically. Enter Edit mode to customize.
+
+Using the default Overview instead: You can replace the Overview dashboard the same way (edit its Raw Configuration and set the same `strategy` block). If you want to keep the original Overview layout, create a separate dashboard instead.
+
 ---
 ## ✨ What You Get (Apple Home Parity Highlights)
 - Automatic My Home view with smart sections (Favorites, Status, Rooms, Groups, Scenes, Cameras)
@@ -178,8 +193,6 @@ Create a new dashboard (e.g. path: `apple-home`) and set strategy:
 ```yaml
 strategy:
   type: custom:apple-home-strategy
-  options:
-    title: My Home  # Optional custom header title
 views: []
 ```
 Open the new dashboard – it will populate automatically.
