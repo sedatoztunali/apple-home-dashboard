@@ -33,3 +33,6 @@ pids/
 
 # Env files (none expected, but exclude just in case)
 .env*
+
+deploy.sh
+*.code-workspace
