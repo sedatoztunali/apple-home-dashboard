@@ -180,7 +180,8 @@
     "image_processing": "处理图像时出错。请重试。"
   },
     "settings": {
-    "show_switches_description": "如果开关被禁用，您仍可以包含希望在仪表板中显示的特定开关",
+    "show_switches_cards_description": "在仪表板上显示开关卡片。默认禁用以保持界面简洁并专注于基本控件。",
+    "include_switches_description": "如果开关被禁用，您仍可以包含希望在仪表板中显示的特定开关",
     "favorite_accessories": "收藏配件",
     "favorite_accessories_description": "添加配件以在主屏幕上的专用收藏部分中显示",
     "exclude_from_home": "从主屏幕排除",

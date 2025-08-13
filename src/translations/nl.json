@@ -182,7 +182,8 @@
     "image_processing": "Fout bij verwerken afbeelding. Probeer opnieuw."
   },
   "settings": {
-    "show_switches_description": "Als schakelaars uitgeschakeld zijn, kunt u nog steeds specifieke schakelaars toevoegen die u in het dashboard wilt weergeven",
+    "show_switches_cards_description": "Schakelaarkaarten weergeven op het dashboard. Standaard uitgeschakeld om de interface schoon en gefocust op essentiële bedieningselementen te houden.",
+    "include_switches_description": "Als schakelaars uitgeschakeld zijn, kunt u nog steeds specifieke schakelaars toevoegen die u in het dashboard wilt weergeven",
     "favorite_accessories": "FAVORIETE ACCESSOIRES",
     "favorite_accessories_description": "Voeg accessoires toe om weer te geven in een speciale Favorieten sectie op het startscherm",
     "exclude_from_home": "UITSLUITEN VAN STARTSCHERM",

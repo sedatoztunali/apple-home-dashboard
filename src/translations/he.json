@@ -195,7 +195,8 @@
     "image_processing": "שגיאה בעיבוד התמונה. אנא נסה שוב."
   },
   "settings": {
-    "show_switches_description": "אם ״הצג כרטיסי מתגים״ מבוטל, אתה יכול עדיין לכלול מתגים ספציפיים שברצונך להציג בפאנל",
+    "show_switches_cards_description": "הצג כרטיסי מתגים בפאנל. מבוטל כברירת מחדל כדי לשמור על ממשק נקי וממוקד בפקדים חיוניים.",
+    "include_switches_description": "אם ״הצג כרטיסי מתגים״ מבוטל,ניתן עדיין לכלול מתגים ספציפיים שברצונך להציג בפאנל",
     "favorite_accessories": "אביזרים מועדפים",
     "favorite_accessories_description": "בחר אביזרים שיופיעו באזור מועדפים במסך הבית",
     "exclude_from_home": "הסר ממסך הבית",

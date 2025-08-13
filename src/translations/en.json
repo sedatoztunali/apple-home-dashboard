@@ -203,7 +203,8 @@
     "image_processing": "Error processing image. Please try again."
   },
   "settings": {
-    "show_switches_description": "If switches are disabled, you can still include specific switches that you want to display in the dashboard",
+    "show_switches_cards_description": "Show switch cards on the dashboard. Disabled by default to keep the interface clean and focused on essential controls.",
+    "include_switches_description": "If switches are disabled, you can still include specific switches that you want to display in the dashboard",
     "favorite_accessories": "FAVORITE ACCESSORIES",
     "favorite_accessories_description": "Add accessories to show in a dedicated Favorites section on the home screen",
     "exclude_from_home": "EXCLUDE FROM HOME SCREEN",

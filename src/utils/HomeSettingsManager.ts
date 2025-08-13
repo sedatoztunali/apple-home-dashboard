@@ -213,7 +213,7 @@ export class HomeSettingsManager {
             </div>
           </div>
         </div>
-        <p class="settings-section-description">${localize('settings.show_switches_description')}</p>
+        <p class="settings-section-description">${localize('settings.show_switches_cards_description')}</p>
       </div>
 
       <div class="settings-section" id="included-switches-section" style="display: ${this.tempSettings.showSwitches ? 'none' : 'block'};">
@@ -229,7 +229,7 @@ export class HomeSettingsManager {
             </div>
           </div>
         </div>
-        <p class="settings-section-description">${localize('settings.show_switches_description')}</p>
+        <p class="settings-section-description">${localize('settings.include_switches_description')}</p>
       </div>
 
       <div class="settings-section">

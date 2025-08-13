@@ -182,7 +182,8 @@
     "image_processing": "Erro ao processar imagem. Tente novamente."
   },
   "settings": {
-    "show_switches_description": "Se os interruptores estiverem desativados, você ainda pode incluir interruptores específicos que deseja exibir no painel",
+    "show_switches_cards_description": "Mostrar cartões de interruptores no painel. Desativado por padrão para manter a interface limpa e focada em controles essenciais.",
+    "include_switches_description": "Se os interruptores estiverem desativados, você ainda pode incluir interruptores específicos que deseja exibir no painel",
     "favorite_accessories": "ACESSÓRIOS FAVORITOS",
     "favorite_accessories_description": "Adicione acessórios para mostrar em uma seção dedicada de Favoritos na tela inicial",
     "exclude_from_home": "EXCLUIR DA TELA INICIAL",

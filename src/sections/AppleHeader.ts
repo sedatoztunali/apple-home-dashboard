@@ -556,7 +556,7 @@ export class AppleHeader {
 
   private getMenuButtonContent(): string {
     if (this.editMode) {
-      return `<span class="done-text">${localize('ui.done')}</span>`;
+      return `<span class="done-text">${localize('ui_actions.done')}</span>`;
     }
     return `
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
