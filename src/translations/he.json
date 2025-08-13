@@ -1,0 +1,223 @@
+{
+  "status": {
+    "on": "דולק",
+    "off": "כבוי",
+    "open": "פתוח",
+    "closed": "סגור",
+    "locked": "נעול",
+    "unlocked": "פתוח",
+    "jammed": "תקוע",
+    "unknown": "לא ידוע",
+    "unavailable": "לא זמין",
+    "idle": "כבוי",
+    "heating": "חימום ל",
+    "cooling": "קירור ל", 
+    "auto": "אוטומטי",
+    "heat_cool": "אוטומטי",
+    "heat": "חימום ל",
+    "cool": "קירור ל",
+    "dry": "ייבוש",
+    "fan_only": "מאוורר",
+    "playing": "מנגן",
+    "paused": "מושהה",
+    "buffering": "טוען",
+    "standby": "המתנה",
+    "clear": "נקי",
+    "occupied": "תפוס",
+    "home": "בבית",
+    "away": "לא בבית",
+    "cleaning": "מנקה",
+    "docked": "בעמדת עגינה",
+    "error": "שגיאה",
+    "armed": "דרוך",
+    "armed_home": "דרוך - בבית",
+    "armed_away": "דרוך - בחוץ",
+    "armed_night": "דרוך - לילה",
+    "armed_vacation": "דרוך - חופשה",
+    "armed_custom_bypass": "מעקף מותאם אישית דרוך",
+    "triggered": "מופעל",
+    "disarmed": "מנוטרל",
+    "pending": "ממתין",
+    "arming": "דורך",
+    "disarming": "מנטרל",
+    "none": "ללא",
+    "heat_to": "חימום ל",
+    "cool_to": "קירור ל"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% פתוח"
+  },
+  "time": {
+    "now": "עכשיו",
+    "seconds": " ש' ",
+    "minutes": " ד' ",
+    "hours": " ש' ",
+    "days": " י' "
+  },
+  "groups": {
+    "lights": "תאורה",
+    "climate": "אקלים",
+    "security": "אבטחה",
+    "water": "מים",
+    "media": "רמקולים וטלוויזיות",
+    "other": "אחר"
+  },
+  "chip_status": {
+    "secure": "מאובטח",
+    "active": "פעיל",
+    "tv": "טלוויזיה",
+    "tvs": "טלוויזיות"
+  },
+  "status_section": {
+    "all_locked": "הכל נעול",
+    "all_unlocked": "הכל פתוח",
+    "motion": "תנועה",
+    "locks": "מנעולים",
+    "security": "אבטחה",
+    "covers": "תריסים",
+    "occupancy": "נוכחות",
+    "light": "אור",
+    "light_sensor": "אור",
+    "smoke": "עשן",
+    "battery": "סוללה",
+    "doors": "דלתות",
+    "windows": "חלונות",
+    "tvs": "טלוויזיות",
+    "speakers": "רמקולים",
+    "lights": "תאורה",
+    "switches": "מתגים",
+    "outlets": "שקעים",
+    "temperature": "טמפרטורה",
+    "humidity": "לחות"
+  },
+  "section_reorder": {
+    "title": "סידור מקטעים",
+    "cancel": "ביטול",
+    "done": "סיום",
+    "drag_to_reorder": "גרור כדי לסדר מחדש מקטעים",
+    "tap_eye_to_toggle": "הקש על העין כדי להציג/להסתיר מקטעים",
+    "scenes": "תרחישים",
+    "cameras": "מצלמות",
+    "visible": "גלוי",
+    "hidden": "מוסתר"
+  },
+  "ui": {
+    "done": "סיום"
+  },
+  "section_titles": {
+    "default_room": "חדר עיקרי",
+    "favorites": "מועדפים",
+    "scenes": "תרחישים", 
+    "cameras": "מצלמות"
+  },
+  "ui_actions": {
+    "done": "סיום",
+    "cancel": "ביטול",
+    "back": "חזור",
+    "home": "בית",
+    "home_settings": "הגדרות הבית",
+    "reorder_sections": "סידור מקטעים",
+    "choose_wallpaper": "בחר רקע"
+  },
+  "wallpaper_presets": {
+    "default": "ברירת מחדל",
+    "sunset": "שקיעה",
+    "ocean": "אוקיינוס",
+    "forest": "יער",
+    "purple": "סגול",
+    "fire": "אש"
+  },
+  "pages": {
+    "scenes": "תרחישים",
+    "cameras": "מצלמות",
+    "default_room": "חדר עיקרי",
+    "my_home": "הבית שלי"
+  },
+  "edit": {
+    "edit_home_view": "עריכת תצוגת בית",
+    "edit_scenes_view": "עריכת תצוגת תרחישים",
+    "edit_cameras_view": "עריכת תצוגת מצלמות",
+    "edit_room_view": "עריכת תצוגת חדר",
+    "make_tall": "הפוך לגבוה",
+    "make_normal_size": "הפוך לרגיל"
+  },
+  "toggles": {
+    "hide_header": "הסתר פס עליון",
+    "show_header": "הצג פס עליון",
+    "hide_sidebar": "הסתר תפריט צד",
+    "show_sidebar": "הצג תפריט צד"
+  },
+  "battery": {
+    "low_battery": "סוללה חלשה",
+    "low_battery_count": "{count} סוללה חלשה"
+  },
+  "lights": {
+    "all_off": "הכל כבוי",
+    "on": "דלוק",
+    "all_on": "הכל דלוק"
+  },
+  "covers": {
+    "all_closed": "הכל סגור",
+    "open": "פתוח",
+    "all_open": "הכל פתוח"
+  },
+  "contact": {
+    "contact_sensors": "חיישני מגנט",
+    "all_closed": "הכל סגור"
+  },
+  "motion": {
+    "detected": "זוהה",
+    "not_detected": "לא זוהה"
+  },
+  "smoke": {
+    "detected": "זוהה",
+    "not_detected": "לא זוהה"
+  },
+  "occupancy": {
+    "detected": "זוהה",
+    "not_detected": "לא זוהה"
+  },
+  "media": {
+    "playing": "מנגן",
+    "multiple_playing": "מנגן"
+  },
+  "camera": {
+    "no_snapshot_available": "תמונה לא זמינה"
+  },
+  "errors": {
+    "entity_not_found": "ישות לא נמצאה",
+    "error_saving_layout": "שגיאה בשמירת פריסה",
+    "customization_manager_not_initialized": "CustomizationManager לא הופעל",
+    "invalid_image": "אנא בחר קובץ תמונה תקין.",
+    "file_size_limit": "גודל הקובץ חייב להיות פחות מ-5MB.",
+    "image_processing": "שגיאה בעיבוד התמונה. אנא נסה שוב."
+  },
+  "settings": {
+    "show_switches_description": "אם ״הצג כרטיסי מתגים״ מבוטל, אתה יכול עדיין לכלול מתגים ספציפיים שברצונך להציג בפאנל",
+    "favorite_accessories": "אביזרים מועדפים",
+    "favorite_accessories_description": "בחר אביזרים שיופיעו באזור מועדפים במסך הבית",
+    "exclude_from_home": "הסר ממסך הבית",
+    "exclude_from_home_description": "אביזרים שלא יוצגו במסך הבית אבל כן יופיעו בעמודים אחרים",
+    "exclude_from_dashboard": "הסר מתצוגה",
+    "exclude_from_dashboard_description": "אביזרים שיוסתרו לחלוטין מכל העמודים",
+    "show_switches_cards": "הצג כרטיסי מתגים",
+    "include_specific_switches": "כלול מתגים ספציפיים",
+    "home_wallpaper": "רקע מסך הבית",
+    "take_photo": "בחר/צלם תמונה...",
+    "choose_from_existing": "בחר רקע קיים",
+    "search_accessories": "חפש אביזרים...",
+    "search_switches": "חפש מתגים...",
+    "hide_ha_header": "הסתר את הפס העליון של Home Assistant",
+    "hide_ha_sidebar": "הסתר את תפריט הצד של Home Assistant"
+  },
+  "floating_toggle": {
+    "home": "בית",
+    "automation": "אוטומציה"
+  },
+  "status_messages": {
+    "unavailable": "לא זמין",
+    "loading_automations": "טוען אוטומציות..."
+  }
+}

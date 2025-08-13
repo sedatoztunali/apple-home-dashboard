@@ -1,0 +1,210 @@
+{
+  "status": {
+    "on": "Ligado",
+    "off": "Desligado",
+    "open": "Aberto",
+    "closed": "Fechado",
+    "locked": "Trancado",
+    "unlocked": "Destrancado",
+    "jammed": "Travado",
+    "unknown": "Desligado",
+    "unavailable": "Desligado",
+    "idle": "Desligado",
+    "heating": "Aquecer para",
+    "cooling": "Resfriar para", 
+    "auto": "Auto",
+    "heat_cool": "Auto",
+    "heat": "Aquecer para",
+    "cool": "Resfriar para",
+    "dry": "Secar",
+    "fan_only": "Ventilador",
+    "playing": "Reproduzindo",
+    "paused": "Pausado",
+    "armed": "Armado",
+    "armed_home": "Armado casa",
+    "armed_away": "Armado ausente",
+    "armed_night": "Armado noite",
+    "armed_vacation": "Armado férias",
+    "armed_custom_bypass": "Armado bypass personalizado",
+    "triggered": "Acionado",
+    "disarmed": "Desarmado",
+    "pending": "Pendente",
+    "arming": "Armando",
+    "disarming": "Desarmando"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Aberto"
+  },
+  "time": {
+    "now": "agora",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "h",
+    "days": "d"
+  },
+  "groups": {
+    "lights": "Luzes",
+    "climate": "Clima",
+    "security": "Segurança",
+    "water": "Água",
+    "media": "Alto-falantes e TVs",
+    "other": "Outros"
+  },
+  "chip_status": {
+    "secure": "Seguro",
+    "active": "Ativo",
+    "tv": "TV",
+    "tvs": "TVs"
+  },
+  "status_section": {
+    "all_locked": "Tudo trancado",
+    "all_unlocked": "Tudo destrancado",
+    "motion": "Movimento",
+    "locks": "Fechaduras",
+    "security": "Segurança", 
+    "covers": "Coberturas",
+    "occupancy": "Ocupação",
+    "light": "Luz",
+    "smoke": "Fumaça",
+    "battery": "Bateria",
+    "doors": "Portas",
+    "windows": "Janelas",
+    "tvs": "TVs",
+    "speakers": "Alto-falantes",
+    "lights": "Luzes",
+    "switches": "Interruptores",
+    "outlets": "Tomadas",
+    "temperature": "Temperatura",
+    "humidity": "Umidade"
+  },
+  "section_reorder": {
+    "title": "Reordenar seções",
+    "cancel": "Cancelar",
+    "done": "Concluído",
+    "drag_to_reorder": "Arrastar para reordenar seções",
+    "tap_eye_to_toggle": "Tocar no olho para mostrar/ocultar",
+    "scenes": "Cenas",
+    "cameras": "Câmeras",
+    "visible": "Visível",
+    "hidden": "Oculto"
+  },
+  "ui": {
+    "done": "Concluído"
+  },
+  "section_titles": {
+    "default_room": "Quarto Padrão",
+    "favorites": "Favoritos",
+    "scenes": "Cenas",
+    "cameras": "Câmeras"
+  },
+  "ui_actions": {
+    "done": "Concluído",
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "home": "Casa",
+    "home_settings": "Configurações da Casa",
+    "reorder_sections": "Reordenar Seções",
+    "choose_wallpaper": "Escolher Papel de Parede"
+  },
+  "wallpaper_presets": {
+    "default": "Padrão",
+    "sunset": "Pôr do Sol",
+    "ocean": "Oceano",
+    "forest": "Floresta",
+    "purple": "Roxo",
+    "fire": "Fogo"
+  },
+  "pages": {
+    "scenes": "Cenas",
+    "cameras": "Câmeras",
+    "default_room": "Quarto Padrão",
+    "my_home": "Minha Casa"
+  },
+  "edit": {
+    "edit_home_view": "Editar Vista Casa",
+    "edit_scenes_view": "Editar Vista Cenas",
+    "edit_cameras_view": "Editar Vista Câmeras",
+    "edit_room_view": "Editar Vista Quarto",
+    "make_tall": "Tornar Alto",
+    "make_normal_size": "Tamanho Normal"
+  },
+  "toggles": {
+    "hide_header": "Ocultar Cabeçalho",
+    "show_header": "Mostrar Cabeçalho",
+    "hide_sidebar": "Ocultar Barra Lateral",
+    "show_sidebar": "Mostrar Barra Lateral"
+  },
+  "battery": {
+    "low_battery": "Bateria Fraca",
+    "low_battery_count": "{count} Bateria Fraca"
+  },
+  "lights": {
+    "all_off": "Todas Desligadas",
+    "on": "Ligado",
+    "all_on": "Todas Ligadas"
+  },
+  "covers": {
+    "all_closed": "Todas Fechadas",
+    "open": "Aberto",
+    "all_open": "Todas Abertas"
+  },
+  "contact": {
+    "contact_sensors": "Sensores de Contato",
+    "all_closed": "Todas Fechadas"
+  },
+  "motion": {
+    "detected": "Detectado",
+    "not_detected": "Não Detectado"
+  },
+  "smoke": {
+    "detected": "Detectado",
+    "not_detected": "Não Detectado"
+  },
+  "occupancy": {
+    "detected": "Detectado",
+    "not_detected": "Não Detectado"
+  },
+  "media": {
+    "playing": "Reproduzindo",
+    "multiple_playing": "Reproduzindo"
+  },
+  "camera": {
+    "no_snapshot_available": "Nenhuma captura disponível"
+  },
+  "errors": {
+    "entity_not_found": "Entidade não encontrada",
+    "error_saving_layout": "Erro ao salvar layout",
+    "customization_manager_not_initialized": "CustomizationManager não inicializado",
+    "invalid_image": "Selecione um arquivo de imagem válido.",
+    "file_size_limit": "O tamanho do arquivo deve ser menor que 5MB.",
+    "image_processing": "Erro ao processar imagem. Tente novamente."
+  },
+  "settings": {
+    "show_switches_description": "Se os interruptores estiverem desativados, você ainda pode incluir interruptores específicos que deseja exibir no painel",
+    "favorite_accessories": "ACESSÓRIOS FAVORITOS",
+    "favorite_accessories_description": "Adicione acessórios para mostrar em uma seção dedicada de Favoritos na tela inicial",
+    "exclude_from_home": "EXCLUIR DA TELA INICIAL",
+    "exclude_from_home_description": "Acessórios que serão ocultados da tela inicial mas visíveis em outras páginas",
+    "exclude_from_dashboard": "EXCLUIR DO PAINEL",
+    "exclude_from_dashboard_description": "Acessórios que serão completamente ocultados de todas as páginas",
+    "show_switches_cards": "Mostrar Cartões de Interruptores",
+    "include_specific_switches": "INCLUIR INTERRUPTORES ESPECÍFICOS",
+    "home_wallpaper": "PAPEL DE PAREDE INICIAL",
+    "take_photo": "Tirar Foto...",
+    "choose_from_existing": "Escolher dos Existentes",
+    "search_accessories": "Procurar acessórios...",
+    "search_switches": "Procurar interruptores...",
+    "hide_ha_header": "Ocultar Cabeçalho Home Assistant",
+    "hide_ha_sidebar": "Ocultar Barra Lateral Home Assistant"
+  },
+  "floating_toggle": {
+    "home": "Início",
+    "automation": "Automação"
+  },
+  "status_messages": {
+    "unavailable": "Indisponível",
+    "loading_automations": "Carregando Automações..."
+  }
+}

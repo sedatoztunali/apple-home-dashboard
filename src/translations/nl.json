@@ -1,0 +1,210 @@
+{
+  "status": {
+    "on": "Aan",
+    "off": "Uit",
+    "open": "Open",
+    "closed": "Gesloten",
+    "locked": "Vergrendeld",
+    "unlocked": "Ontgrendeld",
+    "jammed": "Vast",
+    "unknown": "Uit",
+    "unavailable": "Uit",
+    "idle": "Uit",
+    "heating": "Verwarmen naar",
+    "cooling": "Koelen naar", 
+    "auto": "Auto",
+    "heat_cool": "Auto",
+    "heat": "Verwarmen naar",
+    "cool": "Koelen naar",
+    "dry": "Drogen",
+    "fan_only": "Ventilator",
+    "playing": "Spelen",
+    "paused": "Gepauzeerd",
+    "armed": "Ingeschakeld",
+    "armed_home": "Ingeschakeld thuis",
+    "armed_away": "Ingeschakeld weg",
+    "armed_night": "Ingeschakeld nacht",
+    "armed_vacation": "Ingeschakeld vakantie",
+    "armed_custom_bypass": "Ingeschakeld aangepaste bypass",
+    "triggered": "Geactiveerd",
+    "disarmed": "Uitgeschakeld",
+    "pending": "In behandeling",
+    "arming": "Inschakelen",
+    "disarming": "Uitschakelen"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Open"
+  },
+  "time": {
+    "now": "nu",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "u",
+    "days": "d"
+  },
+  "groups": {
+    "lights": "Verlichting",
+    "climate": "Klimaat",
+    "security": "Beveiliging",
+    "water": "Water",
+    "media": "Speakers & TV's",
+    "other": "Overige"
+  },
+  "chip_status": {
+    "secure": "Beveiligd",
+    "active": "Actief",
+    "tv": "TV",
+    "tvs": "TV's"
+  },
+  "status_section": {
+    "all_locked": "Alles vergrendeld",
+    "all_unlocked": "Alles ontgrendeld",
+    "motion": "Beweging",
+    "locks": "Sloten",
+    "security": "Beveiliging", 
+    "covers": "Covers",
+    "occupancy": "Bezetting",
+    "light": "Licht",
+    "smoke": "Rook",
+    "battery": "Batterij",
+    "doors": "Deuren",
+    "windows": "Ramen",
+    "tvs": "TV's",
+    "speakers": "Luidsprekers",
+    "lights": "Lichten",
+    "switches": "Schakelaars",
+    "outlets": "Stopcontacten",
+    "temperature": "Temperatuur",
+    "humidity": "Vochtigheid"
+  },
+  "section_reorder": {
+    "title": "Secties herordenen",
+    "cancel": "Annuleren",
+    "done": "Klaar",
+    "drag_to_reorder": "Sleep om secties te herordenen",
+    "tap_eye_to_toggle": "Tik op oog om secties te tonen/verbergen",
+    "scenes": "Scènes",
+    "cameras": "Camera's",
+    "visible": "Zichtbaar",
+    "hidden": "Verborgen"
+  },
+  "ui": {
+    "done": "Klaar"
+  },
+  "section_titles": {
+    "default_room": "Standaard Kamer",
+    "favorites": "Favorieten",
+    "scenes": "Scènes",
+    "cameras": "Camera's"
+  },
+  "ui_actions": {
+    "done": "Klaar",
+    "cancel": "Annuleren",
+    "back": "Terug",
+    "home": "Thuis",
+    "home_settings": "Huis Instellingen",
+    "reorder_sections": "Secties Herordenen",
+    "choose_wallpaper": "Achtergrond Kiezen"
+  },
+  "wallpaper_presets": {
+    "default": "Standaard",
+    "sunset": "Zonsondergang",
+    "ocean": "Oceaan",
+    "forest": "Bos",
+    "purple": "Paars",
+    "fire": "Vuur"
+  },
+  "pages": {
+    "scenes": "Scènes",
+    "cameras": "Camera's",
+    "default_room": "Standaard Kamer",
+    "my_home": "Mijn Huis"
+  },
+  "edit": {
+    "edit_home_view": "Bewerk Thuis Weergave",
+    "edit_scenes_view": "Bewerk Scènes Weergave",
+    "edit_cameras_view": "Bewerk Camera's Weergave",
+    "edit_room_view": "Bewerk Kamer Weergave",
+    "make_tall": "Maak Hoog",
+    "make_normal_size": "Normale Grootte"
+  },
+  "toggles": {
+    "hide_header": "Verberg Header",
+    "show_header": "Toon Header",
+    "hide_sidebar": "Verberg Zijbalk",
+    "show_sidebar": "Toon Zijbalk"
+  },
+  "battery": {
+    "low_battery": "Lage Batterij",
+    "low_battery_count": "{count} Lage Batterij"
+  },
+  "lights": {
+    "all_off": "Alle Uit",
+    "on": "Aan",
+    "all_on": "Alle Aan"
+  },
+  "covers": {
+    "all_closed": "Alle Gesloten",
+    "open": "Open",
+    "all_open": "Alle Open"
+  },
+  "contact": {
+    "contact_sensors": "Contact Sensoren",
+    "all_closed": "Alle Gesloten"
+  },
+  "motion": {
+    "detected": "Gedetecteerd",
+    "not_detected": "Niet Gedetecteerd"
+  },
+  "smoke": {
+    "detected": "Gedetecteerd",
+    "not_detected": "Niet Gedetecteerd"
+  },
+  "occupancy": {
+    "detected": "Gedetecteerd",
+    "not_detected": "Niet Gedetecteerd"
+  },
+  "media": {
+    "playing": "Aan Het Spelen",
+    "multiple_playing": "Aan Het Spelen"
+  },
+  "camera": {
+    "no_snapshot_available": "Geen momentopname beschikbaar"
+  },
+  "errors": {
+    "entity_not_found": "Entiteit niet gevonden",
+    "error_saving_layout": "Fout bij opslaan layout",
+    "customization_manager_not_initialized": "CustomizationManager niet geïnitialiseerd",
+    "invalid_image": "Selecteer een geldig afbeeldingsbestand.",
+    "file_size_limit": "Bestandsgrootte moet minder dan 5MB zijn.",
+    "image_processing": "Fout bij verwerken afbeelding. Probeer opnieuw."
+  },
+  "settings": {
+    "show_switches_description": "Als schakelaars uitgeschakeld zijn, kunt u nog steeds specifieke schakelaars toevoegen die u in het dashboard wilt weergeven",
+    "favorite_accessories": "FAVORIETE ACCESSOIRES",
+    "favorite_accessories_description": "Voeg accessoires toe om weer te geven in een speciale Favorieten sectie op het startscherm",
+    "exclude_from_home": "UITSLUITEN VAN STARTSCHERM",
+    "exclude_from_home_description": "Accessoires die verborgen worden op het startscherm maar zichtbaar blijven op andere pagina's",
+    "exclude_from_dashboard": "UITSLUITEN VAN DASHBOARD",
+    "exclude_from_dashboard_description": "Accessoires die volledig verborgen worden op alle pagina's",
+    "show_switches_cards": "Schakelaar Kaarten Weergeven",
+    "include_specific_switches": "SPECIFIEKE SCHAKELAARS TOEVOEGEN",
+    "home_wallpaper": "STARTSCHERM ACHTERGROND",
+    "take_photo": "Foto Maken...",
+    "choose_from_existing": "Kies uit Bestaande",
+    "search_accessories": "Zoek naar accessoires...",
+    "search_switches": "Zoek naar schakelaars...",
+    "hide_ha_header": "Home Assistant Header Verbergen",
+    "hide_ha_sidebar": "Home Assistant Zijbalk Verbergen"
+  },
+  "floating_toggle": {
+    "home": "Thuis",
+    "automation": "Automatisering"
+  },
+  "status_messages": {
+    "unavailable": "Niet beschikbaar",
+    "loading_automations": "Automatiseringen Laden..."
+  }
+}

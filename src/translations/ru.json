@@ -1,0 +1,208 @@
+{
+  "status": {
+    "on": "Включен",
+    "off": "Выключен",
+    "open": "Открыт",
+    "closed": "Закрыт",
+    "locked": "Заблокирован",
+    "unlocked": "Разблокирован",
+    "jammed": "Заклинило",
+    "unknown": "Выключен",
+    "unavailable": "Выключен",
+    "idle": "Выключен",
+    "heating": "Нагрев до",
+    "cooling": "Охлаждение до", 
+    "auto": "Авто",
+    "heat_cool": "Авто",
+    "heat": "Нагрев до",
+    "cool": "Охлаждение до",
+    "dry": "Осушение",
+    "fan_only": "Вентилятор",
+    "playing": "Воспроизведение",
+    "paused": "Пауза",
+    "armed": "Поставлен на охрану",
+    "armed_home": "Охрана дома",
+    "armed_away": "Охрана в отъезде",
+    "armed_night": "Ночная охрана",
+    "armed_vacation": "Охрана в отпуске",
+    "armed_custom_bypass": "Охрана с обходом",
+    "triggered": "Сработала",
+    "disarmed": "Снят с охраны",
+    "pending": "Ожидание",
+    "arming": "Постановка на охрану",
+    "disarming": "Снятие с охраны"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Открыт",
+    "now": "сейчас",
+    "seconds": "с",
+    "minutes": "м",
+    "hours": "ч",
+    "days": "д"
+  },
+  "groups": {
+    "lights": "Освещение",
+    "climate": "Климат",
+    "security": "Безопасность",
+    "water": "Вода",
+    "media": "Колонки и ТВ",
+    "other": "Прочее"
+  },
+  "chip_status": {
+    "secure": "Защищено",
+    "active": "Активно",
+    "tv": "ТВ",
+    "tvs": "ТВ"
+  },
+  "status_section": {
+    "all_locked": "Все заблокировано",
+    "all_unlocked": "Все разблокировано",
+    "motion": "Движение",
+    "locks": "Замки",
+    "security": "Безопасность", 
+    "covers": "Покрытия",
+    "occupancy": "Занятость",
+    "light": "Свет",
+    "smoke": "Дым",
+    "battery": "Батарея",
+    "doors": "Двери",
+    "windows": "Окна",
+    "tvs": "ТВ",
+    "speakers": "Динамики",
+    "lights": "Освещение",
+    "switches": "Выключатели",
+    "outlets": "Розетки",
+    "temperature": "Температура",
+    "humidity": "Влажность"
+  },
+  "section_reorder": {
+    "title": "Перестроить секции",
+    "cancel": "Отмена",
+    "done": "Готово",
+    "drag_to_reorder": "Перетащить для изменения порядка",
+    "tap_eye_to_toggle": "Нажать на глаз для показа/скрытия",
+    "scenes": "Сцены",
+    "cameras": "Камеры",
+    "visible": "Видимый",
+    "hidden": "Скрытый"
+  },
+  "ui": {
+    "done": "Готово"
+  },
+  "section_titles": {
+    "default_room": "Комната по Умолчанию",
+    "favorites": "Избранное",
+    "scenes": "Сцены",
+    "cameras": "Камеры"
+  },
+  "ui_actions": {
+    "done": "Готово",
+    "cancel": "Отмена",
+    "back": "Назад",
+    "home": "Дом",
+    "home_settings": "Настройки Дома",
+    "reorder_sections": "Изменить Порядок Секций",
+    "choose_wallpaper": "Выбрать Обои"
+  },
+  "wallpaper_presets": {
+    "default": "По умолчанию",
+    "sunset": "Закат",
+    "ocean": "Океан",
+    "forest": "Лес",
+    "purple": "Фиолетовый",
+    "fire": "Огонь"
+  },
+  "pages": {
+    "scenes": "Сцены",
+    "cameras": "Камеры",
+    "default_room": "Комната по Умолчанию",
+    "my_home": "Мой Дом"
+  },
+  "edit": {
+    "edit_home_view": "Редактировать Вид Дома",
+    "edit_scenes_view": "Редактировать Вид Сцен",
+    "edit_cameras_view": "Редактировать Вид Камер",
+    "edit_room_view": "Редактировать Вид Комнаты",
+    "make_tall": "Сделать Высоким",
+    "make_normal_size": "Обычный Размер"
+  },
+  "toggles": {
+    "hide_header": "Скрыть Заголовок",
+    "show_header": "Показать Заголовок",
+    "hide_sidebar": "Скрыть Боковую Панель",
+    "show_sidebar": "Показать Боковую Панель"
+  },
+  "battery": {
+    "low_battery": "Низкий Заряд",
+    "low_battery_count": "{count} Низкий Заряд"
+  },
+  "lights": {
+    "all_off": "Все Выключены",
+    "on": "Включено",
+    "all_on": "Все Включены"
+  },
+  "covers": {
+    "all_closed": "Все Закрыты",
+    "open": "Открыто",
+    "all_open": "Все Открыты"
+  },
+  "contact": {
+    "contact_sensors": "Датчики Контакта",
+    "all_closed": "Все Закрыты"
+  },
+  "motion": {
+    "detected": "Обнаружено",
+    "not_detected": "Не Обнаружено"
+  },
+  "smoke": {
+    "detected": "Обнаружено",
+    "not_detected": "Не Обнаружено"
+  },
+  "occupancy": {
+    "detected": "Обнаружено",
+    "not_detected": "Не Обнаружено"
+  },
+  "media": {
+    "playing": "Играет",
+    "multiple_playing": "Играет"
+  },
+  "camera": {
+    "no_snapshot_available": "Снимок недоступен"
+  },
+  "errors": {
+    "entity_not_found": "Сущность не найдена",
+    "error_saving_layout": "Ошибка сохранения макета",
+    "customization_manager_not_initialized": "CustomizationManager не инициализирован",
+    "invalid_image": "Выберите допустимый файл изображения.",
+    "file_size_limit": "Размер файла должен быть менее 5МБ.",
+    "image_processing": "Ошибка обработки изображения. Попробуйте еще раз."
+  },
+  "settings": {
+    "show_switches_description": "Если переключатели отключены, вы все еще можете включить конкретные переключатели, которые хотите отображать в панели",
+    "favorite_accessories": "ИЗБРАННЫЕ АКСЕССУАРЫ",
+    "favorite_accessories_description": "Добавьте аксессуары для отображения в специальном разделе Избранное на главном экране",
+    "exclude_from_home": "ИСКЛЮЧИТЬ С ГЛАВНОГО ЭКРАНА",
+    "exclude_from_home_description": "Аксессуары, которые будут скрыты с главного экрана, но видны на других страницах",
+    "exclude_from_dashboard": "ИСКЛЮЧИТЬ ИЗ ПАНЕЛИ",
+    "exclude_from_dashboard_description": "Аксессуары, которые будут полностью скрыты со всех страниц",
+    "show_switches_cards": "Показать Карточки Переключателей",
+    "include_specific_switches": "ВКЛЮЧИТЬ ОПРЕДЕЛЕННЫЕ ПЕРЕКЛЮЧАТЕЛИ",
+    "home_wallpaper": "ОБОИ ГЛАВНОГО ЭКРАНА",
+    "take_photo": "Сделать Фото...",
+    "choose_from_existing": "Выбрать из Существующих",
+    "search_accessories": "Поиск аксессуаров...",
+    "search_switches": "Поиск переключателей...",
+    "hide_ha_header": "Скрыть заголовок Home Assistant",
+    "hide_ha_sidebar": "Скрыть боковую панель Home Assistant"
+  },
+  "floating_toggle": {
+    "home": "Главная",
+    "automation": "Автоматизация"
+  },
+  "status_messages": {
+    "unavailable": "Недоступно",
+    "loading_automations": "Загрузка Автоматизаций..."
+  }
+}

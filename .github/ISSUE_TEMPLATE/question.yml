@@ -1,0 +1,85 @@
+name: Question
+description: Ask a question about using the Apple Home Dashboard
+title: "[QUESTION] - "
+labels: ["question"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your question!
+        
+        Before asking, please make sure you have:
+        - Read the [README](https://github.com/nitaybz/apple-home-dashboard/blob/main/README.md)
+        - Searched existing issues and discussions
+        - Checked the [Home Assistant Community Forum](https://community.home-assistant.io/)
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm you have done the following
+      options:
+        - label: I have read the README and documentation
+          required: true
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: This is specifically about the Apple Home Dashboard, not general Home Assistant usage
+          required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: Please describe your question in detail
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Please provide context about what you're trying to achieve
+      placeholder: |
+        - What are you trying to do?
+        - What have you already tried?
+        - What specific behavior are you seeing?
+    validations:
+      required: true
+
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant Version
+      description: What version of Home Assistant are you running?
+      placeholder: "2024.7.0"
+    validations:
+      required: false
+
+  - type: input
+    id: dashboard-version
+    attributes:
+      label: Apple Home Dashboard Version
+      description: What version of Apple Home Dashboard are you using?
+      placeholder: "1.0.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant Configuration
+      description: Please provide any relevant configuration (remove sensitive information)
+      placeholder: |
+        strategy:
+          type: custom:apple-home-strategy
+        views: []
+      render: yaml
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any other information that might help us answer your question
+      placeholder: Screenshots, logs, or other relevant details

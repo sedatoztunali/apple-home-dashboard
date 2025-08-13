@@ -1,0 +1,210 @@
+{
+  "status": {
+    "on": "Acceso",
+    "off": "Spento",
+    "open": "Aperto",
+    "closed": "Chiuso",
+    "locked": "Bloccato",
+    "unlocked": "Sbloccato",
+    "jammed": "Inceppato",
+    "unknown": "Spento",
+    "unavailable": "Spento",
+    "idle": "Spento",
+    "heating": "Riscalda a",
+    "cooling": "Raffredda a", 
+    "auto": "Auto",
+    "heat_cool": "Auto",
+    "heat": "Riscalda a",
+    "cool": "Raffredda a",
+    "dry": "Asciuga",
+    "fan_only": "Ventilatore",
+    "playing": "In riproduzione",
+    "paused": "In pausa",
+    "armed": "Armato",
+    "armed_home": "Armato casa",
+    "armed_away": "Armato assente",
+    "armed_night": "Armato notte",
+    "armed_vacation": "Armato vacanza",
+    "armed_custom_bypass": "Armato bypass personalizzato",
+    "triggered": "Attivato",
+    "disarmed": "Disarmato",
+    "pending": "In attesa",
+    "arming": "Armamento",
+    "disarming": "Disarmamento"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Aperto"
+  },
+  "time": {
+    "now": "ora",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "h",
+    "days": "g"
+  },
+  "groups": {
+    "lights": "Luci",
+    "climate": "Clima",
+    "security": "Sicurezza",
+    "water": "Acqua",
+    "media": "Altoparlanti e TV",
+    "other": "Altri"
+  },
+  "chip_status": {
+    "secure": "Sicuro",
+    "active": "Attivo",
+    "tv": "TV",
+    "tvs": "TV"
+  },
+  "status_section": {
+    "all_locked": "Tutto bloccato",
+    "all_unlocked": "Tutto sbloccato",
+    "motion": "Movimento",
+    "locks": "Serrature",
+    "security": "Sicurezza", 
+    "covers": "Coperture",
+    "occupancy": "Occupazione",
+    "light": "Luce",
+    "smoke": "Fumo",
+    "battery": "Batteria",
+    "doors": "Porte",
+    "windows": "Finestre",
+    "tvs": "Televisori",
+    "speakers": "Altoparlanti",
+    "lights": "Luci",
+    "switches": "Interruttori",
+    "outlets": "Prese",
+    "temperature": "Temperatura",
+    "humidity": "Umidità"
+  },
+  "section_reorder": {
+    "title": "Riordina sezioni",
+    "cancel": "Annulla",
+    "done": "Fatto",
+    "drag_to_reorder": "Trascina per riordinare le sezioni",
+    "tap_eye_to_toggle": "Tocca l'occhio per mostrare/nascondere",
+    "scenes": "Scene",
+    "cameras": "Telecamere",
+    "visible": "Visibile",
+    "hidden": "Nascosto"
+  },
+  "ui": {
+    "done": "Fatto"
+  },
+  "section_titles": {
+    "default_room": "Stanza Predefinita",
+    "favorites": "Preferiti",
+    "scenes": "Scene",
+    "cameras": "Telecamere"
+  },
+  "ui_actions": {
+    "done": "Fatto",
+    "cancel": "Annulla",
+    "back": "Indietro",
+    "home": "Casa",
+    "home_settings": "Impostazioni Casa",
+    "reorder_sections": "Riordina Sezioni",
+    "choose_wallpaper": "Scegli Sfondo"
+  },
+  "wallpaper_presets": {
+    "default": "Predefinito",
+    "sunset": "Tramonto",
+    "ocean": "Oceano",
+    "forest": "Foresta",
+    "purple": "Viola",
+    "fire": "Fuoco"
+  },
+  "pages": {
+    "scenes": "Scene",
+    "cameras": "Telecamere",
+    "default_room": "Stanza Predefinita",
+    "my_home": "Casa Mia"
+  },
+  "edit": {
+    "edit_home_view": "Modifica Vista Casa",
+    "edit_scenes_view": "Modifica Vista Scene",
+    "edit_cameras_view": "Modifica Vista Telecamere",
+    "edit_room_view": "Modifica Vista Stanza",
+    "make_tall": "Rendi Alto",
+    "make_normal_size": "Dimensione Normale"
+  },
+  "toggles": {
+    "hide_header": "Nascondi Intestazione",
+    "show_header": "Mostra Intestazione",
+    "hide_sidebar": "Nascondi Barra Laterale",
+    "show_sidebar": "Mostra Barra Laterale"
+  },
+  "battery": {
+    "low_battery": "Batteria Scarica",
+    "low_battery_count": "{count} Batteria Scarica"
+  },
+  "lights": {
+    "all_off": "Tutte Spente",
+    "on": "Acceso",
+    "all_on": "Tutte Accese"
+  },
+  "covers": {
+    "all_closed": "Tutte Chiuse",
+    "open": "Aperto",
+    "all_open": "Tutte Aperte"
+  },
+  "contact": {
+    "contact_sensors": "Sensori di Contatto",
+    "all_closed": "Tutte Chiuse"
+  },
+  "motion": {
+    "detected": "Rilevato",
+    "not_detected": "Non Rilevato"
+  },
+  "smoke": {
+    "detected": "Rilevato",
+    "not_detected": "Non Rilevato"
+  },
+  "occupancy": {
+    "detected": "Rilevato",
+    "not_detected": "Non Rilevato"
+  },
+  "media": {
+    "playing": "In Riproduzione",
+    "multiple_playing": "In Riproduzione"
+  },
+  "camera": {
+    "no_snapshot_available": "Nessuna istantanea disponibile"
+  },
+  "errors": {
+    "entity_not_found": "Entità non trovata",
+    "error_saving_layout": "Errore salvataggio layout",
+    "customization_manager_not_initialized": "CustomizationManager non inizializzato",
+    "invalid_image": "Seleziona un file immagine valido.",
+    "file_size_limit": "La dimensione del file deve essere inferiore a 5MB.",
+    "image_processing": "Errore durante l'elaborazione dell'immagine. Riprova."
+  },
+  "settings": {
+    "show_switches_description": "Se gli interruttori sono disabilitati, puoi comunque includere interruttori specifici che vuoi mostrare nella dashboard",
+    "favorite_accessories": "ACCESSORI PREFERITI",
+    "favorite_accessories_description": "Aggiungi accessori da mostrare in una sezione Preferiti dedicata nella schermata principale",
+    "exclude_from_home": "ESCLUDI DALLA SCHERMATA PRINCIPALE",
+    "exclude_from_home_description": "Accessori che saranno nascosti dalla schermata principale ma visibili in altre pagine",
+    "exclude_from_dashboard": "ESCLUDI DALLA DASHBOARD",
+    "exclude_from_dashboard_description": "Accessori che saranno completamente nascosti da tutte le pagine",
+    "show_switches_cards": "Mostra Schede Interruttori",
+    "include_specific_switches": "INCLUDI INTERRUTTORI SPECIFICI",
+    "home_wallpaper": "SFONDO SCHERMATA PRINCIPALE",
+    "take_photo": "Scatta Foto...",
+    "choose_from_existing": "Scegli tra Esistenti",
+    "search_accessories": "Cerca accessori...",
+    "search_switches": "Cerca interruttori...",
+    "hide_ha_header": "Nascondi Intestazione Home Assistant",
+    "hide_ha_sidebar": "Nascondi Barra Laterale Home Assistant"
+  },
+  "floating_toggle": {
+    "home": "Casa",
+    "automation": "Automazione"
+  },
+  "status_messages": {
+    "unavailable": "Non disponibile",
+    "loading_automations": "Caricamento Automazioni..."
+  }
+}

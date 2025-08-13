@@ -1,0 +1,231 @@
+{
+  "status": {
+    "on": "On",
+    "off": "Off",
+    "open": "Open",
+    "closed": "Closed",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "jammed": "Jammed",
+    "unknown": "Unknown",
+    "unavailable": "Unavailable",
+    "heating": "Heat to",
+    "cooling": "Cool to", 
+    "auto": "Auto",
+    "heat_cool": "Auto",
+    "heat": "Heat to",
+    "cool": "Cool to",
+    "heat_to": "Heat to",
+    "cool_to": "Cool to",
+    "dry": "Dry",
+    "fan_only": "Fan",
+    "playing": "Playing",
+    "paused": "Paused",
+    "buffering": "Buffering",
+    "standby": "Standby",
+    "clear": "Clear",
+    "occupied": "Occupied",
+    "home": "Home",
+    "away": "Away",
+    "cleaning": "Cleaning",
+    "docked": "Docked",
+    "error": "Error",
+    "safe": "Safe",
+    "unsafe": "Unsafe",
+    "running": "Running",
+    "idle": "Idle",
+    "plugged_in": "Plugged In",
+    "unplugged": "Unplugged",
+    "up_to_date": "Up to Date",
+    "update_available": "Update Available",
+    "armed": "Armed",
+    "armed_home": "Armed Home",
+    "armed_away": "Armed Away",
+    "armed_night": "Armed Night",
+    "armed_vacation": "Armed Vacation",
+    "armed_custom_bypass": "Armed Custom Bypass",
+    "triggered": "Triggered",
+    "disarmed": "Disarmed",
+    "pending": "Pending",
+    "arming": "Arming",
+    "disarming": "Disarming",
+    "none": "None"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Open"
+  },
+  "time": {
+    "now": "now",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "h",
+    "days": "d"
+  },
+  "groups": {
+    "lights": "Lights",
+    "climate": "Climate",
+    "security": "Security",
+    "water": "Water",
+    "media": "Speakers & TVs",
+    "other": "Other"
+  },
+  "chip_status": {
+    "secure": "Secure",
+    "active": "Active",
+    "tv": "TV",
+    "tvs": "TVs"
+  },
+  "status_section": {
+    "all_locked": "All Locked",
+    "all_unlocked": "All Unlocked",
+    "motion": "Motion",
+    "locks": "Locks",
+    "security": "Security",
+    "covers": "Covers",
+    "occupancy": "Occupancy",
+    "light": "Light",
+    "light_sensor": "Light",
+    "smoke": "Smoke",
+    "battery": "Battery",
+    "doors": "Doors",
+    "windows": "Windows",
+    "tvs": "TVs",
+    "speakers": "Speakers",
+    "lights": "Lights",
+    "switches": "Switches",
+    "outlets": "Outlets",
+    "temperature": "Temperature",
+    "humidity": "Humidity"
+  },
+  "section_reorder": {
+    "title": "Reorder Sections",
+    "cancel": "Cancel",
+    "done": "Done",
+    "drag_to_reorder": "Drag to reorder sections",
+    "tap_eye_to_toggle": "Tap eye to show/hide sections",
+    "scenes": "Scenes",
+    "cameras": "Cameras",
+    "visible": "Visible",
+    "hidden": "Hidden"
+  },
+  "section_titles": {
+    "default_room": "Default Room",
+    "favorites": "Favorites",
+    "scenes": "Scenes",
+    "cameras": "Cameras"
+  },
+  "ui_actions": {
+    "done": "Done",
+    "cancel": "Cancel",
+    "back": "Back",
+    "home": "Home",
+    "home_settings": "Home Settings",
+    "reorder_sections": "Reorder Sections",
+    "choose_wallpaper": "Choose Wallpaper"
+  },
+  "wallpaper_presets": {
+    "default": "Default",
+    "sunset": "Sunset",
+    "ocean": "Ocean",
+    "forest": "Forest",
+    "purple": "Purple",
+    "fire": "Fire"
+  },
+  "pages": {
+    "scenes": "Scenes",
+    "cameras": "Cameras",
+    "default_room": "Default Room",
+    "my_home": "My Home"
+  },
+  "edit": {
+    "edit_home_view": "Edit Home View",
+    "edit_scenes_view": "Edit Scenes View", 
+    "edit_cameras_view": "Edit Cameras View",
+    "edit_room_view": "Edit Room View",
+    "make_tall": "Make Tall",
+    "make_normal_size": "Make Normal Size"
+  },
+  "toggles": {
+    "hide_header": "Hide Header",
+    "show_header": "Show Header",
+    "hide_sidebar": "Hide Sidebar", 
+    "show_sidebar": "Show Sidebar",
+    "hide_ha_header": "Hide Home Assistant Header",
+    "show_ha_header": "Show Home Assistant Header",
+    "hide_ha_sidebar": "Hide Home Assistant Sidebar",
+    "show_ha_sidebar": "Show Home Assistant Sidebar"
+  },
+  "battery": {
+    "low_battery": "Low Battery",
+    "low_battery_count": "{count} Low Battery"
+  },
+  "lights": {
+    "all_off": "All Off",
+    "on": "On",
+    "all_on": "All On"
+  },
+  "covers": {
+    "all_closed": "All Closed",
+    "open": "Open", 
+    "all_open": "All Open"
+  },
+  "contact": {
+    "contact_sensors": "Contact Sensors",
+    "all_closed": "All Closed"
+  },
+  "motion": {
+    "detected": "Detected",
+    "not_detected": "Not Detected"
+  },
+  "smoke": {
+    "detected": "Detected",
+    "not_detected": "Not Detected"
+  },
+  "occupancy": {
+    "detected": "Detected",
+    "not_detected": "Not Detected"
+  },
+  "media": {
+    "playing": "Playing",
+    "multiple_playing": "Playing"
+  },
+  "camera": {
+    "no_snapshot_available": "No snapshot available"
+  },
+  "errors": {
+    "entity_not_found": "Entity not found",
+    "error_saving_layout": "Error saving layout",
+    "customization_manager_not_initialized": "CustomizationManager not initialized",
+    "invalid_image": "Please select a valid image file.",
+    "file_size_limit": "File size must be less than 5MB.",
+    "image_processing": "Error processing image. Please try again."
+  },
+  "settings": {
+    "show_switches_description": "If switches are disabled, you can still include specific switches that you want to display in the dashboard",
+    "favorite_accessories": "FAVORITE ACCESSORIES",
+    "favorite_accessories_description": "Add accessories to show in a dedicated Favorites section on the home screen",
+    "exclude_from_home": "EXCLUDE FROM HOME SCREEN",
+    "exclude_from_home_description": "Accessories that will be hidden from the home screen but visible on other pages",
+    "exclude_from_dashboard": "EXCLUDE FROM DASHBOARD", 
+    "exclude_from_dashboard_description": "Accessories that will be completely hidden from all pages",
+    "show_switches_cards": "Show Switches Cards",
+    "include_specific_switches": "INCLUDE SPECIFIC SWITCHES",
+    "home_wallpaper": "HOME WALLPAPER",
+    "take_photo": "Take Photo...",
+    "choose_from_existing": "Choose from Existing",
+    "search_accessories": "Search for accessories...",
+    "search_switches": "Search for switches...",
+    "hide_ha_header": "Hide Home Assistant Header",
+    "hide_ha_sidebar": "Hide Home Assistant Sidebar"
+  },
+  "floating_toggle": {
+    "home": "Home",
+    "automation": "Automation"
+  },
+  "status_messages": {
+    "unavailable": "Unavailable",
+    "loading_automations": "Loading Automations..."
+  }
+}

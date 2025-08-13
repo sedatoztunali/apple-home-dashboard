@@ -1,0 +1,223 @@
+{
+  "status": {
+    "on": "Ein",
+    "off": "Aus",
+    "open": "Offen",
+    "closed": "Geschlossen",
+    "locked": "Verriegelt",
+    "unlocked": "Entriegelt",
+    "jammed": "Blockiert",
+    "unknown": "Unbekannt",
+    "unavailable": "Nicht verfügbar",
+    "idle": "Aus",
+    "heating": "Heizen auf",
+    "cooling": "Kühlen auf", 
+    "auto": "Auto",
+    "heat_cool": "Auto",
+    "heat": "Heizen auf",
+    "cool": "Kühlen auf",
+    "dry": "Trocknen",
+    "fan_only": "Lüfter",
+    "playing": "Spielend",
+    "paused": "Pausiert",
+    "buffering": "Puffert",
+    "standby": "Bereit",
+    "clear": "Frei",
+    "occupied": "Belegt",
+    "home": "Zuhause",
+    "away": "Abwesend",
+    "cleaning": "Reinigt",
+    "docked": "Andockstation",
+    "error": "Fehler",
+    "armed": "Scharf",
+    "armed_home": "Scharf Zuhause",
+    "armed_away": "Scharf Abwesend",
+    "armed_night": "Scharf Nacht",
+    "armed_vacation": "Scharf Urlaub",
+    "armed_custom_bypass": "Scharf Benutzerdefinierte Umgehung",
+    "triggered": "Ausgelöst",
+    "disarmed": "Unscharf",
+    "pending": "Ausstehend",
+    "arming": "Scharfstellen",
+    "disarming": "Unscharfstellen",
+    "none": "Keine",
+    "heat_to": "Heizen auf",
+    "cool_to": "Kühlen auf"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Offen"
+  },
+  "time": {
+    "now": "jetzt",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "h",
+    "days": "d"
+  },
+  "groups": {
+    "lights": "Beleuchtung",
+    "climate": "Klima",
+    "security": "Sicherheit",
+    "water": "Wasser",
+    "media": "Lautsprecher & TVs",
+    "other": "Andere"
+  },
+  "chip_status": {
+    "secure": "Sicher",
+    "active": "Aktiv",
+    "tv": "TV",
+    "tvs": "TVs"
+  },
+  "status_section": {
+    "all_locked": "Alle verschlossen",
+    "all_unlocked": "Alle geöffnet",
+    "motion": "Bewegung",
+    "locks": "Schlösser", 
+    "security": "Sicherheit",
+    "covers": "Abdeckungen",
+    "occupancy": "Belegung",
+    "light": "Licht",
+    "light_sensor": "Licht",
+    "smoke": "Rauch",
+    "battery": "Batterie",
+    "doors": "Türen",
+    "windows": "Fenster",
+    "tvs": "Fernseher",
+    "speakers": "Lautsprecher",
+    "lights": "Lichter",
+    "switches": "Schalter",
+    "outlets": "Steckdosen",
+    "temperature": "Temperatur",
+    "humidity": "Feuchtigkeit"
+  },
+  "section_reorder": {
+    "title": "Bereiche neu anordnen",
+    "cancel": "Abbrechen",
+    "done": "Fertig",
+    "drag_to_reorder": "Ziehen zum Neuordnen der Bereiche",
+    "tap_eye_to_toggle": "Auf Auge tippen zum Anzeigen/Verstecken",
+    "scenes": "Szenen",
+    "cameras": "Kameras",
+    "visible": "Sichtbar",
+    "hidden": "Versteckt"
+  },
+  "ui": {
+    "done": "Fertig"
+  },
+  "section_titles": {
+    "default_room": "Standard Raum",
+    "favorites": "Favoriten",
+    "scenes": "Szenen",
+    "cameras": "Kameras"
+  },
+  "ui_actions": {
+    "done": "Fertig",
+    "cancel": "Abbrechen", 
+    "back": "Zurück",
+    "home": "Startseite",
+    "home_settings": "Hauseinstellungen",
+    "reorder_sections": "Bereiche Neu Anordnen",
+    "choose_wallpaper": "Hintergrundbild Wählen"
+  },
+  "wallpaper_presets": {
+    "default": "Standard",
+    "sunset": "Sonnenuntergang",
+    "ocean": "Ozean",
+    "forest": "Wald",
+    "purple": "Lila",
+    "fire": "Feuer"
+  },
+  "pages": {
+    "scenes": "Szenen",
+    "cameras": "Kameras",
+    "default_room": "Standard Raum",
+    "my_home": "Mein Zuhause"
+  },
+  "edit": {
+    "edit_home_view": "Startseite bearbeiten",
+    "edit_scenes_view": "Szenen bearbeiten",
+    "edit_cameras_view": "Kameras bearbeiten", 
+    "edit_room_view": "Raum bearbeiten",
+    "make_tall": "Groß machen",
+    "make_normal_size": "Normale Größe"
+  },
+  "toggles": {
+    "hide_header": "Header ausblenden",
+    "show_header": "Header anzeigen",
+    "hide_sidebar": "Seitenleiste ausblenden",
+    "show_sidebar": "Seitenleiste anzeigen"
+  },
+  "battery": {
+    "low_battery": "Schwache Batterie",
+    "low_battery_count": "{count} Schwache Batterie"
+  },
+  "lights": {
+    "all_off": "Alle Aus",
+    "on": "An",
+    "all_on": "Alle An"
+  },
+  "covers": {
+    "all_closed": "Alle Geschlossen",
+    "open": "Offen",
+    "all_open": "Alle Offen"
+  },
+  "contact": {
+    "contact_sensors": "Kontaktsensoren",
+    "all_closed": "Alle Geschlossen"
+  },
+  "motion": {
+    "detected": "Erkannt",
+    "not_detected": "Nicht Erkannt"
+  },
+  "smoke": {
+    "detected": "Erkannt",
+    "not_detected": "Nicht Erkannt"
+  },
+  "occupancy": {
+    "detected": "Erkannt",
+    "not_detected": "Nicht Erkannt"
+  },
+  "media": {
+    "playing": "Wiedergabe",
+    "multiple_playing": "Wiedergabe"
+  },
+  "camera": {
+    "no_snapshot_available": "Keine Momentaufnahme verfügbar"
+  },
+  "errors": {
+    "entity_not_found": "Entität nicht gefunden",
+    "error_saving_layout": "Fehler beim Speichern des Layouts",
+    "customization_manager_not_initialized": "CustomizationManager nicht initialisiert",
+    "invalid_image": "Bitte wählen Sie eine gültige Bilddatei aus.",
+    "file_size_limit": "Dateigröße muss weniger als 5MB betragen.",
+    "image_processing": "Fehler beim Verarbeiten des Bildes. Bitte versuchen Sie es erneut."
+  },
+  "settings": {
+    "show_switches_description": "Wenn Schalter deaktiviert sind, können Sie dennoch bestimmte Schalter einschließen, die im Dashboard angezeigt werden sollen",
+    "favorite_accessories": "LIEBLINGSZUBEHÖR",
+    "favorite_accessories_description": "Zubehör hinzufügen, das in einem eigenen Favoriten-Bereich auf dem Startbildschirm angezeigt wird",
+    "exclude_from_home": "VOM STARTBILDSCHIRM AUSSCHLIESSEN",
+    "exclude_from_home_description": "Zubehör, das vom Startbildschirm ausgeblendet, aber auf anderen Seiten sichtbar ist",
+    "exclude_from_dashboard": "VOM DASHBOARD AUSSCHLIESSEN",
+    "exclude_from_dashboard_description": "Zubehör, das vollständig von allen Seiten ausgeblendet wird",
+    "show_switches_cards": "Schalter-Karten anzeigen",
+    "include_specific_switches": "BESTIMMTE SCHALTER EINSCHLIESSEN",
+    "home_wallpaper": "STARTBILDSCHIRM-HINTERGRUNDBILD",
+    "take_photo": "Foto aufnehmen...",
+    "choose_from_existing": "Aus Vorhandenen auswählen",
+    "search_accessories": "Nach Zubehör suchen...",
+    "search_switches": "Nach Schaltern suchen...",
+    "hide_ha_header": "Home Assistant Header Verbergen",
+    "hide_ha_sidebar": "Home Assistant Seitenleiste Verbergen"
+  },
+  "floating_toggle": {
+    "home": "Startseite",
+    "automation": "Automatisierung"
+  },
+  "status_messages": {
+    "unavailable": "Nicht verfügbar",
+    "loading_automations": "Automatisierungen werden geladen..."
+  }
+}

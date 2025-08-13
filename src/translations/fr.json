@@ -1,0 +1,222 @@
+{
+  "status": {
+    "on": "Marche",
+    "off": "Arrêt",
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "locked": "Verrouillé",
+    "unlocked": "Déverrouillé",
+    "jammed": "Bloqué",
+    "unknown": "Inconnu",
+    "unavailable": "Indisponible",
+    "idle": "Arrêt",
+    "heating": "Chauffer à",
+    "cooling": "Refroidir à", 
+    "auto": "Auto",
+    "heat_cool": "Auto",
+    "heat": "Chauffer à",
+    "cool": "Refroidir à",
+    "dry": "Sécher",
+    "fan_only": "Ventilateur",
+    "playing": "En lecture",
+    "paused": "En pause",
+    "buffering": "En mémoire tampon",
+    "standby": "En veille",
+    "clear": "Libre",
+    "occupied": "Occupé",
+    "home": "À la maison",
+    "away": "Absent",
+    "cleaning": "Nettoyage",
+    "docked": "À la base",
+    "error": "Erreur",
+    "armed": "Armé",
+    "armed_home": "Armé maison",
+    "armed_away": "Armé absent",
+    "armed_night": "Armé nuit",
+    "armed_vacation": "Armé vacances",
+    "armed_custom_bypass": "Armé contournement personnalisé",
+    "triggered": "Déclenché",
+    "disarmed": "Désarmé",
+    "pending": "En attente",
+    "arming": "Armement",
+    "disarming": "Désarmement",
+    "none": "Aucun",
+    "heat_to": "Chauffer à",
+    "cool_to": "Refroidir à"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Ouvert"
+  },
+  "time": {
+    "now": "maintenant",
+    "seconds": "s",
+    "minutes": "m",
+    "hours": "h",
+    "days": "j"
+  },
+  "groups": {
+    "lights": "Éclairage",
+    "climate": "Climat",
+    "security": "Sécurité",
+    "water": "Eau",
+    "media": "Haut-parleurs et TVs",
+    "other": "Autres"
+  },
+  "chip_status": {
+    "secure": "Sécurisé",
+    "active": "Actif",
+    "tv": "TV",
+    "tvs": "TVs"
+  },
+  "status_section": {
+    "all_locked": "Tout verrouillé",
+    "all_unlocked": "Tout déverrouillé",
+    "motion": "Mouvement",
+    "locks": "Serrures",
+    "security": "Sécurité", 
+    "covers": "Volets",
+    "occupancy": "Occupation",
+    "light": "Lumière",
+    "smoke": "Fumée",
+    "battery": "Batterie",
+    "doors": "Portes",
+    "windows": "Fenêtres",
+    "tvs": "Téléviseurs",
+    "speakers": "Haut-parleurs",
+    "lights": "Lumières",
+    "switches": "Interrupteurs",
+    "outlets": "Prises",
+    "temperature": "Température",
+    "humidity": "Humidité"
+  },
+  "section_reorder": {
+    "title": "Réorganiser les sections",
+    "cancel": "Annuler",
+    "done": "Terminé",
+    "drag_to_reorder": "Glisser pour réorganiser les sections",
+    "tap_eye_to_toggle": "Appuyer sur l'œil pour afficher/masquer",
+    "scenes": "Scènes",
+    "cameras": "Caméras",
+    "visible": "Visible",
+    "hidden": "Masqué"
+  },
+  "ui": {
+    "done": "Terminé"
+  },
+  "section_titles": {
+    "default_room": "Pièce par Défaut",
+    "favorites": "Favoris",
+    "scenes": "Scènes",
+    "cameras": "Caméras"
+  },
+  "ui_actions": {
+    "done": "Terminé",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "home": "Accueil",
+    "home_settings": "Paramètres de la Maison",
+    "reorder_sections": "Réorganiser les Sections",
+    "choose_wallpaper": "Choisir le Fond d'Écran"
+  },
+  "wallpaper_presets": {
+    "default": "Défaut",
+    "sunset": "Coucher de Soleil",
+    "ocean": "Océan",
+    "forest": "Forêt",
+    "purple": "Violet",
+    "fire": "Feu"
+  },
+  "pages": {
+    "scenes": "Scènes",
+    "cameras": "Caméras",
+    "default_room": "Pièce par Défaut",
+    "my_home": "Ma Maison"
+  },
+  "edit": {
+    "edit_home_view": "Modifier Vue Accueil",
+    "edit_scenes_view": "Modifier Vue Scènes",
+    "edit_cameras_view": "Modifier Vue Caméras",
+    "edit_room_view": "Modifier Vue Pièce",
+    "make_tall": "Rendre Haute",
+    "make_normal_size": "Taille Normale"
+  },
+  "toggles": {
+    "hide_header": "Masquer En-tête",
+    "show_header": "Afficher En-tête",
+    "hide_sidebar": "Masquer Barre Latérale",
+    "show_sidebar": "Afficher Barre Latérale"
+  },
+  "battery": {
+    "low_battery": "Batterie Faible",
+    "low_battery_count": "{count} Batterie Faible"
+  },
+  "lights": {
+    "all_off": "Toutes Éteintes",
+    "on": "Allumé",
+    "all_on": "Toutes Allumées"
+  },
+  "covers": {
+    "all_closed": "Toutes Fermées",
+    "open": "Ouvert",
+    "all_open": "Toutes Ouvertes"
+  },
+  "contact": {
+    "contact_sensors": "Capteurs de Contact",
+    "all_closed": "Toutes Fermées"
+  },
+  "motion": {
+    "detected": "Détecté",
+    "not_detected": "Non Détecté"
+  },
+  "smoke": {
+    "detected": "Détecté",
+    "not_detected": "Non Détecté"
+  },
+  "occupancy": {
+    "detected": "Détecté",
+    "not_detected": "Non Détecté"
+  },
+  "media": {
+    "playing": "En Lecture",
+    "multiple_playing": "En Lecture"
+  },
+  "camera": {
+    "no_snapshot_available": "Aucun instantané disponible"
+  },
+  "errors": {
+    "entity_not_found": "Entité non trouvée",
+    "error_saving_layout": "Erreur sauvegarde mise en page",
+    "customization_manager_not_initialized": "CustomizationManager non initialisé",
+    "invalid_image": "Veuillez sélectionner un fichier image valide.",
+    "file_size_limit": "La taille du fichier doit être inférieure à 5Mo.",
+    "image_processing": "Erreur lors du traitement de l'image. Veuillez réessayer."
+  },
+  "settings": {
+    "show_switches_description": "Si les commutateurs sont désactivés, vous pouvez toujours inclure des commutateurs spécifiques que vous souhaitez afficher dans le tableau de bord",
+    "favorite_accessories": "ACCESSOIRES FAVORIS",
+    "favorite_accessories_description": "Ajouter des accessoires à afficher dans une section Favoris dédiée sur l'écran d'accueil",
+    "exclude_from_home": "EXCLURE DE L'ÉCRAN D'ACCUEIL",
+    "exclude_from_home_description": "Accessoires qui seront masqués de l'écran d'accueil mais visibles sur d'autres pages",
+    "exclude_from_dashboard": "EXCLURE DU TABLEAU DE BORD",
+    "exclude_from_dashboard_description": "Accessoires qui seront complètement masqués de toutes les pages",
+    "show_switches_cards": "Afficher les Cartes de Commutateurs",
+    "include_specific_switches": "INCLURE DES COMMUTATEURS SPÉCIFIQUES",
+    "home_wallpaper": "FOND D'ÉCRAN D'ACCUEIL",
+    "take_photo": "Prendre une Photo...",
+    "choose_from_existing": "Choisir parmi les Existants",
+    "search_accessories": "Rechercher des accessoires...",
+    "search_switches": "Rechercher des commutateurs...",
+    "hide_ha_header": "Masquer l'En-tête Home Assistant",
+    "hide_ha_sidebar": "Masquer la Barre Latérale Home Assistant"
+  },
+  "floating_toggle": {
+    "home": "Accueil",
+    "automation": "Automatisation"
+  },
+  "status_messages": {
+    "unavailable": "Indisponible",
+    "loading_automations": "Chargement des Automatisations..."
+  }
+}

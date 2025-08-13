@@ -1,0 +1,72 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  check-for-changes:
+    name: Check for changes
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check_files.outputs.any_changed }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changed documentation files
+        id: check_files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            docs/**
+            mkdocs.yml
+
+  deploy:
+    name: Deploy MkDocs Site
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: check-for-changes
+    if: needs.check-for-changes.outputs.changed == 'true'
+    env:
+      CI_COMMIT_AUTHOR: 'CI Bot'
+      CI_COMMIT_EMAIL: 'ci@noreply.github.com'
+      CI_COMMIT_MESSAGE: 'Continuous Integration - Deploy Documentation'
+
+    steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install MkDocs and dependencies
+        run: pip install mkdocs mkdocs-material pymdown-extensions
+
+      - name: Deploy Docs to GitHub Pages
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
+          git remote set-url origin https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/nitaybz/apple-home-dashboard.git
+          mkdocs gh-deploy --force --clean --message "${{ env.CI_COMMIT_MESSAGE }}"
