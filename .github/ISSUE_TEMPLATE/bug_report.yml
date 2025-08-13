@@ -9,7 +9,7 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
         
-        Please make sure you have read the [README](https://github.com/your-username/apple-home-dashboard/blob/main/README.md) and checked existing issues before submitting a new bug report.
+        Please make sure you have read the [README](https://github.com/nitaybz/apple-home-dashboard/blob/main/README.md) and checked existing issues before submitting a new bug report.
 
   - type: checkboxes
     id: prerequisites

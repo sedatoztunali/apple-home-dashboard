@@ -36,3 +36,4 @@ pids/
 
 deploy.sh
 *.code-workspace
+CHANGELOG.md
