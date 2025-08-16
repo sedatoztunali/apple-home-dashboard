@@ -24,27 +24,13 @@ export class AutomationPage extends HTMLElement {
     return this._hass;
   }
 
-  // Initialize the automation iframe once and keep it hidden
+    // Initialize the automation iframe once and keep it hidden
   async initialize(parentContainer: HTMLElement) {
     if (this.isInitialized || !this._hass) return;
 
     // Create the container and append to parent container for proper positioning
     this.container = document.createElement('div');
     this.container.className = 'automation-container';
-    this.container.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      height: 100vh;
-      background: transparent;
-      overflow: hidden;
-      visibility: hidden;
-      opacity: 0;
-      transition: visibility 0ms, opacity 300ms ease-in-out;
-      z-index: 5;
-    `;
 
     // Create the iframe
     this.iframe = document.createElement('iframe');
@@ -100,6 +86,34 @@ export class AutomationPage extends HTMLElement {
 
     this.container.appendChild(loadingContainer);
     this.container.appendChild(this.iframe);
+    
+    // Create style element for the container and add it to parent
+    const containerStyle = document.createElement('style');
+    containerStyle.textContent = `
+      .automation-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100vh;
+        background: transparent;
+        overflow: hidden;
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0ms, opacity 300ms ease-in-out;
+        z-index: 5;
+      }
+      
+      @media (max-width: 768px) {
+        .automation-container {
+          height: calc(100vh - 80px);
+          padding-bottom: 80px;
+          background: #000;
+        }
+      }
+    `;
+    parentContainer.appendChild(containerStyle);
     parentContainer.appendChild(this.container);
 
     // Load the automation page
@@ -225,99 +239,6 @@ export class AutomationPage extends HTMLElement {
                 }));
               }
               
-              // Try multiple approaches to find and hide the header
-              let headerHidden = false;
-              
-              // Approach 1: Try the dashboard path (ha-panel-lovelace -> hui-root)
-              const haDrawer = main?.shadowRoot?.querySelector('ha-drawer');
-              const haPanelLovelace = haDrawer?.querySelector('ha-panel-lovelace');
-              const huiRoot = haPanelLovelace?.shadowRoot?.querySelector('hui-root');
-              
-              if (huiRoot?.shadowRoot) {
-                const headerEl = huiRoot.shadowRoot.querySelector(".header");
-                if (headerEl) {
-                  headerEl.style.display = "none";
-                  huiRoot.style.setProperty("--mdc-top-app-bar-height", "0px");
-                  huiRoot.style.setProperty("--header-height", "0px");
-                  
-                  const viewElement = huiRoot.shadowRoot.querySelector("#view");
-                  if (viewElement) {
-                    viewElement.style.setProperty("padding-top", "0px");
-                  }
-                  
-                  huiRoot.dispatchEvent(new Event("iron-resize", { bubbles: true, composed: true }));
-                  headerHidden = true;
-                }
-              }
-              
-              // Approach 2: Try config page path (ha-panel-config)
-              if (!headerHidden) {
-                const haPanelConfig = haDrawer?.querySelector('ha-panel-config');
-                
-                if (haPanelConfig) {
-                  // Look for headers in config pages
-                  const configHeaders = [
-                    haPanelConfig.querySelector('app-header'),
-                    haPanelConfig.querySelector('.header'),
-                    haPanelConfig.querySelector('header'),
-                    haPanelConfig.querySelector('mwc-top-app-bar'),
-                    haPanelConfig.querySelector('ha-top-app-bar-fixed')
-                  ].filter(Boolean);
-                  
-                  configHeaders.forEach((header, index) => {
-                    header.style.display = "none";
-                    headerHidden = true;
-                  });
-                }
-              }
-              
-              // Approach 3: Direct search for common header elements
-              if (!headerHidden) {
-                const directHeaders = [
-                  document.querySelector('app-header'),
-                  document.querySelector('.header'),
-                  document.querySelector('header'),
-                  document.querySelector('[role="banner"]'),
-                  document.querySelector('mwc-top-app-bar'),
-                  document.querySelector('ha-top-app-bar-fixed')
-                ].filter(Boolean);
-                
-                directHeaders.forEach((header, index) => {
-                  header.style.display = "none";
-                  headerHidden = true;
-                });
-              }
-              
-              // Approach 4: Deep search using deepQuery
-              if (!headerHidden) {
-                const deepHeader = deepQuery(ha, "app-header") ||
-                                 deepQuery(ha, ".header") ||
-                                 deepQuery(ha, "mwc-top-app-bar") ||
-                                 deepQuery(ha, "ha-top-app-bar-fixed");
-                
-                if (deepHeader) {
-                  deepHeader.style.display = "none";
-                  headerHidden = true;
-                }
-              }
-                
-              // Hide mobile bottom tabbar (to prevent collision with our floating toggle)
-              const tabbarSelectors = ["#tabbar", "paper-tabs", "app-toolbar[slot='bottom']"];
-              for (const selector of tabbarSelectors) {
-                const tabbar = document.querySelector(selector);
-                if (tabbar) {
-                  tabbar.style.display = "none";
-                }
-              }
-              
-              // Additional deep query for mobile tabbar
-              const mobileTabbar = deepQuery(ha, "#tabbar") || 
-                                 deepQuery(ha, "paper-tabs") ||
-                                 deepQuery(ha, "[slot='bottom']");
-              if (mobileTabbar) {
-                mobileTabbar.style.display = "none";
-              }
-              
               // Setup back button override
               setupBackButtonOverride();
               
@@ -344,36 +265,56 @@ export class AutomationPage extends HTMLElement {
           // Back button override functionality
           function setupBackButtonOverride() {
             
-            // Helper to check if we're on the main automation picker page (not a specific automation)
-            const isOnMainAutomationPage = () => {
-              // Method 1: Check URL pattern
+            // Helper to check if we're on a main config picker page (not editing a specific item)
+            const isOnMainConfigPage = () => {
               const currentUrl = window.location.href;
-              const isEditingAutomation = currentUrl.includes('/config/automation/edit/') || 
-                                        currentUrl.includes('/config/automation/new') ||
-                                        currentUrl.includes('/config/automation/trace/');
               
-              // If we're explicitly in edit/new/trace mode, we're NOT on main page
-              if (isEditingAutomation) {
+              // Check if we're editing a specific item (automation, scene, script, or blueprint)
+              const isEditingSpecificItem = currentUrl.includes('/edit/') || 
+                                          currentUrl.includes('/new') ||
+                                          currentUrl.includes('/trace/') ||
+                                          currentUrl.includes('/show/') ||
+                                          currentUrl.includes('/duplicate/');
+              
+              // If we're explicitly in edit/new/trace/show mode, we're NOT on main page
+              if (isEditingSpecificItem) {
                 return false;
               }
               
-              // Method 2: Check for automation picker element
-              const automationPicker = document.querySelector('ha-automation-picker');
-              if (automationPicker) {
-                const style = window.getComputedStyle(automationPicker);
-                const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
-                return isVisible;
+              // Check for main config picker elements (visible ones indicate we're on main page)
+              const pickerElements = [
+                'ha-automation-picker',
+                'ha-scene-dashboard', 
+                'ha-script-picker',
+                'ha-blueprint-overview'
+              ];
+              
+              for (const pickerTag of pickerElements) {
+                const picker = document.querySelector(pickerTag);
+                if (picker) {
+                  const style = window.getComputedStyle(picker);
+                  const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+                  if (isVisible) {
+                    return true;
+                  }
+                }
               }
               
-              // Method 3: Check for automation editor elements (if these exist, we're NOT on main page)
-              const automationEditor = document.querySelector('ha-automation-editor') || 
-                                     document.querySelector('ha-config-automation') ||
-                                     document.querySelector('[data-panel="automation-edit"]');
-              if (automationEditor) {
+              // Check for editor elements (if these exist, we're NOT on main page)
+              const editorElements = [
+                'ha-automation-editor',
+                'ha-scene-editor',
+                'ha-script-editor',
+                'ha-blueprint-editor',
+                '[data-panel*="edit"]'
+              ];
+              
+              const foundEditor = editorElements.some(selector => document.querySelector(selector));
+              if (foundEditor) {
                 return false;
               }
               
-              // Method 4: Default to main page if we can't determine otherwise
+              // Default to main page if we can't determine otherwise
               return true;
             };
             
@@ -384,9 +325,9 @@ export class AutomationPage extends HTMLElement {
               }
               
               const listener = (ev) => {
-                // Only override if we're on the main automation page
-                if (!isOnMainAutomationPage()) {
-                  // Let the normal back navigation work for specific automation pages
+                // Only override if we're on the main config page
+                if (!isOnMainConfigPage()) {
+                  // Let the normal back navigation work for specific item pages
                   return;
                 }
                 
@@ -425,7 +366,7 @@ export class AutomationPage extends HTMLElement {
               '[icon="mdi:arrow-left-thick"]'
             ];
             
-            // Function to patch ALL back buttons (we'll check isOnMainAutomationPage in the listener)
+            // Function to patch ALL back buttons (we'll check isOnMainConfigPage in the listener)
             const patchAllBackButtons = () => {
               let patchedCount = 0;
               
@@ -449,19 +390,22 @@ export class AutomationPage extends HTMLElement {
                 }
               });
               
-              // Specifically check ha-automation-picker shadow DOM
-              const automationPicker = document.querySelector('ha-automation-picker');
-              if (automationPicker?.shadowRoot) {
-                backButtonSelectors.forEach(selector => {
-                  const pickerButtons = automationPicker.shadowRoot.querySelectorAll(selector);
-                  pickerButtons.forEach((btn) => {
-                    if (!btn.__backOverrideApplied) {
-                      patchBackButton(btn);
-                      patchedCount++;
-                    }
+              // Specifically check all config picker shadow DOMs
+              const pickerSelectors = ['ha-automation-picker', 'ha-scene-dashboard', 'ha-script-picker', 'ha-blueprint-overview'];
+              pickerSelectors.forEach(pickerTag => {
+                const picker = document.querySelector(pickerTag);
+                if (picker?.shadowRoot) {
+                  backButtonSelectors.forEach(selector => {
+                    const pickerButtons = picker.shadowRoot.querySelectorAll(selector);
+                    pickerButtons.forEach((btn) => {
+                      if (!btn.__backOverrideApplied) {
+                        patchBackButton(btn);
+                        patchedCount++;
+                      }
+                    });
                   });
-                });
-              }
+                }
+              });
               
               return patchedCount;
             };
@@ -489,8 +433,9 @@ export class AutomationPage extends HTMLElement {
                         });
                       }
                       
-                      // If this is ha-automation-picker, check its shadow DOM too
-                      if (node.tagName === 'HA-AUTOMATION-PICKER' && node.shadowRoot) {
+                      // If this is any config picker element, check its shadow DOM too
+                      const pickerTags = ['HA-AUTOMATION-PICKER', 'HA-SCENE-DASHBOARD', 'HA-SCRIPT-PICKER', 'HA-BLUEPRINT-OVERVIEW'];
+                      if (pickerTags.includes(node.tagName) && node.shadowRoot) {
                         node.shadowRoot.querySelectorAll(selector).forEach((btn) => {
                           if (!btn.__backOverrideApplied) {
                             patchBackButton(btn);
@@ -504,6 +449,21 @@ export class AutomationPage extends HTMLElement {
             });
             
             observer.observe(document.body, { childList: true, subtree: true });
+            
+            // IMPORTANT: Watch for URL changes to catch tab switches (Home Assistant config tabs use URL changes)
+            let lastUrl = window.location.href;
+            const checkForUrlChanges = () => {
+              if (window.location.href !== lastUrl) {
+                lastUrl = window.location.href;
+                // Re-patch buttons after URL change (tab switch)
+                setTimeout(() => {
+                  patchAllBackButtons();
+                }, 300);
+              }
+            };
+            
+            // Check for URL changes every 500ms to catch tab switches
+            setInterval(checkForUrlChanges, 500);
             
             // Also try to find back buttons after delays - automation picker might load later
             const delayedPatch = (delay, attempt) => {
@@ -572,100 +532,6 @@ export class AutomationPage extends HTMLElement {
                     bubbles: true,
                     composed: true,
                   }));
-                }
-                
-                // Try multiple approaches to find and hide the header (same as direct injection)
-                let headerHidden = false;
-                
-                // Approach 1: Try the dashboard path (ha-panel-lovelace -> hui-root)
-                const haDrawer = main?.shadowRoot?.querySelector('ha-drawer');
-                const haPanelLovelace = haDrawer?.querySelector('ha-panel-lovelace');
-                const huiRoot = haPanelLovelace?.shadowRoot?.querySelector('hui-root');
-                
-                if (huiRoot?.shadowRoot) {
-                  const headerEl = huiRoot.shadowRoot.querySelector(".header");
-                  if (headerEl) {
-                    headerEl.style.display = "none";
-                    huiRoot.style.setProperty("--mdc-top-app-bar-height", "0px");
-                    huiRoot.style.setProperty("--header-height", "0px");
-                    
-                    const viewElement = huiRoot.shadowRoot.querySelector("#view");
-                    if (viewElement) {
-                      viewElement.style.setProperty("padding-top", "0px");
-                    }
-                    
-                    huiRoot.dispatchEvent(new Event("iron-resize", { bubbles: true, composed: true }));
-                    headerHidden = true;
-                  }
-                }
-                
-                // Approach 2: Try config page path (ha-panel-config)
-                if (!headerHidden) {
-                  const haPanelConfig = haDrawer?.querySelector('ha-panel-config');
-                  
-                  if (haPanelConfig) {
-                    const configHeaders = [
-                      haPanelConfig.querySelector('app-header'),
-                      haPanelConfig.querySelector('.header'),
-                      haPanelConfig.querySelector('header'),
-                      haPanelConfig.querySelector('mwc-top-app-bar'),
-                      haPanelConfig.querySelector('ha-top-app-bar-fixed')
-                    ].filter(Boolean);
-                    
-                    configHeaders.forEach((header, index) => {
-                      header.style.display = "none";
-                      headerHidden = true;
-                    });
-                  }
-                }
-                
-                // Approach 3: Direct search for common header elements
-                if (!headerHidden) {
-                  const directHeaders = [
-                    document.querySelector('app-header'),
-                    document.querySelector('.header'),
-                    document.querySelector('header'),
-                    document.querySelector('[role="banner"]'),
-                    document.querySelector('mwc-top-app-bar'),
-                    document.querySelector('ha-top-app-bar-fixed')
-                  ].filter(Boolean);
-                  
-                  directHeaders.forEach((header, index) => {
-                    header.style.display = "none";
-                    headerHidden = true;
-                  });
-                }
-                
-                // Approach 4: Deep search using deepQuery
-                if (!headerHidden) {
-                  const deepHeader = deepQuery(ha, "app-header") ||
-                                   deepQuery(ha, ".header") ||
-                                   deepQuery(ha, "mwc-top-app-bar") ||
-                                   deepQuery(ha, "ha-top-app-bar-fixed");
-                  
-                  if (deepHeader) {
-                    deepHeader.style.display = "none";
-                    headerHidden = true;
-                  }
-                }
-                
-                if (!headerHidden) {
-                }
-                
-                // Hide mobile bottom tabbar
-                const tabbarSelectors = ["#tabbar", "paper-tabs", "app-toolbar[slot='bottom']"];
-                for (const selector of tabbarSelectors) {
-                  const tabbar = document.querySelector(selector);
-                  if (tabbar) {
-                    tabbar.style.display = "none";
-                  }
-                }
-                
-                const mobileTabbar = deepQuery(ha, "#tabbar") || 
-                                   deepQuery(ha, "paper-tabs") ||
-                                   deepQuery(ha, "[slot='bottom']");
-                if (mobileTabbar) {
-                  mobileTabbar.style.display = "none";
                 }
                 
                 // Setup back button override
