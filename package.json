@@ -1,6 +1,6 @@
 {
   "name": "apple-home-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Apple Home-inspired dashboard strategy for Home Assistant",
   "main": "apple-home-dashboard.js",
   "scripts": {
@@ -21,7 +21,10 @@
   ],
   "author": "Apple Home Dashboard Team",
   "contributors": [
-    { "name": "NitayBZ", "url": "https://github.com/nitaybz" }
+    {
+      "name": "NitayBZ",
+      "url": "https://github.com/nitaybz"
+    }
   ],
   "funding": {
     "type": "github",
