@@ -663,6 +663,11 @@ export class CustomizationManager {
     return uiSettings.hide_sidebar === true;
   }
 
+  isAutomationToggleHidden(): boolean {
+    const uiSettings = this.getUISettings();
+    return uiSettings.hide_automation_toggle === true;
+  }
+
   async setHeaderVisibility(hidden: boolean): Promise<void> {
     await this.ensureCustomizationsLoaded();
     const uiSettings = this.getUISettings();

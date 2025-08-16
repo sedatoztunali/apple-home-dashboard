@@ -202,7 +202,9 @@
     "search_accessories": "Buscar accesorios...",
     "search_switches": "Buscar interruptores...",
     "hide_ha_header": "Ocultar Encabezado de Home Assistant",
-    "hide_ha_sidebar": "Ocultar Barra Lateral de Home Assistant"
+    "hide_ha_sidebar": "Ocultar Barra Lateral de Home Assistant",
+    "hide_automation_toggle": "Ocultar Toggle de Página de Automatización",
+    "hide_automation_toggle_description": "Oculta el toggle flotante y deshabilita el acceso a la página de automatización. Esto eliminará tanto el botón toggle como impedirá la creación del iframe de automatización."
   },
   "floating_toggle": {
     "home": "Inicio",

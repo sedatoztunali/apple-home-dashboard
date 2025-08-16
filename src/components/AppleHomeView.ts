@@ -1699,6 +1699,9 @@ export class AppleHomeView extends HTMLElement {
         customizations: freshCustomizations
       };
       
+      // Update floating toggle visibility based on current settings
+      this.updateFloatingToggleVisibility();
+      
       // Direct render - renderPage will handle double render protection
       this._rendered = false;
       await this.renderPage('refreshCallback');
@@ -1712,9 +1715,36 @@ export class AppleHomeView extends HTMLElement {
   }
 
   /**
+   * Update floating toggle visibility based on current settings
+   */
+  private updateFloatingToggleVisibility() {
+    const shouldHide = this.customizationManager.isAutomationToggleHidden();
+    
+    if (shouldHide) {
+      // Hide and clean up the floating toggle
+      this.cleanupFloatingToggle();
+      
+      // If currently in automation mode, switch back to home
+      if (this.currentMode === 'automation') {
+        this.switchToHome();
+      }
+    } else {
+      // Show the floating toggle if it doesn't exist
+      if (!AppleHomeView.globalFloatingToggle) {
+        this.initializeFloatingToggle();
+      }
+    }
+  }
+
+  /**
    * Initialize the floating toggle component
    */
   private initializeFloatingToggle() {
+    // Check if automation toggle should be hidden
+    if (this.customizationManager.isAutomationToggleHidden()) {
+      return; // Don't create the floating toggle if it's hidden
+    }
+
     // Set this instance as the active one
     AppleHomeView.activeViewInstance = this;
     
@@ -1850,6 +1880,11 @@ export class AppleHomeView extends HTMLElement {
    * Switch to automation mode
    */
   private async switchToAutomation() {
+    // Check if automation toggle is hidden
+    if (this.customizationManager.isAutomationToggleHidden()) {
+      return; // Don't allow switching to automation if toggle is hidden
+    }
+
     if (this.currentMode === 'automation') return;
     
     this.currentMode = 'automation';
@@ -1863,6 +1898,11 @@ export class AppleHomeView extends HTMLElement {
    * Render the automation page
    */
   private async renderAutomationPage() {
+    // Check if automation toggle is hidden
+    if (this.customizationManager.isAutomationToggleHidden()) {
+      return; // Don't create automation page if toggle is hidden
+    }
+
     if (!this.content || !this._hass) return;
     
     // Set transition state

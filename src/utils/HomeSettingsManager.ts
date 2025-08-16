@@ -15,6 +15,7 @@ export interface HomeSettingsData {
   hideHeader?: boolean;
   hideSidebar?: boolean;
   showSwitches?: boolean;
+  hideAutomationToggle?: boolean;
 }
 
 export class HomeSettingsManager {
@@ -30,7 +31,8 @@ export class HomeSettingsManager {
     includedSwitches: [],
     backgroundType: 'preset',
     presetBackground: BackgroundManager.DEFAULT_BACKGROUND,
-    showSwitches: false
+    showSwitches: false,
+    hideAutomationToggle: false
   };
   private tempSettings: HomeSettingsData = {
     favoriteAccessories: [],
@@ -39,7 +41,8 @@ export class HomeSettingsManager {
     includedSwitches: [],
     backgroundType: 'preset',
     presetBackground: BackgroundManager.DEFAULT_BACKGROUND,
-    showSwitches: false
+    showSwitches: false,
+    hideAutomationToggle: false
   };
   private availableEntities: any[] = [];
 
@@ -75,7 +78,8 @@ export class HomeSettingsManager {
       presetBackground: currentBackground.type === 'preset' ? currentBackground.backgroundImage : BackgroundManager.DEFAULT_BACKGROUND,
       hideHeader: customizations.ui?.hide_header || false,
       hideSidebar: customizations.ui?.hide_sidebar || false,
-      showSwitches: customizations.home?.show_switches || false
+      showSwitches: customizations.home?.show_switches || false,
+      hideAutomationToggle: customizations.ui?.hide_automation_toggle || false
     };
 
     // Create a copy for temporary editing
@@ -89,7 +93,8 @@ export class HomeSettingsManager {
       presetBackground: this.settings.presetBackground,
       hideHeader: this.settings.hideHeader,
       hideSidebar: this.settings.hideSidebar,
-      showSwitches: this.settings.showSwitches
+      showSwitches: this.settings.showSwitches,
+      hideAutomationToggle: this.settings.hideAutomationToggle
     };
     
     }
@@ -273,6 +278,18 @@ export class HomeSettingsManager {
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-card switch-card" data-setting="automation">
+          <div class="switch-setting-row">
+            <span class="option-text">${localize('settings.hide_automation_toggle')}</span>
+            <div class="ui-setting-toggle" id="automation-toggle">
+              <div class="toggle-switch"></div>
+            </div>
+          </div>
+        </div>
+        <p class="settings-section-description">${localize('settings.hide_automation_toggle_description')}</p>
       </div>
     `;
   }
@@ -968,7 +985,8 @@ export class HomeSettingsManager {
       JSON.stringify(this.settings.excludedFromDashboard) !== JSON.stringify(this.tempSettings.excludedFromDashboard) ||
       JSON.stringify(this.settings.excludedFromHome) !== JSON.stringify(this.tempSettings.excludedFromHome) ||
       JSON.stringify(this.settings.includedSwitches) !== JSON.stringify(this.tempSettings.includedSwitches) ||
-      this.settings.showSwitches !== this.tempSettings.showSwitches;
+      this.settings.showSwitches !== this.tempSettings.showSwitches ||
+      this.settings.hideAutomationToggle !== this.tempSettings.hideAutomationToggle;
     
     // Apply temporary settings to actual settings
     this.settings.favoriteAccessories = [...this.tempSettings.favoriteAccessories];
@@ -981,6 +999,7 @@ export class HomeSettingsManager {
     this.settings.hideHeader = this.tempSettings.hideHeader;
     this.settings.hideSidebar = this.tempSettings.hideSidebar;
     this.settings.showSwitches = this.tempSettings.showSwitches;
+    this.settings.hideAutomationToggle = this.tempSettings.hideAutomationToggle;
     
     // Wait for settings to be saved before proceeding
     await this.saveSettings();
@@ -1027,6 +1046,7 @@ export class HomeSettingsManager {
     const ui = this.customizationManager.getCustomization('ui') || {};
     ui.hide_header = this.settings.hideHeader;
     ui.hide_sidebar = this.settings.hideSidebar;
+    ui.hide_automation_toggle = this.settings.hideAutomationToggle;
     await this.customizationManager.setCustomization('ui', ui);
 
     // Update background section
@@ -1096,6 +1116,7 @@ export class HomeSettingsManager {
     const headerToggle = this.modal.querySelector('#header-toggle');
     const sidebarToggle = this.modal.querySelector('#sidebar-toggle');
     const switchesToggle = this.modal.querySelector('#switches-toggle');
+    const automationToggle = this.modal.querySelector('#automation-toggle');
     
     headerToggle?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1113,7 +1134,7 @@ export class HomeSettingsManager {
       e.stopPropagation();
       this.tempSettings.showSwitches = !this.tempSettings.showSwitches;
       this.updateUIToggle('switches-toggle', this.tempSettings.showSwitches || false);
-      
+
       // Show/hide the included switches section based on the showSwitches setting
       const includedSwitchesSection = this.modal?.querySelector('#included-switches-section') as HTMLElement;
       if (includedSwitchesSection) {
@@ -1124,7 +1145,11 @@ export class HomeSettingsManager {
       this.refreshAutocompleteResults();
     });
 
-    // Update the current wallpaper preview with a slight delay to ensure DOM is ready
+    automationToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.tempSettings.hideAutomationToggle = !this.tempSettings.hideAutomationToggle;
+      this.updateUIToggle('automation-toggle', this.tempSettings.hideAutomationToggle || false);
+    });    // Update the current wallpaper preview with a slight delay to ensure DOM is ready
     setTimeout(() => {
       this.updateCurrentWallpaperPreview();
       this.initializeUIToggles();
@@ -1178,6 +1203,7 @@ export class HomeSettingsManager {
     this.updateUIToggle('header-toggle', this.tempSettings.hideHeader || false);
     this.updateUIToggle('sidebar-toggle', this.tempSettings.hideSidebar || false);
     this.updateUIToggle('switches-toggle', this.tempSettings.showSwitches || false);
+    this.updateUIToggle('automation-toggle', this.tempSettings.hideAutomationToggle || false);
   }
 
   private openPresetsView() {

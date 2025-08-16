@@ -43,7 +43,7 @@ export class AutomationPage extends HTMLElement {
       visibility: hidden;
       opacity: 0;
       transition: visibility 0ms, opacity 300ms ease-in-out;
-      z-index: 10;
+      z-index: 5;
     `;
 
     // Create the iframe

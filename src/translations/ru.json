@@ -196,7 +196,9 @@
     "search_accessories": "Поиск аксессуаров...",
     "search_switches": "Поиск переключателей...",
     "hide_ha_header": "Скрыть заголовок Home Assistant",
-    "hide_ha_sidebar": "Скрыть боковую панель Home Assistant"
+    "hide_ha_sidebar": "Скрыть боковую панель Home Assistant",
+    "hide_automation_toggle": "Скрыть Переключатель Страницы Автоматизации",
+    "hide_automation_toggle_description": "Скрывает плавающий переключатель и отключает доступ к странице автоматизации. Это удалит как кнопку переключателя, так и предотвратит создание iframe автоматизации."
   },
   "floating_toggle": {
     "home": "Главная",
