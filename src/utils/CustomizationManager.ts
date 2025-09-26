@@ -80,7 +80,6 @@ export class CustomizationManager {
             const loaded = await this.loadCustomizations();
             await this.setCustomizations(loaded);
             this.triggerGlobalDashboardRefresh();
-            console.log(`🔄 Dashboard switched from '${oldDashboardKey}' to '${newDashboardKey}', customizations reloaded`);
           } catch (err) {
             console.error('Error reloading customizations on dashboard switch:', err);
           }
@@ -485,11 +484,9 @@ export class CustomizationManager {
         // SPECIAL CASE: For Home Assistant storage, 'lovelace' should be null (default dashboard)
         // but for component isolation, we'll use 'lovelace' in other methods
         if (dashboardKey === 'lovelace') {
-          console.log(`🔑 Storage key for lovelace: null (default dashboard) from path: ${currentPath}`);
           return null; // Default dashboard for HA storage
         }
         
-        console.log(`🔑 Dashboard key detected: '${dashboardKey}' from path: ${currentPath}`);
         return dashboardKey;
       }
       

@@ -73,7 +73,6 @@ export class AppleHomeView extends HTMLElement {
     
     // Initialize dashboard key for this instance
     this.currentDashboardKey = this.getDashboardKey();
-    console.log(`🏠 AppleHomeView created for dashboard: ${this.currentDashboardKey}`);
     
     // Initialize callbacks
     this.refreshCallback = () => this.refreshDashboard();
