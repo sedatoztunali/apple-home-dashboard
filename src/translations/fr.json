@@ -210,13 +210,7 @@
     "search_accessories": "Rechercher des accessoires...",
     "search_switches": "Rechercher des commutateurs...",
     "hide_ha_header": "Masquer l'En-tête Home Assistant",
-    "hide_ha_sidebar": "Masquer la Barre Latérale Home Assistant",
-    "hide_automation_toggle": "Masquer le Toggle de Page d'Automatisation",
-    "hide_automation_toggle_description": "Masque le toggle flottant et désactive l'accès à la page d'automatisation. Cela supprimera à la fois le bouton toggle et empêchera la création de l'iframe d'automatisation."
-  },
-  "floating_toggle": {
-    "home": "Accueil",
-    "automation": "Automatisation"
+    "hide_ha_sidebar": "Masquer la Barre Latérale Home Assistant"
   },
   "status_messages": {
     "unavailable": "Indisponible",

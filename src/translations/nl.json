@@ -198,13 +198,7 @@
     "search_accessories": "Zoek naar accessoires...",
     "search_switches": "Zoek naar schakelaars...",
     "hide_ha_header": "Home Assistant Header Verbergen",
-    "hide_ha_sidebar": "Home Assistant Zijbalk Verbergen",
-    "hide_automation_toggle": "Automatisering Pagina Toggle Verbergen",
-    "hide_automation_toggle_description": "Verbergt de zwevende toggle en schakelt toegang tot de automatiseringspagina uit. Dit zal zowel de toggle-knop verwijderen als het maken van het automatisering iframe voorkomen."
-  },
-  "floating_toggle": {
-    "home": "Thuis",
-    "automation": "Automatisering"
+    "hide_ha_sidebar": "Home Assistant Zijbalk Verbergen"
   },
   "status_messages": {
     "unavailable": "Niet beschikbaar",

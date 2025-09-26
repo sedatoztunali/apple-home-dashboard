@@ -57,18 +57,34 @@ export class DashboardStateManager {
    */
   private isCurrentlyInDashboard(): boolean {
     const currentPath = window.location.pathname;
-    
-    // If we have a stored dashboard URL, check if we're still on it
-    if (this.dashboardUrl) {
-      const dashboardBase = this.dashboardUrl.split('/').slice(0, 2).join('/');
-      const inDashboard = currentPath.startsWith(dashboardBase);
-      return inDashboard;
+    // Detect dashboard page patterns (/dashboardKey/page)
+    // Match any two-segment path: /dashboardKey/page
+    const match = currentPath.match(/^\/([^\/]+)\/([^\/\?#]+)/);
+    if (!match) {
+      return false;
     }
-    
-    // Check for dashboard patterns (like /apple-home, etc)
-    const dashboardMatch = currentPath.match(/\/([^\/]+)/);
-    const isNotLovelace = !!(dashboardMatch && dashboardMatch[1] !== 'lovelace');
-    return isNotLovelace;
+    const key = match[1];
+    const page = match[2];
+    // Exclude core HA pages
+    const excludedKeys = [
+      'config',
+      'developer-tools', 
+      'hacs',
+      'dev-tools',
+      'api',
+      'logbook',
+      'history', 
+      'profile',
+      'media-browser',
+      'energy',
+      'map',
+      'todo',
+      'calendar'
+    ];
+    if (excludedKeys.includes(key)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -96,6 +112,8 @@ export class DashboardStateManager {
     
     if (wasActive) {
       this.notifyListeners(false);
+      // Clear stored URL to detect new dashboard entries correctly
+      this.dashboardUrl = null;
     }
   }
 
@@ -145,14 +163,14 @@ export class DashboardStateManager {
    * Handle immediate navigation changes
    */
   private handleNavigationChange(source: string): void {
-    const currentPath = window.location.pathname;
     const isInDashboard = this.isCurrentlyInDashboard();
     const wasActive = this.isActive;
-
     if (wasActive && !isInDashboard) {
       this.setDashboardInactive();
     } else if (!wasActive && isInDashboard) {
-      this.setDashboardActive(currentPath);
+      this.setDashboardActive();
+    } else if (wasActive && isInDashboard) {
+      this.notifyListeners(true);
     }
   }
 

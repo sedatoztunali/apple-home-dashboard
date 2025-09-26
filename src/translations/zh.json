@@ -196,13 +196,7 @@
     "search_accessories": "搜索配件...",
     "search_switches": "搜索开关...",
     "hide_ha_header": "隐藏 Home Assistant 标题栏",
-    "hide_ha_sidebar": "隐藏 Home Assistant 侧边栏",
-    "hide_automation_toggle": "隐藏自动化页面切换器",
-    "hide_automation_toggle_description": "隐藏浮动切换器并禁用对自动化页面的访问。这将移除切换按钮并防止创建自动化iframe。"
-  },
-  "floating_toggle": {
-    "home": "主页",
-    "automation": "自动化"
+    "hide_ha_sidebar": "隐藏 Home Assistant 侧边栏"
   },
   "status_messages": {
     "unavailable": "不可用",

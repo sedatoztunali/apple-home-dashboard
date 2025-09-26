@@ -10,6 +10,7 @@ export interface BackgroundConfig {
 export class BackgroundManager {
   private customizationManager: CustomizationManager;
   private currentBackground: BackgroundConfig;
+  private dashboardRefreshHandler?: (event: Event) => void;
   private static activeInstances = new Set<BackgroundManager>();
 
   // Predefined gradient backgrounds
@@ -67,23 +68,56 @@ export class BackgroundManager {
       });
     }
     
+    // Listen for dashboard refresh events to update background configuration
+    this.setupDashboardRefreshListener();
+    
     BackgroundManager.activeInstances.add(this);
+  }
+
+  /**
+   * Setup listener for dashboard refresh events to update background configuration
+   */
+  private setupDashboardRefreshListener(): void {
+    this.dashboardRefreshHandler = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      
+      // Refresh background configuration from updated customizations
+      const newBackgroundConfig = this.getBackgroundConfig();
+      
+      // Only update and reapply if the background configuration actually changed
+      if (JSON.stringify(newBackgroundConfig) !== JSON.stringify(this.currentBackground)) {
+        this.currentBackground = newBackgroundConfig;
+        
+        // Reapply background if dashboard is currently active
+        if (DashboardStateManager.getInstance().isDashboardActive()) {
+          this.applyBackgroundToBody(this.currentBackground);
+        }
+      }
+    };
+    
+    document.addEventListener('apple-home-dashboard-refresh', this.dashboardRefreshHandler);
   }
 
   /**
    * Handle dashboard state changes
    */
-  private handleDashboardStateChange(isInDashboard: boolean): void {
-    const wasActive = this.customizationManager.isDashboardCurrentlyActive();
-    
-    if (wasActive && !isInDashboard) {
-      // User navigated away from dashboard - remove background
-      this.removeBackground();
-      this.customizationManager.setDashboardActive(false);
-    } else if (!wasActive && isInDashboard) {
-      // User navigated back to dashboard - reapply background
+  private handleDashboardStateChange(isActive: boolean): void {
+    if (isActive) {
+      // Dashboard activated: apply custom background
       this.applyBackgroundToBody(this.currentBackground);
-      this.customizationManager.setDashboardActive(true);
+    } else {
+      // Dashboard deactivated: remove any custom background
+      this.removeBackground();
+    }
+  }
+
+  /**
+   * Clear any custom background styles from the document
+   */
+  static clearBackgrounds(): void {
+    const styleEl = document.querySelector('#apple-home-body-background');
+    if (styleEl) {
+      styleEl.remove();
     }
   }
 
@@ -122,8 +156,8 @@ export class BackgroundManager {
    * Apply background to document body using CSS style element
    */
   private applyBackgroundToBody(config: BackgroundConfig): void {
-    // Only apply background if we're currently in the dashboard
-    if (!this.customizationManager.isCurrentlyInDashboard()) {
+    // Only apply background if Dashboard is active per DashboardStateManager
+    if (!DashboardStateManager.getInstance().isDashboardActive()) {
       return;
     }
     
@@ -271,6 +305,12 @@ export class BackgroundManager {
    * Cleanup method - call when dashboard is destroyed
    */
   cleanup(): void {
+    // Remove dashboard refresh event listener
+    if (this.dashboardRefreshHandler) {
+      document.removeEventListener('apple-home-dashboard-refresh', this.dashboardRefreshHandler);
+      this.dashboardRefreshHandler = undefined;
+    }
+    
     BackgroundManager.activeInstances.delete(this);
     
     // Only remove background if this was the last instance

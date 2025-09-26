@@ -298,21 +298,36 @@ export class HomeAssistantUIManager {
 
     this.dashboardStateManager = DashboardStateManager.getInstance();
     
-    this.originalState = { ...this.state };
+    // Store original state BEFORE any dashboard modifications
+    this.originalState = {
+      headerVisible: true, // Default HA state
+      sidebarVisible: true // Default HA state  
+    };
     
+    // Apply dashboard settings immediately if we're already in dashboard
     if (this.dashboardStateManager.isDashboardActive()) {
       this.applyDashboardUISettings();
     }
     
+    // Debounce restoration to avoid flicker on quick navigations
+    let restoreTimeout: number | null = null;
     this.dashboardStateManager.addListener((isActive: boolean) => {
       if (isActive) {
+        // Cancel pending restoration
+        if (restoreTimeout !== null) {
+          clearTimeout(restoreTimeout);
+          restoreTimeout = null;
+        }
+        // Entering dashboard - apply dashboard UI settings
         requestAnimationFrame(() => {
           this.applyDashboardUISettings();
         });
       } else {
-        setTimeout(() => {
+        // Leaving dashboard - schedule restoration after delay
+        restoreTimeout = window.setTimeout(() => {
           this.restoreOriginalUIState();
-        }, 100);
+          restoreTimeout = null;
+        }, 300);
       }
     });
   }
@@ -352,18 +367,22 @@ export class HomeAssistantUIManager {
   private restoreOriginalUIState(): void {
     if (!this.originalState) return;
 
-    // Restore original header state
-    if (this.state.headerVisible !== this.originalState.headerVisible) {
-      this.state.headerVisible = this.originalState.headerVisible;
-      this.collapseHeader(!this.state.headerVisible);
+    // Force restoration to default HA state
+    const needsHeaderRestore = !this.originalState.headerVisible;
+    const needsSidebarRestore = !this.originalState.sidebarVisible;
+
+    // Restore header if it was hidden
+    if (needsHeaderRestore || !this.state.headerVisible) {
+      this.state.headerVisible = true;
+      this.collapseHeader(false); // Show header
     }
 
-    // Restore original sidebar state
-    if (this.state.sidebarVisible !== this.originalState.sidebarVisible) {
-      // Reset the last state tracker to allow restoration
+    // Restore sidebar if it was hidden
+    if (needsSidebarRestore || !this.state.sidebarVisible) {
+      // Reset the last state tracker to force restoration
       this.lastSidebarState = null;
-      this.state.sidebarVisible = this.originalState.sidebarVisible;
-      this.collapseSidebar(!this.state.sidebarVisible);
+      this.state.sidebarVisible = true;
+      this.collapseSidebar(false); // Show sidebar
     }
   }
 

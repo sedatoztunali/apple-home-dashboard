@@ -211,13 +211,7 @@
     "search_accessories": "Nach Zubehör suchen...",
     "search_switches": "Nach Schaltern suchen...",
     "hide_ha_header": "Home Assistant Header Verbergen",
-    "hide_ha_sidebar": "Home Assistant Seitenleiste Verbergen",
-    "hide_automation_toggle": "Automatisierung-Toggle Verbergen",
-    "hide_automation_toggle_description": "Verberge den schwebenden Toggle und deaktiviere den Zugang zur Automatisierungsseite. Dies entfernt sowohl den Toggle-Button als auch verhindert die Erstellung des Automatisierungs-iframes."
-  },
-  "floating_toggle": {
-    "home": "Startseite",
-    "automation": "Automatisierung"
+    "hide_ha_sidebar": "Home Assistant Seitenleiste Verbergen"
   },
   "status_messages": {
     "unavailable": "Nicht verfügbar",

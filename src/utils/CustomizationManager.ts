@@ -11,6 +11,82 @@ export class CustomizationManager {
 
   constructor(hass?: any) {
     this._hass = hass;
+    this.dashboardUrl = window.location.pathname;
+    
+    // Listen for dashboard activation to load corresponding customizations
+    import('./DashboardStateManager').then(({ DashboardStateManager }) => {
+      DashboardStateManager.getInstance().addListener(async (isActive: boolean) => {
+        if (isActive && this._hass) {
+          try {
+            // Load customizations for the current dashboard key
+            const loaded = await this.loadCustomizations();
+            await this.setCustomizations(loaded);
+            // Trigger global refresh to update UI and background
+            this.triggerGlobalDashboardRefresh();
+          } catch (err) {
+            console.error('Error reloading customizations on dashboard change:', err);
+          }
+        }
+      });
+    });
+    
+    // Also listen for URL changes to detect dashboard switches
+    this.setupUrlChangeListener();
+  }
+
+  /**
+   * Setup URL change listener to detect dashboard switches
+   */
+  private setupUrlChangeListener(): void {
+    // Store original pushState and replaceState methods
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    
+    // Override pushState to detect navigation
+    history.pushState = function(...args) {
+      originalPushState.apply(history, args);
+      CustomizationManager.getInstance().handleUrlChange();
+    };
+    
+    // Override replaceState to detect navigation  
+    history.replaceState = function(...args) {
+      originalReplaceState.apply(history, args);
+      CustomizationManager.getInstance().handleUrlChange();
+    };
+    
+    // Listen for popstate events (back/forward buttons)
+    window.addEventListener('popstate', () => {
+      CustomizationManager.getInstance().handleUrlChange();
+    });
+  }
+
+  /**
+   * Handle URL changes to detect dashboard switches
+   */
+  private async handleUrlChange(): Promise<void> {
+    const currentUrl = window.location.pathname;
+    
+    // Check if we switched to a different dashboard
+    if (this.dashboardUrl !== currentUrl) {
+      const oldDashboardKey = await this.getCurrentDashboardKey(this._hass);
+      this.dashboardUrl = currentUrl;
+      const newDashboardKey = await this.getCurrentDashboardKey(this._hass);
+      
+      // Only reload if we're switching between different dashboards and we have hass
+      if (oldDashboardKey !== newDashboardKey && this._hass) {
+        // Small delay to ensure new page is loaded
+        setTimeout(async () => {
+          try {
+            const loaded = await this.loadCustomizations();
+            await this.setCustomizations(loaded);
+            this.triggerGlobalDashboardRefresh();
+            console.log(`🔄 Dashboard switched from '${oldDashboardKey}' to '${newDashboardKey}', customizations reloaded`);
+          } catch (err) {
+            console.error('Error reloading customizations on dashboard switch:', err);
+          }
+        }, 100);
+      }
+    }
   }
 
   // Singleton pattern to ensure we have one shared instance
@@ -396,29 +472,48 @@ export class CustomizationManager {
       // Parse dashboard name from current URL - this is the most reliable method
       const currentPath = window.location.pathname;
       
-      // Check if we're on a specific dashboard path like /apple-home or /apple-home/0
+      // Extract the base dashboard identifier for STORAGE purposes
+      // Examples: 
+      // /lovelace/home -> null (default dashboard for HA storage)
+      // /dashboard-test/home -> 'dashboard-test'  
+      // /apple-home/home -> 'apple-home'
+      
       const dashboardMatch = currentPath.match(/\/([^\/]+)/);
-      if (dashboardMatch && dashboardMatch[1] !== 'lovelace') {
+      if (dashboardMatch && dashboardMatch[1]) {
         const dashboardKey = dashboardMatch[1];
         
-        // Verify this dashboard exists in panels (from hass.panels)
-        if (hass.panels && hass.panels[dashboardKey]) {
-          return dashboardKey;
-        } else {
-          return dashboardKey; // Still try to use it
+        // SPECIAL CASE: For Home Assistant storage, 'lovelace' should be null (default dashboard)
+        // but for component isolation, we'll use 'lovelace' in other methods
+        if (dashboardKey === 'lovelace') {
+          console.log(`🔑 Storage key for lovelace: null (default dashboard) from path: ${currentPath}`);
+          return null; // Default dashboard for HA storage
         }
+        
+        console.log(`🔑 Dashboard key detected: '${dashboardKey}' from path: ${currentPath}`);
+        return dashboardKey;
       }
       
-      // Check for default dashboard
-      if (currentPath === '/lovelace' || currentPath.endsWith('/lovelace')) {
-        return null; // null means default dashboard
-      }
-      
-      return null;
+      console.warn('🔑 Could not extract dashboard key from path:', currentPath);
+      return null; // Default fallback for storage
     } catch (error) {
       console.error('🏠 APPLE HOME: Error getting dashboard key:', error);
       return null;
     }
+  }
+
+  /**
+   * Get dashboard key for component isolation (different from storage key)
+   * This ensures each dashboard has its own component instances
+   */
+  getComponentDashboardKey(): string {
+    const currentPath = window.location.pathname;
+    const dashboardMatch = currentPath.match(/\/([^\/]+)/);
+    
+    if (dashboardMatch && dashboardMatch[1]) {
+      return dashboardMatch[1]; // Always return the actual path segment (including 'lovelace')
+    }
+    
+    return 'default';
   }
 
   async saveCurrentLayout() {
@@ -626,17 +721,20 @@ export class CustomizationManager {
     // If we have a stored dashboard URL, check if we're still on it
     if (this.dashboardUrl) {
       const dashboardBase = this.dashboardUrl.split('/').slice(0, 2).join('/');
-      const isOnDashboard = currentPath.startsWith(dashboardBase);
-      return isOnDashboard;
+      if (currentPath.startsWith(dashboardBase)) {
+        return true;
+      }
     }
-    
-    // Fallback: check common dashboard patterns
-    const dashboardMatch = currentPath.match(/\/([^\/]+)/);
-    
-    if (dashboardMatch && dashboardMatch[1] !== 'lovelace') {
+    // Check for dashboard page patterns (/dashboardKey/page)
+    const dashboardMatch = currentPath.match(/\/([^\/]+)\/([^\/\?#]+)/);
+    if (dashboardMatch && dashboardMatch[1] && dashboardMatch[2]) {
       return true;
     }
-    
+    // Also treat base dashboard paths (/dashboardKey) as active dashboards
+    const baseMatch = currentPath.match(/^\/([^\/]+)$/);
+    if (baseMatch && baseMatch[1]) {
+      return true;
+    }
     return false;
   }
 
@@ -661,11 +759,6 @@ export class CustomizationManager {
   isSidebarHidden(): boolean {
     const uiSettings = this.getUISettings();
     return uiSettings.hide_sidebar === true;
-  }
-
-  isAutomationToggleHidden(): boolean {
-    const uiSettings = this.getUISettings();
-    return uiSettings.hide_automation_toggle === true;
   }
 
   async setHeaderVisibility(hidden: boolean): Promise<void> {

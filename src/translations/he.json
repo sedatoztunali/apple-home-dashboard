@@ -211,13 +211,7 @@
     "search_accessories": "חפש אביזרים...",
     "search_switches": "חפש מתגים...",
     "hide_ha_header": "הסתר את הפס העליון של Home Assistant",
-    "hide_ha_sidebar": "הסתר את תפריט הצד של Home Assistant",
-    "hide_automation_toggle": "הסתר כפתור מעבר לעמוד אוטומציה",
-    "hide_automation_toggle_description": "מסתיר את הכפתור הצף ומבטל גישה לעמוד האוטומציה. זה יסיר הן את כפתור המעבר והן ימנע יצירת iframe האוטומציה."
-  },
-  "floating_toggle": {
-    "home": "בית",
-    "automation": "אוטומציה"
+    "hide_ha_sidebar": "הסתר את תפריט הצד של Home Assistant"
   },
   "status_messages": {
     "unavailable": "לא זמין",

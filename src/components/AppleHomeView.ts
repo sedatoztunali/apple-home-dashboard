@@ -4,7 +4,7 @@ import { AppleHeader, HeaderConfig } from '../sections/AppleHeader';
 import { CustomizationManager } from '../utils/CustomizationManager';
 import { CardManager } from '../utils/CardManager';
 import { setupLocalize, localize } from '../utils/LocalizationService';
-import { AppleChips, ChipsConfig } from '../sections/AppleChips';
+import { AppleChips } from '../sections/AppleChips';
 import { ChipsConfigurationManager } from '../utils/ChipsConfigurationManager';
 import { HomePage } from '../pages/HomePage';
 import { GroupPage } from '../pages/GroupPage';
@@ -12,16 +12,13 @@ import { RTLHelper } from '../utils/RTLHelper';
 import { RoomPage } from '../pages/RoomPage';
 import { ScenesPage } from '../pages/ScenesPage';
 import { CamerasPage } from '../pages/CamerasPage';
-import { AutomationPage } from '../pages/AutomationPage';
-import { FloatingToggle } from './FloatingToggle';
 import { DeviceGroup } from '../config/DashboardConfig';
 import { DashboardStateManager } from '../utils/DashboardStateManager';
 
 export class AppleHomeView extends HTMLElement {
-  // Global floating toggle management
-  private static globalFloatingToggle?: FloatingToggle;
-  private static activeViewInstance?: AppleHomeView;
-  private static dashboardStateListener?: (isActive: boolean) => void;
+  // Dashboard-specific management - keyed by dashboard URL base
+  private static dashboardActiveInstances = new Map<string, AppleHomeView>();
+  private static dashboardStateListeners = new Map<string, (isActive: boolean) => void>();
   
   private config?: any;
   private _hass?: any;
@@ -34,11 +31,27 @@ export class AppleHomeView extends HTMLElement {
   private chipsElement?: AppleChips;
   private visibilityChangeHandler?: () => void; // Add visibility change handler
   private globalRefreshHandler?: (event: Event) => void; // Add global refresh handler
+  private currentDashboardKey: string = 'default'; // Track current dashboard key
   
-  // Floating toggle and automation page
-  private floatingToggle?: FloatingToggle;
-  private automationPage: AutomationPage;
-  private currentMode: 'home' | 'automation' = 'home';
+  // Helper methods for dashboard-specific management
+  private getDashboardKey(): string {
+    // Extract dashboard key directly from URL (independent method)
+    const currentPath = window.location.pathname;
+    const dashboardMatch = currentPath.match(/\/([^\/]+)/);
+    return dashboardMatch && dashboardMatch[1] ? dashboardMatch[1] : 'default';
+  }
+  
+  private getCurrentActiveInstance(): AppleHomeView | undefined {
+    return AppleHomeView.dashboardActiveInstances.get(this.currentDashboardKey);
+  }
+  
+  private setCurrentActiveInstance(instance: AppleHomeView | undefined): void {
+    if (instance) {
+      AppleHomeView.dashboardActiveInstances.set(this.currentDashboardKey, instance);
+    } else {
+      AppleHomeView.dashboardActiveInstances.delete(this.currentDashboardKey);
+    }
+  }
   
   // Page renderers
   private homePage: HomePage;
@@ -57,6 +70,10 @@ export class AppleHomeView extends HTMLElement {
 
   constructor() {
     super();
+    
+    // Initialize dashboard key for this instance
+    this.currentDashboardKey = this.getDashboardKey();
+    console.log(`🏠 AppleHomeView created for dashboard: ${this.currentDashboardKey}`);
     
     // Initialize callbacks
     this.refreshCallback = () => this.refreshDashboard();
@@ -83,7 +100,6 @@ export class AppleHomeView extends HTMLElement {
     this.roomPage = new RoomPage();
     this.scenesPage = new ScenesPage();
     this.camerasPage = new CamerasPage();
-    this.automationPage = new AutomationPage();
     
     // Set up header manager dependencies
     this.appleHeader.setCustomizationManager(this.customizationManager);
@@ -113,61 +129,14 @@ export class AppleHomeView extends HTMLElement {
     };
     document.addEventListener('apple-home-dashboard-refresh', this.globalRefreshHandler);
     
-    // Add message listener for automation iframe back button
-    window.addEventListener('message', (event) => {
-      if (event.data?.type === 'switchToHome') {
-        this.switchToHome();
-      }
-    });
-
-    // Add early protection against automation navigation race conditions
-    this.setupNavigationProtection();
-  }
-
-  private setupNavigationProtection() {
-    // Only intercept automation URLs during the initial page load period
-    // After the dashboard is fully loaded, allow normal automation navigation
-    let initialLoadComplete = false;
+    // CRITICAL: Initialize dashboard state manager to detect we're in dashboard
+    const stateManager = DashboardStateManager.getInstance();
+    const currentPath = window.location.pathname;
+    stateManager.setDashboardActive(currentPath);
     
-    // Mark initial load as complete after a short delay and when page is rendered
-    setTimeout(() => {
-      if (this._rendered) {
-        initialLoadComplete = true;
-      } else {
-        // If not rendered yet, wait a bit more
-        setTimeout(() => {
-          initialLoadComplete = true;
-        }, 2000);
-      }
-    }, 1000);
+    // CRITICAL: Set this as the active instance for this dashboard
+    this.setCurrentActiveInstance(this);
 
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    const shouldBlockAutomationUrl = (url: string) => {
-      // Only block during initial load and if it's a direct navigation to config/automation
-      // (not our intended iframe usage)
-      if (initialLoadComplete) return false;
-      
-      if (url && url.includes('/config/automation') && !url.includes('#') && !url.includes('?iframe')) {
-        return true;
-      }
-      return false;
-    };
-
-    history.pushState = function(state: any, title: string, url?: string | URL | null) {
-      if (url && shouldBlockAutomationUrl(url.toString())) {
-        return; // Prevent the navigation only during initial load
-      }
-      return originalPushState.call(history, state, title, url);
-    };
-
-    history.replaceState = function(state: any, title: string, url?: string | URL | null) {
-      if (url && shouldBlockAutomationUrl(url.toString())) {
-        return; // Prevent the navigation only during initial load
-      }
-      return originalReplaceState.call(history, state, title, url);
-    };
   }
 
   disconnectedCallback() {
@@ -189,54 +158,19 @@ export class AppleHomeView extends HTMLElement {
       this.dragAndDropManager.disableDragAndDrop(this.content!);
     }
     
-    // Clean up resize listener for this instance only
-    if (this.floatingToggle) {
-      const resizeHandler = (this.floatingToggle as any)._resizeHandler;
-      if (resizeHandler) {
-        window.removeEventListener('resize', resizeHandler);
-        delete (this.floatingToggle as any)._resizeHandler;
-      }
-    }
-    
-    // Clear active instance reference if this is the active one
-    if (AppleHomeView.activeViewInstance === this) {
-      AppleHomeView.activeViewInstance = undefined;
+    // Clear active instance reference if this is the active one for this dashboard
+    if (this.getCurrentActiveInstance() === this) {
+      this.setCurrentActiveInstance(undefined);
     }
     
     // Clean up all camera managers in the current content
     this.cleanupCameras();
     
-    // Clean up automation page
-    this.automationPage?.cleanup();
-  }
-
-  /**
-   * Clean up floating toggle completely (for page refresh/unload)
-   */
-  cleanupFloatingToggle() {
-    if (AppleHomeView.globalFloatingToggle && AppleHomeView.globalFloatingToggle.parentNode) {
-      // Clean up resize listener if it exists
-      const resizeHandler = (AppleHomeView.globalFloatingToggle as any)._resizeHandler;
-      if (resizeHandler) {
-        window.removeEventListener('resize', resizeHandler);
-      }
-      
-      // Clean up the toggle's event listeners
-      (AppleHomeView.globalFloatingToggle as any).cleanup?.();
-      
-      AppleHomeView.globalFloatingToggle.parentNode.removeChild(AppleHomeView.globalFloatingToggle);
-      AppleHomeView.globalFloatingToggle = undefined;
-      AppleHomeView.activeViewInstance = undefined;
+    // CRITICAL: Mark dashboard as inactive when disconnecting
+    const stateManager = DashboardStateManager.getInstance();
+    if (stateManager.isDashboardActive()) {
+      stateManager.setDashboardInactive();
     }
-    
-    // Clean up dashboard state listener
-    if (AppleHomeView.dashboardStateListener) {
-      DashboardStateManager.getInstance().removeListener(AppleHomeView.dashboardStateListener);
-      AppleHomeView.dashboardStateListener = undefined;
-    }
-    
-    // Also clean up instance reference
-    this.floatingToggle = undefined;
   }
 
   private async handleGlobalRefresh(customizations: any) {
@@ -268,10 +202,6 @@ export class AppleHomeView extends HTMLElement {
     // This prevents state corruption during navigation
     this._rendered = false;
     
-    // Reset edit mode when navigating to prevent state issues
-    // if (this.appleHeader) {
-    //   this.appleHeader.resetEditMode();
-    // }
     
     // Check if this is actually a different config
     const configChanged = JSON.stringify(this.config) !== JSON.stringify(config);
@@ -491,18 +421,6 @@ export class AppleHomeView extends HTMLElement {
     if (!this._rendered) {
       this.renderPage('setHass-firstTime');
       this._rendered = true;
-      
-      // Initialize automation page once hass and content are available
-      if (this.content) {
-        this.preloadAutomationPage();
-        
-        // Recalculate floating toggle position after initial render
-        setTimeout(() => {
-          if (this.floatingToggle) {
-            this.floatingToggle.recalculatePosition();
-          }
-        }, 300);
-      }
     } else {
       // Optimized updates: just update existing components with new hass
       this.updateExistingCards(this._hass);
@@ -605,12 +523,11 @@ export class AppleHomeView extends HTMLElement {
     // Ensure shadow root is properly initialized
     this.ensureShadowRootExists();
     
-    // Clear existing content but preserve permanent elements (header, chips, and automation)
+    // Clear existing content but preserve permanent elements (header, chips)
     if (this.content) {
       // Save permanent elements before clearing
       const permanentHeader = this.content.querySelector('.apple-home-header.permanent-header');
       const permanentChips = this.content.querySelector('.permanent-chips');
-      const automationContainer = this.content.querySelector('.automation-container');
       
       this.content.innerHTML = '';
       
@@ -622,9 +539,6 @@ export class AppleHomeView extends HTMLElement {
         this.content.appendChild(permanentChips);
         this.chipsElement = new AppleChips(permanentChips as HTMLElement, this.customizationManager);
         this.setupChipsCallback();
-      }
-      if (automationContainer) {
-        this.content.appendChild(automationContainer);
       }
     }
   }
@@ -1076,15 +990,6 @@ export class AppleHomeView extends HTMLElement {
           </div>
         </div>
       `;
-      
-      // Initialize floating toggle when structure is created
-      this.initializeFloatingToggle();
-    }
-    
-    // Always ensure floating toggle is properly initialized
-    // This handles cases where toggle was removed but structure still exists
-    if (!structureCreated) {
-      this.initializeFloatingToggle();
     }
     
     // Always ensure we have the references after HTML structure exists
@@ -1134,9 +1039,6 @@ export class AppleHomeView extends HTMLElement {
     }
     if (this.camerasPage) {
       this.camerasPage.hass = hass;
-    }
-    if (this.automationPage) {
-      this.automationPage.hass = hass;
     }
   }
 
@@ -1319,12 +1221,6 @@ export class AppleHomeView extends HTMLElement {
       return;
     }
     
-    // If in automation mode, render automation page instead
-    if (this.currentMode === 'automation') {
-      await this.renderAutomationPage();
-      return;
-    }
-    
     // Prevent multiple renders within 500ms (accounts for settings save delays)
     const now = Date.now();
     if (now - this._lastRenderTime < 500) {
@@ -1421,9 +1317,6 @@ export class AppleHomeView extends HTMLElement {
     // Mark as rendered immediately after render logic completes
     this._rendered = true;
 
-    // CRITICAL: Re-initialize automation page after any render to ensure it persists
-    await this.ensureAutomationPageReady();
-
     // CRITICAL: Ensure chips are recreated and properly configured after page render
     this.ensureChipsExist();
     
@@ -1439,11 +1332,6 @@ export class AppleHomeView extends HTMLElement {
     setTimeout(() => {
       this.resumeCameras();
       this._isTransitioning = false;
-      
-      // Recalculate floating toggle position after layout changes
-      if (this.floatingToggle) {
-        this.floatingToggle.recalculatePosition();
-      }
     }, 200);
   }
 
@@ -1617,12 +1505,6 @@ export class AppleHomeView extends HTMLElement {
       const currentConfig = cardElement.config || {};
       const newConfig = { ...currentConfig, is_tall: shouldBeTall };
       cardElement.setConfig(newConfig);
-      
-      // Don't trigger re-render - let the card handle its own updates
-      // Removed: cardElement.hass = cardElement.hass;
-      
-      // Don't refresh edit mode - it can cause rerenders
-      // Removed: cardElement.refreshEditMode();
     }
     
     // Update the button visual state
@@ -1699,9 +1581,6 @@ export class AppleHomeView extends HTMLElement {
         customizations: freshCustomizations
       };
       
-      // Update floating toggle visibility based on current settings
-      this.updateFloatingToggleVisibility();
-      
       // Direct render - renderPage will handle double render protection
       this._rendered = false;
       await this.renderPage('refreshCallback');
@@ -1713,222 +1592,4 @@ export class AppleHomeView extends HTMLElement {
       await this.renderPage('refreshCallback-error');
     }
   }
-
-  /**
-   * Update floating toggle visibility based on current settings
-   */
-  private updateFloatingToggleVisibility() {
-    const shouldHide = this.customizationManager.isAutomationToggleHidden();
-    
-    if (shouldHide) {
-      // Hide and clean up the floating toggle
-      this.cleanupFloatingToggle();
-      
-      // If currently in automation mode, switch back to home
-      if (this.currentMode === 'automation') {
-        this.switchToHome();
-      }
-    } else {
-      // Show the floating toggle if it doesn't exist
-      if (!AppleHomeView.globalFloatingToggle) {
-        this.initializeFloatingToggle();
-      }
-    }
-  }
-
-  /**
-   * Initialize the floating toggle component
-   */
-  private initializeFloatingToggle() {
-    // Check if automation toggle should be hidden
-    if (this.customizationManager.isAutomationToggleHidden()) {
-      return; // Don't create the floating toggle if it's hidden
-    }
-
-    // Set this instance as the active one
-    AppleHomeView.activeViewInstance = this;
-    
-    // If there's already a global floating toggle, clean it up to prevent duplicates
-    if (AppleHomeView.globalFloatingToggle && AppleHomeView.globalFloatingToggle.parentNode) {
-      (AppleHomeView.globalFloatingToggle as any).cleanup?.();
-      AppleHomeView.globalFloatingToggle.parentNode.removeChild(AppleHomeView.globalFloatingToggle);
-    }
-    
-    // Also remove any stray floating toggles that might exist in the DOM
-    const existingToggles = document.querySelectorAll('floating-toggle');
-    existingToggles.forEach(toggle => {
-      if (toggle.parentNode) {
-        (toggle as any).cleanup?.();
-        toggle.parentNode.removeChild(toggle);
-      }
-    });
-    
-    // Create new global floating toggle
-    AppleHomeView.globalFloatingToggle = new FloatingToggle();
-    this.floatingToggle = AppleHomeView.globalFloatingToggle;
-    
-    // Add to document body
-    document.body.appendChild(this.floatingToggle);
-    
-    // Configure the toggle
-    this.floatingToggle.setConfig({
-      currentMode: this.currentMode,
-      onHomeClick: () => this.switchToHome(),
-      onAutomationClick: () => this.switchToAutomation(),
-      containerElement: this
-    });
-
-    // Update positioning when window resizes
-    this.addResizeListener();
-    
-    // Set up dashboard state listener (only once)
-    if (!AppleHomeView.dashboardStateListener) {
-      AppleHomeView.dashboardStateListener = (isActive: boolean) => {
-        if (AppleHomeView.globalFloatingToggle) {
-          AppleHomeView.globalFloatingToggle.style.display = isActive ? 'block' : 'none';
-        }
-      };
-      
-      DashboardStateManager.getInstance().addListener(AppleHomeView.dashboardStateListener);
-    }
-  }
-
-  private addResizeListener() {
-    if (this.floatingToggle) {
-      const resizeHandler = () => {
-        this.floatingToggle?.recalculatePosition();
-      };
-      
-      window.addEventListener('resize', resizeHandler);
-      
-      // Store the handler for cleanup
-      (this.floatingToggle as any)._resizeHandler = resizeHandler;
-    }
-  }
-
-  /**
-   * Ensure automation page is ready after any render
-   */
-  private async ensureAutomationPageReady() {
-    if (!this._hass || !this.content) return;
-    
-    try {
-      // Always re-initialize if the container is missing from DOM (even if flag says initialized)
-      const containerExists = this.content.querySelector('.automation-container');
-      
-      if (!this.automationPage.isInitialized || !containerExists) {
-        // Reset the initialization flag if container is missing
-        if (!containerExists) {
-          this.automationPage.isInitialized = false;
-        }
-        
-        this.automationPage.hass = this._hass;
-        await this.automationPage.initialize(this.content);
-      }
-      
-      // If we're in automation mode, ensure it's visible
-      if (this.currentMode === 'automation') {
-        this.automationPage.show();
-      }
-    } catch (error) {
-      console.error('Automation page re-initialization failed:', error);
-    }
-  }
-
-  /**
-   * Preload automation page in background for instant switching
-   */
-  private async preloadAutomationPage() {
-    if (!this._hass || !this.content) return;
-    
-    try {
-      this.automationPage.hass = this._hass;
-      await this.automationPage.initialize(this.content);
-    } catch (error) {
-      console.error('Automation initialization failed:', error);
-    }
-  }
-
-  /**
-   * Switch to home mode
-   */
-  private async switchToHome() {
-    if (this.currentMode === 'home') return;
-    
-    // Clear any pending mode switch and debounce rapid switches
-    if (this._modeSwitchDebounce) {
-      clearTimeout(this._modeSwitchDebounce);
-    }
-    
-    this._modeSwitchDebounce = window.setTimeout(() => {
-      this._modeSwitchDebounce = null;
-      this._performSwitchToHome();
-    }, 100); // 100ms debounce
-  }
-
-  private _performSwitchToHome() {
-    if (this.currentMode === 'home') return;
-    
-    this.currentMode = 'home';
-    this.floatingToggle?.updateMode('home');
-    
-    // Simply hide the automation page - no re-rendering needed
-    this.automationPage?.hide();
-  }
-
-  /**
-   * Switch to automation mode
-   */
-  private async switchToAutomation() {
-    // Check if automation toggle is hidden
-    if (this.customizationManager.isAutomationToggleHidden()) {
-      return; // Don't allow switching to automation if toggle is hidden
-    }
-
-    if (this.currentMode === 'automation') return;
-    
-    this.currentMode = 'automation';
-    this.floatingToggle?.updateMode('automation');
-    
-    // Render automation page
-    await this.renderAutomationPage();
-  }
-
-  /**
-   * Render the automation page
-   */
-  private async renderAutomationPage() {
-    // Check if automation toggle is hidden
-    if (this.customizationManager.isAutomationToggleHidden()) {
-      return; // Don't create automation page if toggle is hidden
-    }
-
-    if (!this.content || !this._hass) return;
-    
-    // Set transition state
-    this._isTransitioning = true;
-    
-    try {
-      // Pause cameras before switching
-      this.pauseCameras();
-      
-      // Always ensure automation page is ready - check both flag and DOM existence
-      if (!this.automationPage.isInitialized || !this.content.querySelector('.automation-container')) {
-        this.automationPage.hass = this._hass;
-        await this.automationPage.initialize(this.content);
-      }
-      
-      // Always show the automation page
-      this.automationPage.show();
-      
-    } catch (error) {
-      console.error('Error rendering automation page:', error);
-    } finally {
-      this._isTransitioning = false;
-    }
-  }
-
-  /**
-   * Clean up floating toggle when component is destroyed
-   */
 }

@@ -219,13 +219,7 @@
     "search_accessories": "Search for accessories...",
     "search_switches": "Search for switches...",
     "hide_ha_header": "Hide Home Assistant Header",
-    "hide_ha_sidebar": "Hide Home Assistant Sidebar",
-    "hide_automation_toggle": "Hide Automation Page Toggle",
-    "hide_automation_toggle_description": "Hide the floating toggle and disable access to the automation page. This will remove both the toggle button and prevent the automation iframe from being created."
-  },
-  "floating_toggle": {
-    "home": "Home",
-    "automation": "Automation"
+    "hide_ha_sidebar": "Hide Home Assistant Sidebar"
   },
   "status_messages": {
     "unavailable": "Unavailable",

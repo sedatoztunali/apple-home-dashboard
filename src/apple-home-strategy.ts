@@ -66,29 +66,6 @@ async function generateLovelaceDashboard(
   // Initialize UI manager with customizations for header/sidebar control
   const uiManager = HomeAssistantUIManager.initializeWithCustomizations(customizationManager);
   
-  // Clean up any existing floating toggles before creating new ones to prevent duplicates
-  const existingToggles = document.querySelectorAll('floating-toggle');
-  existingToggles.forEach(toggle => {
-    if (toggle.parentNode) {
-      (toggle as any).cleanup?.();
-      toggle.parentNode.removeChild(toggle);
-    }
-  });
-  
-  // Set up global cleanup for floating toggle on page unload
-  if (!window.appleHomeCleanupRegistered) {
-    window.addEventListener('beforeunload', () => {
-      // Find any existing apple-home-view elements and clean up their floating toggles
-      const appleHomeViews = document.querySelectorAll('apple-home-view');
-      appleHomeViews.forEach((view: any) => {
-        if (view.cleanupFloatingToggle) {
-          view.cleanupFloatingToggle();
-        }
-      });
-    });
-    window.appleHomeCleanupRegistered = true;
-  }
-  
   // Apply UI settings once with a small delay to ensure DOM is ready
   setTimeout(() => {
     uiManager.reapplyDashboardSettings();
