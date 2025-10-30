@@ -1,8 +1,8 @@
 {
-  "name": "apple-home-dashboard",
-  "version": "1.0.3",
-  "description": "Apple Home-inspired dashboard strategy for Home Assistant",
-  "main": "apple-home-dashboard.js",
+  "name": "smart-home-dashboard",
+  "version": "1.0.4",
+  "description": "Smart Home-inspired dashboard strategy for Home Assistant",
+  "main": "smart-home-dashboard.js",
   "scripts": {
     "build": "webpack",
     "build:dev": "webpack --mode=development --watch",
@@ -14,10 +14,10 @@
   },
   "keywords": [
     "home-assistant",
-    "apple-home",
+    "smart-home",
     "dashboard",
     "strategy",
-    "smart-home"
+    "ui"
   ],
   "author": "Apple Home Dashboard Team",
   "contributors": [
@@ -66,8 +66,8 @@
     "README.md"
   ],
   "hacs": {
-    "name": "Apple Home Dashboard Strategy",
-    "filename": "apple-home-dashboard.js",
+    "name": "Smart Home Dashboard Strategy",
+    "filename": "smart-home-dashboard.js",
     "render_readme": true
   }
 }

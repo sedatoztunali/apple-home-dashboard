@@ -1,0 +1,230 @@
+{
+  "status": {
+    "on": "Açık",
+    "off": "Kapalı",
+    "open": "Açık",
+    "closed": "Kapalı",
+    "locked": "Kilitli",
+    "unlocked": "Kilitsiz",
+    "jammed": "Sıkışmış",
+    "unknown": "Bilinmiyor",
+    "unavailable": "Kullanılamıyor",
+    "heating": "Isıtılıyor",
+    "cooling": "Soğutuluyor",
+    "auto": "Otomatik",
+    "heat_cool": "Otomatik",
+    "heat": "Isıtılıyor",
+    "cool": "Soğutuluyor",
+    "heat_to": "Şu dereceye ısıt",
+    "cool_to": "Şu dereceye soğut",
+    "dry": "Kurulama",
+    "fan_only": "Vantilatör",
+    "playing": "Oynatılıyor",
+    "paused": "Duraklatıldı",
+    "buffering": "Arabelleğe alınıyor",
+    "standby": "Beklemede",
+    "clear": "Temiz",
+    "occupied": "Dolu",
+    "home": "Evde",
+    "away": "Dışarıda",
+    "cleaning": "Temizleniyor",
+    "docked": "İstasyonda",
+    "error": "Hata",
+    "safe": "Güvenli",
+    "unsafe": "Güvensiz",
+    "running": "Çalışıyor",
+    "idle": "Boşta",
+    "plugged_in": "Prize takılı",
+    "unplugged": "Prizden çıkarılmış",
+    "up_to_date": "Güncel",
+    "update_available": "Güncelleme mevcut",
+    "armed": "Kuruldu",
+    "armed_home": "Evde kuruldu",
+    "armed_away": "Dışarıda kuruldu",
+    "armed_night": "Gece kuruldu",
+    "armed_vacation": "Tatil modu",
+    "armed_custom_bypass": "Özel baypas ile kuruldu",
+    "triggered": "Tetiklendi",
+    "disarmed": "Devre dışı",
+    "pending": "Bekliyor",
+    "arming": "Kuruluyor",
+    "disarming": "Devre dışı bırakılıyor",
+    "none": "Yok"
+  },
+  "units": {
+    "percent": "%",
+    "degrees": "°",
+    "open_percent": "% Açık"
+  },
+  "time": {
+    "now": "şimdi",
+    "seconds": "sn",
+    "minutes": "dk",
+    "hours": "sa",
+    "days": "g"
+  },
+  "groups": {
+    "lights": "Aydınlatma",
+    "climate": "İklim",
+    "security": "Güvenlik",
+    "water": "Su",
+    "media": "Hoparlörler ve TV'ler",
+    "other": "Diğer"
+  },
+  "chip_status": {
+    "secure": "Güvenli",
+    "active": "Aktif",
+    "tv": "TV",
+    "tvs": "TV'ler"
+  },
+  "status_section": {
+    "all_locked": "Hepsi kilitli",
+    "all_unlocked": "Hepsi kilitsiz",
+    "motion": "Hareket",
+    "locks": "Kilitler",
+    "security": "Güvenlik",
+    "covers": "Panjur",
+    "occupancy": "Kullanım",
+    "light": "Işık",
+    "light_sensor": "Işık",
+    "smoke": "Duman",
+    "battery": "Pil",
+    "doors": "Kapılar",
+    "windows": "Pencereler",
+    "tvs": "TV'ler",
+    "speakers": "Hoparlörler",
+    "lights": "Işıklar",
+    "switches": "Anahtarlar",
+    "outlets": "Prizler",
+    "temperature": "Sıcaklık",
+    "humidity": "Nem"
+  },
+  "section_reorder": {
+    "title": "Bölümleri Yeniden Sırala",
+    "cancel": "İptal",
+    "done": "Bitti",
+    "drag_to_reorder": "Bölümleri sürükleyerek sırala",
+    "tap_eye_to_toggle": "Göz ikonuna dokunarak göster/gizle",
+    "scenes": "Sahneler",
+    "cameras": "Kameralar",
+    "visible": "Görünür",
+    "hidden": "Gizli"
+  },
+  "section_titles": {
+    "default_room": "Varsayılan Oda",
+    "favorites": "Favoriler",
+    "scenes": "Sahneler",
+    "cameras": "Kameralar"
+  },
+  "ui_actions": {
+    "done": "Bitti",
+    "cancel": "İptal",
+    "back": "Geri",
+    "home": "Ana ekran",
+    "home_settings": "Ev Ayarları",
+    "reorder_sections": "Bölümleri Yeniden Sırala",
+    "choose_wallpaper": "Duvar Kağıdı Seç"
+  },
+  "wallpaper_presets": {
+    "default": "Varsayılan",
+    "sunset": "Gün batımı",
+    "ocean": "Okyanus",
+    "forest": "Orman",
+    "purple": "Mor",
+    "fire": "Alev"
+  },
+  "pages": {
+    "scenes": "Sahneler",
+    "cameras": "Kameralar",
+    "default_room": "Varsayılan Oda",
+    "my_home": "Evim"
+  },
+  "edit": {
+    "edit_home_view": "Ana Ekranı Düzenle",
+    "edit_scenes_view": "Sahneler Görünümünü Düzenle",
+    "edit_cameras_view": "Kameralar Görünümünü Düzenle",
+    "edit_room_view": "Oda Görünümünü Düzenle",
+    "make_tall": "Yüksek Yap",
+    "make_normal_size": "Normal Boyut"
+  },
+  "toggles": {
+    "hide_header": "Başlığı Gizle",
+    "show_header": "Başlığı Göster",
+    "hide_sidebar": "Kenar Çubuğunu Gizle",
+    "show_sidebar": "Kenar Çubuğunu Göster",
+    "hide_ha_header": "Home Assistant Başlığını Gizle",
+    "show_ha_header": "Home Assistant Başlığını Göster",
+    "hide_ha_sidebar": "Home Assistant Kenar Çubuğunu Gizle",
+    "show_ha_sidebar": "Home Assistant Kenar Çubuğunu Göster"
+  },
+  "battery": {
+    "low_battery": "Düşük Pil",
+    "low_battery_count": "{count} Düşük Pil"
+  },
+  "lights": {
+    "all_off": "Hepsi Kapalı",
+    "on": "Açık",
+    "all_on": "Hepsi Açık"
+  },
+  "covers": {
+    "all_closed": "Hepsi Kapalı",
+    "open": "Açık",
+    "all_open": "Hepsi Açık"
+  },
+  "contact": {
+    "contact_sensors": "Temas Sensörleri",
+    "all_closed": "Hepsi Kapalı"
+  },
+  "motion": {
+    "detected": "Algılandı",
+    "not_detected": "Algılanmadı"
+  },
+  "smoke": {
+    "detected": "Algılandı",
+    "not_detected": "Algılanmadı"
+  },
+  "occupancy": {
+    "detected": "Algılandı",
+    "not_detected": "Algılanmadı"
+  },
+  "media": {
+    "playing": "Oynatılıyor",
+    "multiple_playing": "Oynatılıyor"
+  },
+  "camera": {
+    "no_snapshot_available": "Anlık görüntü yok"
+  },
+  "errors": {
+    "entity_not_found": "Varlık bulunamadı",
+    "error_saving_layout": "Yerleşim kaydedilirken hata",
+    "customization_manager_not_initialized": "CustomizationManager başlatılmadı",
+    "invalid_image": "Lütfen geçerli bir görsel dosyası seçin.",
+    "file_size_limit": "Dosya boyutu 5MB'den küçük olmalıdır.",
+    "image_processing": "Görsel işlenirken hata. Lütfen tekrar deneyin."
+  },
+  "settings": {
+    "show_switches_cards_description": "Kontrol panelinde anahtar kartlarını göster. Varsayılan olarak kapalıdır; arayüzü sade ve temel kontrollere odaklı tutar.",
+    "include_switches_description": "Anahtarlar kapalıysa, yine de göstermek istediğiniz belirli anahtarları dahil edebilirsiniz",
+    "favorite_accessories": "FAVORİ AKSESUARLAR",
+    "favorite_accessories_description": "Ana ekrandaki Favoriler bölümünde göstermek için aksesuar ekleyin",
+    "exclude_from_home": "ANA EKRANDAN ÇIKAR",
+    "exclude_from_home_description": "Ana ekranda gizlenir, diğer sayfalarda görünür",
+    "exclude_from_dashboard": "DASHBOARD'DAN ÇIKAR",
+    "exclude_from_dashboard_description": "Tüm sayfalarda tamamen gizlenir",
+    "show_switches_cards": "Anahtar Kartlarını Göster",
+    "include_specific_switches": "BELİRLİ ANAHTARLARI DAHİL ET",
+    "home_wallpaper": "ANA EKRAN DUVAR KAĞIDI",
+    "take_photo": "Fotoğraf Çek...",
+    "choose_from_existing": "Mevcut Olandan Seç",
+    "search_accessories": "Aksesuar ara...",
+    "search_switches": "Anahtar ara...",
+    "hide_ha_header": "Home Assistant Başlığını Gizle",
+    "hide_ha_sidebar": "Home Assistant Kenar Çubuğunu Gizle"
+  },
+  "status_messages": {
+    "unavailable": "Kullanılamıyor",
+    "loading_automations": "Otomasyonlar Yükleniyor..."
+  }
+}
+
+

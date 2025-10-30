@@ -1,6 +1,6 @@
 {
-  "name": "Apple Home Dashboard Strategy",
+  "name": "Smart Home Dashboard Strategy",
   "render_readme": true,
-  "filename": "apple-home-dashboard.js",
+  "filename": "smart-home-dashboard.js",
   "homeassistant": "2024.7.0"
 }

@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/apple-home-strategy.ts',
   output: {
     clean: true,
-    filename: 'apple-home-dashboard.js', // renamed to match repository name
+    filename: 'smart-home-dashboard.js',
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {

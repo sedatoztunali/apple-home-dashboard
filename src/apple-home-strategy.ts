@@ -79,7 +79,7 @@ async function generateLovelaceDashboard(
     icon: 'mdi:home',
     panel: true,
     cards: [{
-      type: 'custom:apple-home-view',
+      type: 'custom:smart-home-view',
       title: homeTitle,
       pageType: 'home',
       customizations: customizations
@@ -101,7 +101,7 @@ async function generateLovelaceDashboard(
       panel: true,
       subview: true,
       cards: [{
-        type: 'custom:apple-home-view',
+        type: 'custom:smart-home-view',
         title: groupName,
         pageType: 'group',
         deviceGroup: group,
@@ -117,8 +117,8 @@ async function generateLovelaceDashboard(
     icon: 'mdi:palette',
     panel: true,
     subview: true,
-    cards: [{
-      type: 'custom:apple-home-view',
+  cards: [{
+      type: 'custom:smart-home-view',
       title: localize('pages.scenes'),
       pageType: 'scenes',
       customizations: customizations
@@ -131,8 +131,8 @@ async function generateLovelaceDashboard(
     icon: 'mdi:cctv',
     panel: true,
     subview: true,
-    cards: [{
-      type: 'custom:apple-home-view',
+  cards: [{
+      type: 'custom:smart-home-view',
       title: localize('pages.cameras'),
       pageType: 'cameras',
       customizations: customizations
@@ -151,7 +151,7 @@ async function generateLovelaceDashboard(
         panel: true,
         subview: true,
         cards: [{
-          type: 'custom:apple-home-view',
+          type: 'custom:smart-home-view',
           title: area.name,
           pageType: 'room',
           areaId: area.area_id,
@@ -171,8 +171,8 @@ async function generateLovelaceDashboard(
     icon: 'mdi:home-outline',
     panel: true,
     subview: true,
-    cards: [{
-      type: 'custom:apple-home-view',
+  cards: [{
+      type: 'custom:smart-home-view',
       title: localize('pages.default_room'),
       pageType: 'room',
       areaId: 'no_area',
@@ -206,27 +206,27 @@ class AppleHomeStrategy extends HTMLElement {
 if (!customElements.get('apple-home-card')) {
   customElements.define('apple-home-card', AppleHomeCard);
 }
-if (!customElements.get('apple-home-view')) {
-  customElements.define('apple-home-view', AppleHomeView);
+if (!customElements.get('smart-home-view')) {
+  customElements.define('smart-home-view', AppleHomeView);
 }
 
 // Register the strategy element with Home Assistant (required pattern)
-if (!customElements.get('ll-strategy-apple-home-strategy')) {
-  customElements.define('ll-strategy-apple-home-strategy', AppleHomeStrategy);
+if (!customElements.get('ll-strategy-smart-home-strategy')) {
+  customElements.define('ll-strategy-smart-home-strategy', AppleHomeStrategy);
 }
 
 // Register the strategy with Home Assistant cards list
 if (window.customCards) {
   window.customCards.push({
     type: 'custom:apple-home-strategy',
-    name: 'Apple Home Strategy',
-    description: 'Apple Home-style dashboard strategy with stateless architecture',
+    name: 'Smart Home Strategy',
+    description: 'Smart Home-style dashboard strategy with stateless architecture',
     preview: false
   });
 }
 
 // Also register the function for backward compatibility
 window.customStrategies = window.customStrategies || {};
-window.customStrategies['apple-home-strategy'] = generateLovelaceDashboard;
+window.customStrategies['smart-home-strategy'] = generateLovelaceDashboard;
 
 

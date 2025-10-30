@@ -1,4 +1,4 @@
-# 🏠 Apple Home Dashboard Strategy
+# 🏠 Smart Home Dashboard Strategy
 
 A pixel‑level Apple Home style dashboard for Home Assistant. Instantly turns your Lovelace dashboard into an iOS Home app experience: familiar layout, section structure, color language, typography, card behaviors, navigation and editing flow – all automatic.
 
@@ -13,13 +13,13 @@ A pixel‑level Apple Home style dashboard for Home Assistant. Instantly turns y
 
 ## 🚀 Quick Start (2 minutes)
 1. Install
-   - HACS: Add custom repository (Dashboard), install "Apple Home Dashboard Strategy" (resource added automatically).  OR
-   - Manual: Download `apple-home-dashboard.js` to `/config/www/` and add a Lovelace resource: /local/apple-home-dashboard.js (Module).
+   - HACS: Add custom repository (Dashboard), install "Smart Home Dashboard Strategy" (resource added automatically).  OR
+   - Manual: Download `smart-home-dashboard.js` to `/config/www/` and add a Lovelace resource: /local/smart-home-dashboard.js (Module).
 2. Create a new Dashboard (Settings → Dashboards → +) – give it a path like `apple-home` and switch it to YAML mode (Enable advanced mode in your profile if needed).
 3. Open Raw Configuration for that dashboard and paste ONLY:
 ```yaml
 strategy:
-  type: custom:apple-home-strategy
+  type: custom:smart-home-strategy
 views: []
 ```
 4. Save & refresh – the Home (My Home) view, Rooms, Groups, Scenes & Cameras generate automatically. Enter Edit mode to customize.
@@ -177,22 +177,22 @@ Accessory names are automatically cleaned to remove redundant room/area names (m
 2. Install “Apple Home Dashboard Strategy”
 3. Restart Home Assistant if prompted
 4. Add resource automatically (or manually if needed):
-   - URL: /hacsfiles/apple-home-dashboard/apple-home-dashboard.js
+  - URL: /hacsfiles/apple-home-dashboard/smart-home-dashboard.js
    - Type: Module
 
 ### Option 2: Manual
-1. Download `apple-home-dashboard.js` from the latest release
-2. Place in `/config/www/apple-home-dashboard.js`
+1. Download `smart-home-dashboard.js` from the latest release
+2. Place in `/config/www/smart-home-dashboard.js`
 3. Add a Lovelace resource:
    - Settings → Dashboards → Resources → +
-   - URL: /local/apple-home-dashboard.js
+   - URL: /local/smart-home-dashboard.js
    - Type: Module
 
 ### Create the Dashboard
 Create a new dashboard (e.g. path: `apple-home`) and set strategy:
 ```yaml
 strategy:
-  type: custom:apple-home-strategy
+  type: custom:smart-home-strategy
 views: []
 ```
 Open the new dashboard – it will populate automatically.
@@ -206,7 +206,7 @@ Open the new dashboard – it will populate automatically.
 Example:
 ```yaml
 strategy:
-  type: custom:apple-home-strategy
+  type: custom:smart-home-strategy
   options:
     title: Casa
 ```

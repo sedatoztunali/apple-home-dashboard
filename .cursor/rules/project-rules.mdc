@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+Rule: Localization completeness
+Description: If we implement or change any localization-related feature (new keys, renamed keys, or behavior depending on translations), ensure corresponding keys are added/updated across ALL language files under `src/translations` (including `en` as canonical and every supported locale), keeping key structures consistent.
+Rule: Complete TODO implementation
+Description: If a task is defined in `TODO.md`, implement all code changes and required configuration end-to-end to satisfy its acceptance criteria. Do not leave partial work; ensure builds/lints pass and behavior is verified before marking it complete.
