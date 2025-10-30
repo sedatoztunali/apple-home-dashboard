@@ -109,6 +109,7 @@
   "section_titles": {
     "default_room": "חדר עיקרי",
     "favorites": "מועדפים",
+    "commonly_used": "בשימוש תכוף",
     "scenes": "תרחישים", 
     "cameras": "מצלמות"
   },

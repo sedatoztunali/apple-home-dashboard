@@ -99,7 +99,8 @@
   },
   "section_titles": {
     "default_room": "Habitación Predeterminada",
-    "favorites": "Favoritos", 
+    "favorites": "Favoritos",
+    "commonly_used": "Más Usados",
     "scenes": "Escenas",
     "cameras": "Cámaras"
   },

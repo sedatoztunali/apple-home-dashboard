@@ -5,7 +5,9 @@ import { ScenesSection } from '../sections/ScenesSection';
 import { CamerasSection } from '../sections/CamerasSection';
 import { AreaSection } from '../sections/AreaSection';
 import { FavoritesSection } from '../sections/FavoritesSection';
+import { CommonlyUsedSection } from '../sections/CommonlyUsedSection';
 import { Entity, Area } from '../types/types';
+import { CardManager } from '../utils/CardManager';
 
 export class HomePage {
   private customizationManager?: CustomizationManager;
@@ -13,6 +15,8 @@ export class HomePage {
   private camerasSection?: CamerasSection;
   private areaSection?: AreaSection;
   private favoritesSection?: FavoritesSection;
+  private commonlyUsedSection?: CommonlyUsedSection;
+  private cardManager?: CardManager;
   private _hass?: any;
   private _title?: string;
   private _config?: any;
@@ -39,10 +43,12 @@ export class HomePage {
 
   private initializeSections() {
     if (this.customizationManager) {
-      this.scenesSection = new ScenesSection(this.customizationManager);
-      this.camerasSection = new CamerasSection(this.customizationManager);
-      this.areaSection = new AreaSection(this.customizationManager);
+      this.cardManager = new CardManager(this.customizationManager);
+      this.scenesSection = new ScenesSection(this.customizationManager, this.cardManager);
+      this.camerasSection = new CamerasSection(this.customizationManager, this.cardManager);
+      this.areaSection = new AreaSection(this.customizationManager, this.cardManager);
       this.favoritesSection = new FavoritesSection(this.customizationManager);
+      this.commonlyUsedSection = new CommonlyUsedSection(this.customizationManager, this.cardManager);
     }
   }
 
@@ -181,7 +187,7 @@ export class HomePage {
     hass: any,
     onTallToggle?: (entityId: string, areaId: string) => void | Promise<void | boolean>
   ): Promise<void> {
-    if (!this.customizationManager || !this.scenesSection || !this.camerasSection || !this.areaSection || !this.favoritesSection) {
+    if (!this.customizationManager || !this.scenesSection || !this.camerasSection || !this.areaSection || !this.favoritesSection || !this.commonlyUsedSection) {
       throw new Error('Required sections not initialized');
     }
     
@@ -192,13 +198,18 @@ export class HomePage {
     // Create a map of all available sections
     const availableSections = new Map<string, () => Promise<void>>();
     
-    // Add favorites section if there are favorites defined
+    // Add favorites section if there are favorites defined (first in order)
     const hasFavorites = await this.customizationManager?.hasFavoriteAccessories();
     if (hasFavorites) {
       availableSections.set('favorites_section', async () => {
         await this.favoritesSection!.render(container, allEntities, hass, onTallToggle);
       });
     }
+    
+    // Add commonly used section (will auto-hide if empty, second in order)
+    availableSections.set('commonly_used_section', async () => {
+      await this.commonlyUsedSection!.render(container, allEntities, hass, onTallToggle);
+    });
     
     // Add scenes section if there are any scenes or scripts
     if (scenesEntities.length > 0) {
@@ -237,14 +248,16 @@ export class HomePage {
         }
       }
     } else {
-      // Default order: cameras, scenes, favorites, then areas alphabetically
+      // Default order: favorites, commonly_used, cameras, scenes, then areas alphabetically
       orderedSectionIds = Array.from(availableSections.keys()).sort((a, b) => {
+        if (a === 'favorites_section') return -1;
+        if (b === 'favorites_section') return 1;
+        if (a === 'commonly_used_section') return -1;
+        if (b === 'commonly_used_section') return 1;
         if (a === 'cameras_section') return -1;
         if (b === 'cameras_section') return 1;
         if (a === 'scenes_section') return -1;
         if (b === 'scenes_section') return 1;
-        if (a === 'favorites_section') return -1;
-        if (b === 'favorites_section') return 1;
         return a.localeCompare(b);
       });
     }

@@ -108,6 +108,7 @@
   "section_titles": {
     "default_room": "Pièce par Défaut",
     "favorites": "Favoris",
+    "commonly_used": "Utilisés Souvent",
     "scenes": "Scènes",
     "cameras": "Caméras"
   },

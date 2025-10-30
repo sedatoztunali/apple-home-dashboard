@@ -1,4 +1,5 @@
 import { CustomizationManager } from './CustomizationManager';
+import { UsageTracker } from './UsageTracker';
 import Sortable from 'sortablejs';
 import { localize } from './LocalizationService';
 import { RTLHelper } from './RTLHelper';
@@ -6,7 +7,7 @@ import { RTLHelper } from './RTLHelper';
 interface SectionItem {
   id: string;
   name: string;
-  type: 'area' | 'scenes' | 'cameras' | 'favorites';
+  type: 'area' | 'scenes' | 'cameras' | 'favorites' | 'commonly_used';
   visible: boolean;
   order: number;
 }
@@ -102,10 +103,10 @@ export class SectionReorderManager {
       });
     }
 
-    // Add Favorites section (third in default order)
+    // Add Favorites section (first in default order)
     const favoriteAccessories = await this.customizationManager.getFavoriteAccessories();
     if (favoriteAccessories.length > 0) {
-      const baseOrder = (cameraEntities.length > 0 ? 1 : 0) + (scenesEntities.length > 0 ? 1 : 0);
+      const baseOrder = 0; // First section
       sections.push({
         id: 'favorites_section',
         name: localize('section_titles.favorites'),
@@ -115,13 +116,28 @@ export class SectionReorderManager {
       });
     }
 
+    // Add Commonly Used section (second in default order, after favorites)
+    const usageTracker = UsageTracker.getInstance(this.customizationManager);
+    const hasCommonlyUsed = await usageTracker.hasCommonlyUsed(2, 24);
+    if (hasCommonlyUsed) {
+      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0); // After favorites
+      sections.push({
+        id: 'commonly_used_section',
+        name: localize('section_titles.commonly_used'),
+        type: 'commonly_used',
+        visible: !hiddenSections.includes('commonly_used_section'),
+        order: sectionOrder.indexOf('commonly_used_section') !== -1 ? sectionOrder.indexOf('commonly_used_section') : baseOrder
+      });
+    }
+
     // Add area sections
     areas.forEach((area, index) => {
       const areaId = area.area_id || area.id;
       const areaName = area.name || areaId;
-      const baseOrder = (cameraEntities.length > 0 ? 1 : 0) + 
+      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + 
+                       (hasCommonlyUsed ? 1 : 0) + 
+                       (cameraEntities.length > 0 ? 1 : 0) + 
                        (scenesEntities.length > 0 ? 1 : 0) + 
-                       (favoriteAccessories.length > 0 ? 1 : 0) + 
                        index;
       
       sections.push({

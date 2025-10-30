@@ -6,6 +6,34 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Tamamlananlar
 
+- [x] T-005 — Commonly Used section (Manuel tracking)
+  - Oluşturulma: 2025-10-30
+  - Tamamlanma: 2025-10-30
+  - Bağımlılıklar: —
+  - Mevcut: Home ekranında sadece Favorites, Status, Rooms, Groups, Scenes, Cameras bölümleri var
+  - Hedef: Son 24 saatte sık kullanılan varlıkları gösteren "Commonly Used" bölümü eklenmeli
+  - Kapsam:
+    - `UsageTracker` utility sınıfı: etkileşim tracking ve sıralama (Home Assistant storage)
+    - `CommonlyUsedSection` component: FavoritesSection benzeri yapı
+    - `AppleHomeCard.ts`: `handleCardClick` ve `handleIconClick` içine tracking ekleme
+    - Action types: tap, toggle, more-info açma
+    - **Filtreleme kriterleri:**
+      - Minimum kullanım eşiği: Son 24 saatte en az 2-3 kez kullanılmış olmalı
+      - Tek seferlik kullanımlar bölüme eklenmemeli
+      - Sıralama: Kullanım sıklığı (ağırlık) + son kullanım zamanı (ağırlık) kombinasyonu
+    - Son 24 saatteki etkileşimleri filtreleme ve sıralama algoritması
+    - `HomePage.ts`: CommonlyUsedSection render'ı ekleme
+    - Section sıralama ve gizleme desteği
+    - Çeviri anahtarları (tüm dillerde): `section_titles.commonly_used`
+    - Varsayılan sıralama: Favorites → Commonly Used → Cameras → Scenes → Areas
+  - Kabul Kriterleri:
+    - Son 24 saatte **sık kullanılan** (en az eşik değer kadar) varlıklar "Commonly Used" bölümünde görünür
+    - Tek seferlik kullanımlar bölüme eklenmez
+    - En çok kullanılanlar üstte, az kullanılanlar altta sıralanır
+    - Boş olduğunda (eşik değeri aşan varlık yoksa) bölüm otomatik gizlenir
+    - Etkileşimler kalıcı olarak saklanır (yeniden yüklemede korunur)
+    - Build ve lint temiz
+
 - [x] T-002 — Home Wallpaper kaldırma seçeneği
   - Oluşturulma: 2025-10-30
   - Tamamlanma: 2025-10-30

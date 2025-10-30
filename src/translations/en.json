@@ -113,6 +113,7 @@
   "section_titles": {
     "default_room": "Default Room",
     "favorites": "Favorites",
+    "commonly_used": "Commonly Used",
     "scenes": "Scenes",
     "cameras": "Cameras"
   },

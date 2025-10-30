@@ -94,6 +94,7 @@
   "section_titles": {
     "default_room": "Комната по Умолчанию",
     "favorites": "Избранное",
+    "commonly_used": "Часто Используемые",
     "scenes": "Сцены",
     "cameras": "Камеры"
   },

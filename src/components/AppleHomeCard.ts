@@ -3,6 +3,8 @@ import { SnapshotManager } from '../utils/SnapshotManager';
 import { CardConfig, EntityState } from '../types/types';
 import { localize } from '../utils/LocalizationService';
 import { RTLHelper } from '../utils/RTLHelper';
+import { UsageTracker } from '../utils/UsageTracker';
+import { CustomizationManager } from '../utils/CustomizationManager';
 
 export class AppleHomeCard extends HTMLElement {
   private config?: CardConfig;
@@ -852,6 +854,9 @@ export class AppleHomeCard extends HTMLElement {
       return;
     }
     
+    // Track interaction for commonly used section
+    this.trackInteraction('more-info');
+    
     // Open more-info dialog for card area clicks
     this.dispatchEvent(new CustomEvent('hass-more-info', {
       bubbles: true,
@@ -868,6 +873,13 @@ export class AppleHomeCard extends HTMLElement {
     
     const domain = this.entity.split('.')[0];
     const entityId = this.entity;
+    
+    // Track interaction for commonly used section
+    // Determine action type based on domain
+    const actionType: 'toggle' | 'more-info' = ['climate', 'camera', 'binary_sensor', 'sensor'].includes(domain) 
+      ? 'more-info' 
+      : 'toggle';
+    this.trackInteraction(actionType);
     
     // Handle different domains for icon clicks (toggle behavior)
     switch (domain) {
@@ -937,6 +949,22 @@ export class AppleHomeCard extends HTMLElement {
           // Try to toggle
           this._hass.callService('homeassistant', 'toggle', { entity_id: entityId });
         }
+    }
+  }
+
+  /**
+   * Track entity interaction for commonly used section
+   */
+  private trackInteraction(actionType: 'tap' | 'toggle' | 'more-info' = 'tap'): void {
+    if (!this.entity) return;
+    
+    try {
+      const customizationManager = CustomizationManager.getInstance();
+      const usageTracker = UsageTracker.getInstance(customizationManager);
+      usageTracker.trackInteraction(this.entity, actionType);
+    } catch (error) {
+      // Silently fail - tracking is not critical
+      console.debug('Failed to track interaction:', error);
     }
   }
 
