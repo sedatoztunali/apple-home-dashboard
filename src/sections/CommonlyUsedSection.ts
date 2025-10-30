@@ -22,10 +22,14 @@ export class CommonlyUsedSection {
     hass: any,
     onTallToggle?: (entityId: string, areaId: string) => void | Promise<void | boolean>
   ): Promise<void> {
+    console.log('📊 CommonlyUsedSection: Starting render');
     // Get commonly used entities (minimum 2 interactions in last 24 hours)
     const commonlyUsedEntityIds = await this.usageTracker.getCommonlyUsed(2, 24);
     
+    console.log('📊 CommonlyUsedSection: Got commonly used entities', commonlyUsedEntityIds);
+    
     if (commonlyUsedEntityIds.length === 0) {
+      console.log('📊 CommonlyUsedSection: No commonly used entities, skipping render');
       return; // Don't render if no commonly used entities
     }
 
