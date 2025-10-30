@@ -1,6 +1,6 @@
 {
   "name": "smart-home-dashboard",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Smart Home-inspired dashboard strategy for Home Assistant",
   "main": "smart-home-dashboard.js",
   "scripts": {

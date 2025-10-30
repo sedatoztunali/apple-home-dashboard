@@ -42,7 +42,14 @@ export class SectionReorderManager {
     const sectionOrder = customizations.home?.sections?.order || [];
     const hiddenSections = customizations.home?.sections?.hidden || [];
 
-    // Add Cameras section (first in default order)
+    // Get Favorites section count (needed for baseOrder calculations)
+    const favoriteAccessories = await this.customizationManager.getFavoriteAccessories();
+    
+    // Check for Commonly Used section (needed for baseOrder calculations)
+    const usageTracker = UsageTracker.getInstance(this.customizationManager);
+    const hasCommonlyUsed = await usageTracker.hasCommonlyUsed(2, 24);
+
+    // Add Cameras section (third in default order, after favorites and commonly_used)
     const cameraEntities = Object.values(hass.states).filter((state: any) => {
       if (!state.entity_id.startsWith('camera.')) {
         return false;
@@ -63,16 +70,17 @@ export class SectionReorderManager {
     });
     
     if (cameraEntities.length > 0) {
+      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + (hasCommonlyUsed ? 1 : 0);
       sections.push({
         id: 'cameras_section',
         name: localize('section_titles.cameras'),
         type: 'cameras',
         visible: !hiddenSections.includes('cameras_section'),
-        order: sectionOrder.indexOf('cameras_section') !== -1 ? sectionOrder.indexOf('cameras_section') : 0
+        order: sectionOrder.indexOf('cameras_section') !== -1 ? sectionOrder.indexOf('cameras_section') : baseOrder
       });
     }
 
-    // Add Scenes section (second in default order)
+    // Add Scenes section (fourth in default order, after cameras)
     const scenesEntities = Object.values(hass.states).filter((state: any) => {
       if (!state.entity_id.startsWith('scene.') && !state.entity_id.startsWith('script.')) {
         return false;
@@ -92,19 +100,7 @@ export class SectionReorderManager {
       return true;
     });
     
-    if (scenesEntities.length > 0) {
-      const baseOrder = cameraEntities.length > 0 ? 1 : 0;
-      sections.push({
-        id: 'scenes_section',
-        name: localize('section_titles.scenes'),
-        type: 'scenes',
-        visible: !hiddenSections.includes('scenes_section'),
-        order: sectionOrder.indexOf('scenes_section') !== -1 ? sectionOrder.indexOf('scenes_section') : baseOrder
-      });
-    }
-
     // Add Favorites section (first in default order)
-    const favoriteAccessories = await this.customizationManager.getFavoriteAccessories();
     if (favoriteAccessories.length > 0) {
       const baseOrder = 0; // First section
       sections.push({
@@ -117,8 +113,6 @@ export class SectionReorderManager {
     }
 
     // Add Commonly Used section (second in default order, after favorites)
-    const usageTracker = UsageTracker.getInstance(this.customizationManager);
-    const hasCommonlyUsed = await usageTracker.hasCommonlyUsed(2, 24);
     if (hasCommonlyUsed) {
       const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0); // After favorites
       sections.push({
@@ -127,6 +121,18 @@ export class SectionReorderManager {
         type: 'commonly_used',
         visible: !hiddenSections.includes('commonly_used_section'),
         order: sectionOrder.indexOf('commonly_used_section') !== -1 ? sectionOrder.indexOf('commonly_used_section') : baseOrder
+      });
+    }
+
+    // Add Scenes section (fourth in default order, after cameras)
+    if (scenesEntities.length > 0) {
+      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + (hasCommonlyUsed ? 1 : 0) + (cameraEntities.length > 0 ? 1 : 0);
+      sections.push({
+        id: 'scenes_section',
+        name: localize('section_titles.scenes'),
+        type: 'scenes',
+        visible: !hiddenSections.includes('scenes_section'),
+        order: sectionOrder.indexOf('scenes_section') !== -1 ? sectionOrder.indexOf('scenes_section') : baseOrder
       });
     }
 

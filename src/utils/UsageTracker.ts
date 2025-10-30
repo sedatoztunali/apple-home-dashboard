@@ -61,11 +61,8 @@ export class UsageTracker {
       // Add current timestamp
       usageData[entityId].push(now);
 
-      console.log('📊 UsageTracker: Tracking interaction', { entityId, actionType, count: usageData[entityId].length });
-
       // Save back to storage
       await this.customizationManager.setCustomization('home', homeData);
-      console.log('📊 UsageTracker: Saved to storage');
     } catch (error) {
       console.warn('Failed to track entity interaction:', error);
     }
@@ -95,13 +92,6 @@ export class UsageTracker {
       const homeData = this.customizationManager.getCustomization('home');
       const usageData: UsageData = homeData[UsageTracker.STORAGE_KEY] || {};
 
-      console.log('📊 UsageTracker: Getting commonly used', { 
-        minThreshold, 
-        hours, 
-        usageDataKeys: Object.keys(usageData).length,
-        usageData 
-      });
-
       const cutoffTime = Date.now() - (hours * 60 * 60 * 1000);
       const entityScores: Array<{ entityId: string; score: number; lastUsed: number }> = [];
 
@@ -109,13 +99,6 @@ export class UsageTracker {
       for (const [entityId, timestamps] of Object.entries(usageData)) {
         // Filter timestamps within the time window
         const recentTimestamps = timestamps.filter(ts => ts >= cutoffTime);
-        
-        console.log('📊 UsageTracker: Processing entity', { 
-          entityId, 
-          totalTimestamps: timestamps.length, 
-          recentTimestamps: recentTimestamps.length,
-          minThreshold 
-        });
         
         if (recentTimestamps.length >= minThreshold) {
           const score = recentTimestamps.length; // Usage count
@@ -137,9 +120,7 @@ export class UsageTracker {
         return b.lastUsed - a.lastUsed; // More recent first
       });
 
-      const result = entityScores.map(item => item.entityId);
-      console.log('📊 UsageTracker: Commonly used entities', result);
-      return result;
+      return entityScores.map(item => item.entityId);
     } catch (error) {
       console.warn('Failed to get commonly used entities:', error);
       return [];
