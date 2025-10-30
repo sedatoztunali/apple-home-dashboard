@@ -29,6 +29,43 @@ declare global {
 }
 
 /**
+ * Automatically install Star Wars Light theme if not already installed
+ * Note: Theme file must be manually placed in /config/themes/ directory
+ * This function attempts to register it via Home Assistant's theme registry
+ */
+async function installThemeAutomatically(hass: any): Promise<void> {
+  if (!hass) return;
+  
+  try {
+    // Check if theme is already registered
+    const themes = await hass.callWS({ type: 'frontend/get_themes' });
+    const themeName = 'Star Wars Light';
+    
+    const themeExists = themes?.themes?.some((theme: any) => theme.name === themeName);
+    
+    if (themeExists) {
+      // Theme already exists, nothing to do
+      return;
+    }
+    
+    // Note: Home Assistant doesn't allow registering themes programmatically via WebSocket
+    // Themes must be either:
+    // 1. Placed in /config/themes/ directory (HA auto-discovers them)
+    // 2. Installed via HACS
+    // 3. Defined in configuration.yaml
+    
+    // For now, we'll just log a helpful message
+    console.info('💡 Smart Home Dashboard: Star Wars Light theme recommended but not found.');
+    console.info('   To install: Place theme/star_wars_light.yaml in /config/themes/ directory');
+    console.info('   Or install via HACS: https://github.com/Stormrage-DJ/ha_theme_star_wars_light');
+    
+  } catch (error) {
+    // Non-critical, theme installation is optional
+    console.warn('Could not check theme registry:', error);
+  }
+}
+
+/**
  * Main strategy function - generates dashboard configuration
  * This is called by Home Assistant's strategy system
  */
@@ -70,6 +107,14 @@ async function generateLovelaceDashboard(
   setTimeout(() => {
     uiManager.reapplyDashboardSettings();
   }, 100);
+
+  // Automatically install theme if not already installed
+  try {
+    await installThemeAutomatically(hass);
+  } catch (error) {
+    console.warn('Failed to install theme automatically:', error);
+    // Non-critical, continue without theme
+  }
 
   // Home view configuration - always first
   const homeTitle = options?.title || hass?.config?.location_name || localize('pages.my_home');

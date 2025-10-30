@@ -1725,6 +1725,19 @@ export class AppleHeader {
         -webkit-backdrop-filter: blur(50px);
       }
 
+      /* When scrolled, make buttons and icons white */
+      .apple-home-header.scrolled .apple-header-back-button {
+        color: #ffffff;
+      }
+
+      .apple-home-header.scrolled .apple-header-sidebar-button {
+        color: #ffffff;
+      }
+
+      .apple-home-header.scrolled .apple-header-menu-button {
+        color: #ffffff;
+      }
+
       .apple-header-content {
         display: flex;
         align-items: center;
@@ -1737,8 +1750,9 @@ export class AppleHeader {
       .apple-header-back-button {
         background: transparent;
         border: none;
-        color: #ffffff;
+        color: #000000;
         cursor: pointer;
+        transition: color 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -1770,6 +1784,8 @@ export class AppleHeader {
       .apple-header-back-button ha-icon {
         --mdc-icon-size: 30px;
         flex-shrink: 0;
+        color: inherit;
+        transition: color 0.2s ease;
       }
 
       .apple-home-header.rtl .apple-header-back-button {
@@ -1799,8 +1815,9 @@ export class AppleHeader {
       .apple-header-sidebar-button {
         background: transparent;
         border: none;
-        color: #ffffff;
+        color: #000000;
         cursor: pointer;
+        transition: color 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1816,6 +1833,8 @@ export class AppleHeader {
 
       .apple-header-sidebar-button ha-icon {
         --mdc-icon-size: 24px;
+        color: inherit;
+        transition: color 0.2s ease;
       }
 
       .apple-home-header.rtl .apple-header-sidebar-button {
@@ -1914,9 +1933,8 @@ export class AppleHeader {
       .apple-header-menu-button {
         background: transparent;
         border: none;
-        color: #ffffff;
+        color: #000000;
         cursor: pointer;
-        padding: 8px;
         transition: all 0.2s ease;
         font-family: inherit;
         display: flex;
