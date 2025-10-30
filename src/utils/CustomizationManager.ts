@@ -331,11 +331,17 @@ export class CustomizationManager {
     }
     
     try {
+      console.log('💾 CustomizationManager: Saving customizations', { 
+        usage_tracking: this.customizations.home?.usage_tracking,
+        homeKeys: Object.keys(this.customizations.home || {})
+      });
       const success = await this.saveCustomizationsToStorage(this._hass, this.customizations);
       
       if (!success) {
         console.error('🏠 APPLE HOME: Failed to save customizations - check Home Assistant setup');
         console.error('🏠 APPLE HOME: Please create an input_text helper named "apple_home_dashboard_config" for persistent storage');
+      } else {
+        console.log('💾 CustomizationManager: Successfully saved customizations');
       }
       // Removed global refresh - individual components should handle their own updates
     } catch (error) {
@@ -396,10 +402,17 @@ export class CustomizationManager {
       // Try to get the current dashboard key dynamically
       const dashboardKey = await this.getCurrentDashboardKey(hass);
       
+      console.log('💾 CustomizationManager: Saving to storage', { dashboardKey, usage_tracking: customizations.home?.usage_tracking });
+      
       // Get current dashboard config
       const currentConfig = await hass.callWS({
         type: 'lovelace/config',
         url_path: dashboardKey
+      });
+      
+      console.log('💾 CustomizationManager: Current config', { 
+        hasCustomizations: !!currentConfig.customizations,
+        usage_tracking: currentConfig.customizations?.home?.usage_tracking 
       });
       
       // Update config with customizations
@@ -408,12 +421,18 @@ export class CustomizationManager {
         customizations: customizations
       };
       
+      console.log('💾 CustomizationManager: Updated config', { 
+        usage_tracking: updatedConfig.customizations?.home?.usage_tracking 
+      });
+      
       // Save updated config back to dashboard
       await hass.callWS({
         type: 'lovelace/config/save',
         url_path: dashboardKey,
         config: updatedConfig
       });
+      
+      console.log('💾 CustomizationManager: Config saved successfully');
       
       // Hide the dashboard update notification
       this.hideNotificationAfterSave();
