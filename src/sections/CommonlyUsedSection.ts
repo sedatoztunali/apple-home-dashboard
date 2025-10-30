@@ -113,7 +113,7 @@ export class CommonlyUsedSection {
         cardElement = document.createElement('apple-home-card') as HTMLElement;
         
         // Determine if card should be tall based on customizations
-        const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id, 'home') || false;
+        const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id || 'commonly_used', 'home') || false;
         const configWithTall = { ...cardConfig, is_tall: shouldBeTall };
         
         (cardElement as any).setConfig(configWithTall);
@@ -138,7 +138,7 @@ export class CommonlyUsedSection {
       wrapper.dataset.entityId = cardConfig.entity;
       
       // Determine if card should be tall based on customizations
-      const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id, 'home') || false;
+      const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id || 'commonly_used', 'home') || false;
       if (shouldBeTall) {
         wrapper.classList.add('tall');
       }

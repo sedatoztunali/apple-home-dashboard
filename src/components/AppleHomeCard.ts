@@ -956,12 +956,16 @@ export class AppleHomeCard extends HTMLElement {
    * Track entity interaction for commonly used section
    */
   private trackInteraction(actionType: 'tap' | 'toggle' | 'more-info' = 'tap'): void {
-    if (!this.entity) return;
+    if (!this.entity || !this._hass) return;
     
     try {
-      const customizationManager = CustomizationManager.getInstance();
+      const customizationManager = CustomizationManager.getInstance(this._hass);
       const usageTracker = UsageTracker.getInstance(customizationManager);
-      usageTracker.trackInteraction(this.entity, actionType);
+      // Fire and forget - don't await to avoid blocking UI
+      usageTracker.trackInteraction(this.entity, actionType).catch(error => {
+        // Silently fail - tracking is not critical
+        console.debug('Failed to track interaction:', error);
+      });
     } catch (error) {
       // Silently fail - tracking is not critical
       console.debug('Failed to track interaction:', error);
