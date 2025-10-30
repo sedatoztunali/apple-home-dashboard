@@ -193,6 +193,7 @@
     "home_wallpaper": "主屏幕壁纸",
     "take_photo": "拍照...",
     "choose_from_existing": "从现有中选择",
+    "remove_wallpaper": "移除壁纸",
     "search_accessories": "搜索配件...",
     "search_switches": "搜索开关...",
     "hide_ha_header": "隐藏 Home Assistant 标题栏",

@@ -3,8 +3,8 @@ import { DashboardConfig } from '../config/DashboardConfig';
 import { DashboardStateManager } from './DashboardStateManager';
 
 export interface BackgroundConfig {
-  type: 'preset' | 'custom';
-  backgroundImage?: string; // data URL (e.g., "url(data:image/jpeg;base64,...)") or preset gradient name
+  type: 'preset' | 'custom' | 'theme';
+  backgroundImage?: string; // data URL (e.g., "url(data:image/jpeg;base64,...)") or preset gradient name or theme background URL
 }
 
 export class BackgroundManager {
@@ -16,12 +16,12 @@ export class BackgroundManager {
   // Predefined gradient backgrounds
   static readonly PRESET_BACKGROUNDS = {
     'default': DashboardConfig.getDefaultBackground(),
-    'sunset': `linear-gradient(135deg, 
-      rgba(255, 149, 113, 0.8) 0%, 
-      rgba(255, 112, 166, 0.8) 20%, 
-      rgba(255, 95, 192, 0.8) 40%, 
-      rgba(198, 113, 255, 0.8) 60%, 
-      rgba(142, 140, 255, 0.8) 80%, 
+    'sunset': `linear-gradient(135deg,
+      rgba(255, 149, 113, 0.8) 0%,
+      rgba(255, 112, 166, 0.8) 20%,
+      rgba(255, 95, 192, 0.8) 40%,
+      rgba(198, 113, 255, 0.8) 60%,
+      rgba(142, 140, 255, 0.8) 80%,
       rgba(115, 152, 255, 0.8) 100%
     )`,
     'ocean': `linear-gradient(135deg,
@@ -57,20 +57,26 @@ export class BackgroundManager {
   // Default background is the first preset
   static readonly DEFAULT_BACKGROUND = 'default';
 
+  // Theme default background URL (Star Wars Light theme)
+  static readonly THEME_BACKGROUND_URL = 'https://raw.githubusercontent.com/Stormrage-DJ/ha_theme_star_wars_light/main/assets/star_wars_light_bg.png';
+
+  // Theme background CSS (matches theme card-mod-view)
+  static readonly THEME_BACKGROUND_CSS = `top center / auto no-repeat url('${BackgroundManager.THEME_BACKGROUND_URL}') fixed`;
+
   constructor(customizationManager: CustomizationManager) {
     this.customizationManager = customizationManager;
     this.currentBackground = this.getBackgroundConfig();
-    
+
     // Only start monitoring if this is the first instance
     if (BackgroundManager.activeInstances.size === 0) {
       DashboardStateManager.getInstance().addListener((isInDashboard: boolean) => {
         this.handleDashboardStateChange(isInDashboard);
       });
     }
-    
+
     // Listen for dashboard refresh events to update background configuration
     this.setupDashboardRefreshListener();
-    
+
     BackgroundManager.activeInstances.add(this);
   }
 
@@ -80,21 +86,21 @@ export class BackgroundManager {
   private setupDashboardRefreshListener(): void {
     this.dashboardRefreshHandler = (event: Event) => {
       const customEvent = event as CustomEvent;
-      
+
       // Refresh background configuration from updated customizations
       const newBackgroundConfig = this.getBackgroundConfig();
-      
+
       // Only update and reapply if the background configuration actually changed
       if (JSON.stringify(newBackgroundConfig) !== JSON.stringify(this.currentBackground)) {
         this.currentBackground = newBackgroundConfig;
-        
+
         // Reapply background if dashboard is currently active
         if (DashboardStateManager.getInstance().isDashboardActive()) {
           this.applyBackgroundToBody(this.currentBackground);
         }
       }
     };
-    
+
     document.addEventListener('apple-home-dashboard-refresh', this.dashboardRefreshHandler);
   }
 
@@ -127,14 +133,14 @@ export class BackgroundManager {
   private getBackgroundConfig(): BackgroundConfig {
     const customizations = this.customizationManager.getCustomizations();
     const backgroundData = customizations.background;
-    
+
     if (backgroundData) {
       return {
         type: backgroundData.type || 'preset',
         backgroundImage: backgroundData.value || backgroundData.backgroundImage || BackgroundManager.DEFAULT_BACKGROUND
       };
     }
-    
+
     return { type: 'preset', backgroundImage: BackgroundManager.DEFAULT_BACKGROUND };
   }
 
@@ -160,38 +166,61 @@ export class BackgroundManager {
     if (!DashboardStateManager.getInstance().isDashboardActive()) {
       return;
     }
-    
+
     let backgroundStyle = '';
-    
-    if (config.type === 'custom' && config.backgroundImage) {
+    let backgroundSize = 'cover';
+    let backgroundPosition = 'center';
+    let backgroundRepeat = 'no-repeat';
+    let backgroundAttachment = 'fixed';
+
+    if (config.type === 'theme') {
+      // Theme background uses specific CSS from theme file
+      backgroundStyle = `url('${BackgroundManager.THEME_BACKGROUND_URL}')`;
+      backgroundSize = 'auto';
+      backgroundPosition = 'top center';
+      backgroundRepeat = 'no-repeat';
+      backgroundAttachment = 'fixed';
+    } else if (config.type === 'custom' && config.backgroundImage) {
       backgroundStyle = config.backgroundImage;
+      backgroundSize = 'cover';
+      backgroundPosition = 'center';
+      backgroundRepeat = 'no-repeat';
+      backgroundAttachment = 'fixed';
     } else if (config.type === 'preset' && config.backgroundImage) {
       backgroundStyle = BackgroundManager.getPresetBackground(config.backgroundImage);
+      backgroundSize = 'cover';
+      backgroundPosition = 'center';
+      backgroundRepeat = 'no-repeat';
+      backgroundAttachment = 'fixed';
     } else {
       backgroundStyle = BackgroundManager.getDefaultBackground();
+      backgroundSize = 'cover';
+      backgroundPosition = 'center';
+      backgroundRepeat = 'no-repeat';
+      backgroundAttachment = 'fixed';
     }
-    
+
     // Remove any existing background style first
     const existingStyle = document.querySelector('#apple-home-body-background');
     if (existingStyle) {
       existingStyle.remove();
     }
-    
+
     // Create new style element for body background
     const styleElement = document.createElement('style');
     styleElement.id = 'apple-home-body-background';
-    
+
     styleElement.textContent = `
       body {
         background-image: ${backgroundStyle} !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-repeat: no-repeat !important;
-        background-attachment: fixed !important;
+        background-size: ${backgroundSize} !important;
+        background-position: ${backgroundPosition} !important;
+        background-repeat: ${backgroundRepeat} !important;
+        background-attachment: ${backgroundAttachment} !important;
         height: unset !important;
       }
     `;
-    
+
     document.head.appendChild(styleElement);
   }
 
@@ -201,7 +230,7 @@ export class BackgroundManager {
   initializeBackground(): void {
     // Set dashboard as active and apply background
     this.customizationManager.setDashboardActive(true);
-    
+
     const config = this.getCurrentBackground();
     this.applyBackgroundToBody(config);
   }
@@ -241,6 +270,17 @@ export class BackgroundManager {
   }
 
   /**
+   * Remove custom wallpaper and apply theme default background
+   */
+  async removeWallpaper(): Promise<void> {
+    const config: BackgroundConfig = {
+      type: 'theme',
+      backgroundImage: BackgroundManager.THEME_BACKGROUND_URL
+    };
+    await this.setBackground(config);
+  }
+
+  /**
    * Get current background config
    */
   getCurrentBackground(): BackgroundConfig {
@@ -253,6 +293,13 @@ export class BackgroundManager {
    */
   isUsingCustomBackground(): boolean {
     return this.currentBackground.type === 'custom' && !!this.currentBackground.backgroundImage;
+  }
+
+  /**
+   * Check if using theme background
+   */
+  isUsingThemeBackground(): boolean {
+    return this.currentBackground.type === 'theme';
   }
 
   /**
@@ -310,9 +357,9 @@ export class BackgroundManager {
       document.removeEventListener('apple-home-dashboard-refresh', this.dashboardRefreshHandler);
       this.dashboardRefreshHandler = undefined;
     }
-    
+
     BackgroundManager.activeInstances.delete(this);
-    
+
     // Only remove background if this was the last instance
     if (BackgroundManager.activeInstances.size === 0) {
       this.removeBackground();

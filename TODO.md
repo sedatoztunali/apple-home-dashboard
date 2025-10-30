@@ -4,18 +4,25 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Aktif İşler
 
-- [ ] T-002 — Home Wallpaper kaldırma seçeneği
+## Tamamlananlar
+
+- [x] T-002 — Home Wallpaper kaldırma seçeneği
   - Oluşturulma: 2025-10-30
-  - Tamamlanma: —
+  - Tamamlanma: 2025-10-30
   - Bağımlılıklar: —
   - Mevcut: "Home Settings" içinde duvar kâğıdı olarak bir resim seçilebiliyor
-  - Hedef: Arka plan resmini tamamen kaldır (varsayılan/none) seçeneği eklenebilmeli
+  - Hedef: Arka plan resmini tamamen kaldır (theme varsayılan arka planına dön) seçeneği eklenebilmeli
   - Kapsam:
-    - Home Settings UI'ına "No wallpaper" / "Remove background" seçeneği eklenmesi
-    - `BackgroundManager` ve `CustomizationManager` üzerinde none/null durumunun kalıcı saklanması
+    - Home Settings UI'ına "Remove wallpaper" / "Clear background" seçeneği eklenmesi
+    - `BackgroundManager`'a `removeWallpaper()` metodu eklenmesi
+    - Theme varsayılan arka planı: `https://raw.githubusercontent.com/Stormrage-DJ/ha_theme_star_wars_light/main/assets/star_wars_light_bg.png`
+    - Theme background CSS: `top center / auto no-repeat url(...) fixed`
+    - Arka plan temizlendiğinde theme background'unun uygulanması
+    - `CustomizationManager` üzerinde theme durumunun kalıcı saklanması
     - Uygulandığında anında görünümün güncellenmesi ve reload sonrası kalıcılık
   - Kabul Kriterleri:
-    - Kullanıcı ayardan arka planı kaldırdığında arka plan şeffaf/varsayılan duruma geçer
+    - Kullanıcı ayardan arka planı kaldırdığında theme varsayılan arka planı uygulanır
+    - Theme background CSS özellikleri doğru uygulanır (position: top center, size: auto, no-repeat, fixed)
     - Ayar kalıcıdır, yeniden yüklemede korunur
     - Build ve lint temiz
 
@@ -67,5 +74,3 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
     - Dil `tr` seçildiğinde tüm etiketler Türkçe görüntülenir
     - Dil `nl` seçildiğinde eksik etiket kalmaz
     - Build ve lint temiz
-
-

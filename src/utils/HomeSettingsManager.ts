@@ -9,7 +9,7 @@ export interface HomeSettingsData {
   excludedFromDashboard: string[];
   excludedFromHome: string[];
   includedSwitches: string[];
-  backgroundType: 'preset' | 'custom';
+  backgroundType: 'preset' | 'custom' | 'theme';
   customBackground?: string;
   presetBackground?: string;
   hideHeader?: boolean;
@@ -60,17 +60,17 @@ export class HomeSettingsManager {
   private async loadSettings() {
     await this.customizationManager.ensureCustomizationsLoaded();
     const customizations = this.customizationManager.getCustomizations();
-    
+
     // Use BackgroundManager to get the current background config properly
     const backgroundManager = new BackgroundManager(this.customizationManager);
     const currentBackground = backgroundManager.getCurrentBackground();
-    
+
     this.settings = {
       favoriteAccessories: customizations.home?.favorites || [],
       excludedFromDashboard: customizations.home?.excluded_from_dashboard || [],
       excludedFromHome: customizations.home?.excluded_from_home || [],
       includedSwitches: customizations.home?.included_switches || [],
-      backgroundType: currentBackground.type,
+      backgroundType: currentBackground.type === 'theme' ? 'theme' : (currentBackground.type === 'custom' ? 'custom' : 'preset'),
       customBackground: currentBackground.type === 'custom' ? currentBackground.backgroundImage : undefined,
       presetBackground: currentBackground.type === 'preset' ? currentBackground.backgroundImage : BackgroundManager.DEFAULT_BACKGROUND,
       hideHeader: customizations.ui?.hide_header || false,
@@ -91,31 +91,31 @@ export class HomeSettingsManager {
       hideSidebar: this.settings.hideSidebar,
       showSwitches: this.settings.showSwitches
     };
-    
-    }
+
+  }
 
   private async loadAvailableEntities() {
     if (!this.hass) return;
 
-        // Get all entities that are supported by the dashboard
+    // Get all entities that are supported by the dashboard
     this.availableEntities = Object.values(this.hass.states)
       .filter((state: any) => {
         const domain = state.entity_id.split('.')[0];
         if (!DashboardConfig.isSupportedDomain(domain)) {
           return false;
         }
-        
+
         // Check if entity is hidden in the entity registry
         const entityRegistry = this.hass.entities?.[state.entity_id];
         if (entityRegistry && entityRegistry.hidden_by) {
           return false;
         }
-        
+
         // Check if entity is disabled in the entity registry
         if (entityRegistry && entityRegistry.disabled_by) {
           return false;
         }
-        
+
         return true;
       })
       .map((state: any) => ({
@@ -136,7 +136,7 @@ export class HomeSettingsManager {
   private createModal() {
     this.modal = document.createElement('div');
     this.modal.className = 'apple-home-settings-modal';
-    
+
     this.modal.innerHTML = `
       <div class="modal-backdrop"></div>
       <div class="modal-content">
@@ -243,12 +243,15 @@ export class HomeSettingsManager {
               <span class="option-text">${localize('settings.choose_from_existing')}</span>
               <ha-icon icon="mdi:chevron-right" class="option-arrow"></ha-icon>
             </div>
+            <div class="wallpaper-option-row" data-action="remove">
+              <span class="option-text">${localize('settings.remove_wallpaper')}</span>
+            </div>
           </div>
-          
+
           <div class="current-wallpaper-preview">
             <div class="wallpaper-preview-image" id="current-wallpaper-preview"></div>
           </div>
-          
+
           <input type="file" id="background-file-input" accept="image/*" style="display: none;">
         </div>
       </div>
@@ -281,7 +284,7 @@ export class HomeSettingsManager {
     return entityIds.map(entityId => {
       const entity = this.availableEntities.find(e => e.entity_id === entityId);
       if (!entity) return '';
-      
+
       return `
         <div class="selected-entity-chip" data-entity-id="${entityId}">
           <span class="entity-name">${entity.friendly_name}</span>
@@ -608,7 +611,7 @@ export class HomeSettingsManager {
           transform: translateY(0);
           opacity: 1;
         }
-        
+
         .settings-section {
           padding: 16px;
         }
@@ -694,7 +697,7 @@ export class HomeSettingsManager {
         transform: translateX(20px);
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -759,9 +762,9 @@ export class HomeSettingsManager {
           this.positionAutocompleteResults(results);
         }
       };
-      
+
       window.addEventListener('resize', resizeHandler);
-      
+
       // Store cleanup function for later
       (results as any)._cleanup = () => {
         window.removeEventListener('resize', resizeHandler);
@@ -771,35 +774,35 @@ export class HomeSettingsManager {
 
   private showAutocompleteResults(query: string, resultsContainer: HTMLElement, setting: keyof HomeSettingsData) {
     const alreadySelected = this.tempSettings[setting];
-    
+
     // Filter entities based on query and exclude already selected ones
     let filteredEntities = this.availableEntities.filter(entity => {
-      const matchesQuery = query === '' || 
+      const matchesQuery = query === '' ||
         entity.friendly_name.toLowerCase().includes(query) ||
         entity.entity_id.toLowerCase().includes(query);
       const notSelected = !Array.isArray(alreadySelected) || !alreadySelected.includes(entity.entity_id);
-      
+
       // Exclude cameras from favorites
       if (setting === 'favoriteAccessories' && entity.domain === 'camera') {
         return false;
       }
-      
+
       // Exclude switches from favorites, excludedFromDashboard, and excludedFromHome if showSwitches is disabled
       if (!this.tempSettings.showSwitches && entity.domain === 'switch') {
         if (setting === 'favoriteAccessories' || setting === 'excludedFromDashboard' || setting === 'excludedFromHome') {
           return false;
         }
       }
-      
-            // For included switches, only show switches that are not outlets and are available
+
+      // For included switches, only show switches that are not outlets and are available
       if (setting === 'includedSwitches') {
         if (entity.domain !== 'switch') {
           return false;
         }
         // Check if it's not an outlet (outlets typically have device_class of 'outlet' or contain 'outlet' in the name)
-        const isOutlet = entity.attributes?.device_class === 'outlet' || 
-                         entity.entity_id.toLowerCase().includes('outlet') ||
-                         entity.friendly_name.toLowerCase().includes('outlet');
+        const isOutlet = entity.attributes?.device_class === 'outlet' ||
+          entity.entity_id.toLowerCase().includes('outlet') ||
+          entity.friendly_name.toLowerCase().includes('outlet');
         if (isOutlet) {
           return false;
         }
@@ -809,7 +812,7 @@ export class HomeSettingsManager {
           return false;
         }
       }
-      
+
       return matchesQuery && notSelected;
     }).slice(0, 10); // Limit to 10 results
 
@@ -872,7 +875,7 @@ export class HomeSettingsManager {
       const input = selector.querySelector('.autocomplete-input') as HTMLInputElement;
       const results = selector.querySelector('.autocomplete-results') as HTMLElement;
       const setting = selector.getAttribute('data-setting') as keyof HomeSettingsData;
-      
+
       if (input && results && setting && results.classList.contains('show')) {
         const query = input.value.toLowerCase().trim();
         this.showAutocompleteResults(query, results, setting);
@@ -918,7 +921,7 @@ export class HomeSettingsManager {
         const entityId = chip?.getAttribute('data-entity-id');
         const selector = (e.target as HTMLElement).closest('.entity-selector');
         const setting = selector?.getAttribute('data-setting') as keyof HomeSettingsData;
-        
+
         if (entityId && setting) {
           this.removeEntityFromSetting(entityId, setting);
         }
@@ -928,10 +931,10 @@ export class HomeSettingsManager {
 
   private showModal() {
     if (!this.modal) return;
-    
+
     // Block background scrolling
     document.body.style.overflow = 'hidden';
-    
+
     requestAnimationFrame(() => {
       this.modal?.classList.add('show');
     });
@@ -951,7 +954,7 @@ export class HomeSettingsManager {
     document.body.style.overflow = '';
 
     this.modal.classList.remove('show');
-    
+
     setTimeout(() => {
       document.removeEventListener('keydown', this.handleEscapeKey);
       if (this.modal && this.modal.parentNode) {
@@ -963,13 +966,13 @@ export class HomeSettingsManager {
 
   private async saveAndClose() {
     // Check if changes require a full re-render (entity list changes) vs just DOM updates (UI/background)
-    this.requiresRender = 
+    this.requiresRender =
       JSON.stringify(this.settings.favoriteAccessories) !== JSON.stringify(this.tempSettings.favoriteAccessories) ||
       JSON.stringify(this.settings.excludedFromDashboard) !== JSON.stringify(this.tempSettings.excludedFromDashboard) ||
       JSON.stringify(this.settings.excludedFromHome) !== JSON.stringify(this.tempSettings.excludedFromHome) ||
       JSON.stringify(this.settings.includedSwitches) !== JSON.stringify(this.tempSettings.includedSwitches) ||
       this.settings.showSwitches !== this.tempSettings.showSwitches
-    
+
     // Apply temporary settings to actual settings
     this.settings.favoriteAccessories = [...this.tempSettings.favoriteAccessories];
     this.settings.excludedFromDashboard = [...this.tempSettings.excludedFromDashboard];
@@ -981,28 +984,28 @@ export class HomeSettingsManager {
     this.settings.hideHeader = this.tempSettings.hideHeader;
     this.settings.hideSidebar = this.tempSettings.hideSidebar;
     this.settings.showSwitches = this.tempSettings.showSwitches;
-    
+
     // Wait for settings to be saved before proceeding
     await this.saveSettings();
-    
+
     // Start closing the modal with fade effect
     if (this.modal) {
       this.modal.style.transition = 'opacity 0.3s ease-out';
       this.modal.style.opacity = '0';
     }
-    
+
     // Wait for modal to fully fade before doing anything else
     setTimeout(() => {
       // Restore background scrolling
       document.body.style.overflow = '';
-      
+
       // Remove modal from DOM
       document.removeEventListener('keydown', this.handleEscapeKey);
       if (this.modal && this.modal.parentNode) {
         this.modal.parentNode.removeChild(this.modal);
       }
       this.modal = undefined;
-      
+
       // Only trigger callback after everything is cleaned up
       // Check if we actually need a re-render (entity list changes vs just UI/background changes)
       if (this.onSaveCallback && this.requiresRender) {
@@ -1022,7 +1025,7 @@ export class HomeSettingsManager {
     home.included_switches = this.settings.includedSwitches;
     home.show_switches = this.settings.showSwitches;
     await this.customizationManager.setCustomization('home', home);
-    
+
     // Update UI section
     const ui = this.customizationManager.getCustomization('ui') || {};
     ui.hide_header = this.settings.hideHeader;
@@ -1032,33 +1035,37 @@ export class HomeSettingsManager {
     // Update background section
     const backgroundConfig = {
       type: this.settings.backgroundType,
-      value: this.settings.backgroundType === 'custom' 
-        ? this.settings.customBackground 
-        : this.settings.presetBackground
+      value: this.settings.backgroundType === 'custom'
+        ? this.settings.customBackground
+        : this.settings.backgroundType === 'theme'
+          ? BackgroundManager.THEME_BACKGROUND_URL
+          : this.settings.presetBackground
     };
     await this.customizationManager.setCustomization('background', backgroundConfig);
-    
+
     // Apply background immediately using BackgroundManager's setBackground method
     // Convert storage format to BackgroundManager's expected format
     const backgroundManagerConfig = {
       type: this.settings.backgroundType,
-      backgroundImage: this.settings.backgroundType === 'custom' 
-        ? this.settings.customBackground 
-        : this.settings.presetBackground
+      backgroundImage: this.settings.backgroundType === 'custom'
+        ? this.settings.customBackground
+        : this.settings.backgroundType === 'theme'
+          ? BackgroundManager.THEME_BACKGROUND_URL
+          : this.settings.presetBackground
     };
     const backgroundManager = new BackgroundManager(this.customizationManager);
     await backgroundManager.setBackground(backgroundManagerConfig);
-    
+
     // Apply UI settings immediately using HomeAssistantUIManager
     const uiManager = HomeAssistantUIManager.initializeWithCustomizations(this.customizationManager);
     // Force reapplication of dashboard UI settings
     uiManager.reapplyDashboardSettings();
-    
+
     // Background and UI changes are handled above via DOM manipulation
     // No need for global refresh as BackgroundManager handles background changes directly
     // and HomeAssistantUIManager handles UI changes directly
-    
-    }
+
+  }
 
   private setupBackgroundEventListeners() {
     if (!this.modal) return;
@@ -1069,13 +1076,16 @@ export class HomeSettingsManager {
       row.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
         const action = target.dataset.action;
-        
+
         if (action === 'upload') {
           // Upload photo
           document.getElementById('background-file-input')?.click();
         } else if (action === 'presets') {
           // Open presets selection view
           this.openPresetsView();
+        } else if (action === 'remove') {
+          // Remove wallpaper and apply theme default
+          this.handleRemoveWallpaper();
         }
       });
     });
@@ -1096,19 +1106,19 @@ export class HomeSettingsManager {
     const headerToggle = this.modal.querySelector('#header-toggle');
     const sidebarToggle = this.modal.querySelector('#sidebar-toggle');
     const switchesToggle = this.modal.querySelector('#switches-toggle');
-    
+
     headerToggle?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.tempSettings.hideHeader = !this.tempSettings.hideHeader;
       this.updateUIToggle('header-toggle', this.tempSettings.hideHeader);
     });
-    
+
     sidebarToggle?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.tempSettings.hideSidebar = !this.tempSettings.hideSidebar;
       this.updateUIToggle('sidebar-toggle', this.tempSettings.hideSidebar);
     });
-    
+
     switchesToggle?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.tempSettings.showSwitches = !this.tempSettings.showSwitches;
@@ -1119,7 +1129,7 @@ export class HomeSettingsManager {
       if (includedSwitchesSection) {
         includedSwitchesSection.style.display = this.tempSettings.showSwitches ? 'none' : 'block';
       }
-      
+
       // Refresh autocomplete results for all sections that might have switch entities visible
       this.refreshAutocompleteResults();
     });
@@ -1137,30 +1147,33 @@ export class HomeSettingsManager {
     }
 
     let backgroundStyle = '';
-    
+
     // Use tempSettings to show immediate preview of changes
-    if (this.tempSettings.backgroundType === 'custom' && this.tempSettings.customBackground) {
+    if (this.tempSettings.backgroundType === 'theme') {
+      // Theme background preview
+      backgroundStyle = `url('${BackgroundManager.THEME_BACKGROUND_URL}')`;
+    } else if (this.tempSettings.backgroundType === 'custom' && this.tempSettings.customBackground) {
       backgroundStyle = this.tempSettings.customBackground;
     } else if (this.tempSettings.backgroundType === 'preset' && this.tempSettings.presetBackground) {
       backgroundStyle = BackgroundManager.getPresetBackground(this.tempSettings.presetBackground);
     } else {
       backgroundStyle = BackgroundManager.getDefaultBackground();
     }
-    
+
     // Clear existing styles first
     previewElement.style.removeProperty('background');
     previewElement.style.removeProperty('background-image');
-    
+
     // Apply the background style
     if (backgroundStyle.startsWith('url(')) {
       previewElement.style.setProperty('background-image', backgroundStyle);
-      } else {
+    } else {
       previewElement.style.setProperty('background', backgroundStyle);
-      }
-    
+    }
+
     // Also check computed styles
     const computedStyles = window.getComputedStyle(previewElement);
-    }
+  }
 
   private updateUIToggle(toggleId: string, isActive: boolean) {
     const toggle = this.modal?.querySelector(`#${toggleId}`) as HTMLElement;
@@ -1183,7 +1196,7 @@ export class HomeSettingsManager {
     // Create and show a presets selection modal/view
     const presetsModal = document.createElement('div');
     presetsModal.className = 'presets-selection-modal';
-    
+
     presetsModal.innerHTML = `
       <div class="modal-backdrop"></div>
       <div class="modal-content presets-content">
@@ -1198,7 +1211,7 @@ export class HomeSettingsManager {
         <div class="modal-body">
           <div class="presets-grid">
             ${BackgroundManager.getPresetNames().map(presetName => `
-              <div class="preset-option ${this.tempSettings.backgroundType === 'preset' && this.tempSettings.presetBackground === presetName ? 'selected' : ''}" 
+              <div class="preset-option ${this.tempSettings.backgroundType === 'preset' && this.tempSettings.presetBackground === presetName ? 'selected' : ''}"
                    data-preset="${presetName}">
                 <div class="preset-preview" style="background: ${BackgroundManager.getPresetBackground(presetName)}"></div>
                 <div class="preset-name">${this.formatPresetName(presetName)}</div>
@@ -1211,12 +1224,12 @@ export class HomeSettingsManager {
 
     // Add presets modal styles
     this.addPresetsModalStyles();
-    
+
     document.body.appendChild(presetsModal);
 
     // Setup presets modal event listeners
     this.setupPresetsModalEventListeners(presetsModal);
-    
+
     // Show the modal with animation
     requestAnimationFrame(() => {
       presetsModal.classList.add('show');
@@ -1226,7 +1239,7 @@ export class HomeSettingsManager {
   private addPresetsModalStyles() {
     // Don't add styles if they already exist
     if (document.querySelector('#presets-modal-styles')) return;
-    
+
     const style = document.createElement('style');
     style.id = 'presets-modal-styles';
     style.textContent = `
@@ -1424,7 +1437,7 @@ export class HomeSettingsManager {
         }
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -1443,10 +1456,10 @@ export class HomeSettingsManager {
       this.tempSettings.backgroundType = originalSettings.backgroundType;
       this.tempSettings.presetBackground = originalSettings.presetBackground;
       this.tempSettings.customBackground = originalSettings.customBackground;
-      
+
       // Update the main modal preview to show reverted state
       this.updateCurrentWallpaperPreview();
-      
+
       this.closePresetsModal(presetsModal);
     });
 
@@ -1457,10 +1470,10 @@ export class HomeSettingsManager {
       this.tempSettings.backgroundType = originalSettings.backgroundType;
       this.tempSettings.presetBackground = originalSettings.presetBackground;
       this.tempSettings.customBackground = originalSettings.customBackground;
-      
+
       // Update the main modal preview to show reverted state
       this.updateCurrentWallpaperPreview();
-      
+
       this.closePresetsModal(presetsModal);
     });
 
@@ -1470,15 +1483,15 @@ export class HomeSettingsManager {
       option.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
         const preset = target.dataset.preset;
-        
+
         if (preset) {
           // Update temp settings immediately
           this.tempSettings.backgroundType = 'preset';
           this.tempSettings.presetBackground = preset;
-          
+
           // Immediately update the main modal preview
           this.updateCurrentWallpaperPreview();
-          
+
           // Close the presets modal automatically
           this.closePresetsModal(presetsModal);
         }
@@ -1488,12 +1501,12 @@ export class HomeSettingsManager {
 
   private closePresetsModal(presetsModal: HTMLElement) {
     presetsModal.classList.remove('show');
-    
+
     setTimeout(() => {
       if (presetsModal.parentNode) {
         presetsModal.parentNode.removeChild(presetsModal);
       }
-      
+
       // Remove styles when no longer needed
       const styleElement = document.querySelector('#presets-modal-styles');
       if (styleElement) {
@@ -1517,13 +1530,30 @@ export class HomeSettingsManager {
       const dataUrl = await BackgroundManager.imageToDataUrl(file);
       this.tempSettings.customBackground = dataUrl;
       this.tempSettings.backgroundType = 'custom';
-      
+
       // Immediately update the current wallpaper preview
       this.updateCurrentWallpaperPreview();
-      
+
     } catch (error) {
       console.error('Error converting image to base64:', error);
       alert(localize('errors.image_processing'));
+    }
+  }
+
+  private async handleRemoveWallpaper() {
+    try {
+      const backgroundManager = new BackgroundManager(this.customizationManager);
+      await backgroundManager.removeWallpaper();
+
+      // Update temp settings to reflect theme background
+      this.tempSettings.backgroundType = 'theme';
+      this.tempSettings.customBackground = undefined;
+      this.tempSettings.presetBackground = BackgroundManager.DEFAULT_BACKGROUND;
+
+      // Immediately update the current wallpaper preview
+      this.updateCurrentWallpaperPreview();
+    } catch (error) {
+      console.error('Error removing wallpaper:', error);
     }
   }
 
@@ -1535,7 +1565,7 @@ export class HomeSettingsManager {
 
   public destroy() {
     this.closeModal();
-    
+
     // Remove styles
     const styleElement = document.querySelector('#apple-home-settings-styles');
     if (styleElement) {
