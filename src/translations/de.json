@@ -142,7 +142,9 @@
     "edit_cameras_view": "Kameras bearbeiten", 
     "edit_room_view": "Raum bearbeiten",
     "make_tall": "Groß machen",
-    "make_normal_size": "Normale Größe"
+    "make_normal_size": "Normale Größe",
+    "rename_entity": "Umbenennen",
+    "custom_name": "Benutzerdefinierter Name"
   },
   "toggles": {
     "hide_header": "Header ausblenden",

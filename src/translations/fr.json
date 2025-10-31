@@ -141,7 +141,9 @@
     "edit_cameras_view": "Modifier Vue Caméras",
     "edit_room_view": "Modifier Vue Pièce",
     "make_tall": "Rendre Haute",
-    "make_normal_size": "Taille Normale"
+    "make_normal_size": "Taille Normale",
+    "rename_entity": "Renommer",
+    "custom_name": "Nom Personnalisé"
   },
   "toggles": {
     "hide_header": "Masquer En-tête",

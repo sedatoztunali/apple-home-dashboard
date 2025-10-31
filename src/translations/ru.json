@@ -127,7 +127,9 @@
     "edit_cameras_view": "Редактировать Вид Камер",
     "edit_room_view": "Редактировать Вид Комнаты",
     "make_tall": "Сделать Высоким",
-    "make_normal_size": "Обычный Размер"
+    "make_normal_size": "Обычный Размер",
+    "rename_entity": "Переименовать",
+    "custom_name": "Пользовательское Имя"
   },
   "toggles": {
     "hide_header": "Скрыть Заголовок",

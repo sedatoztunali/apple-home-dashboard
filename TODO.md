@@ -6,6 +6,31 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Tamamlananlar
 
+- [x] T-008 — Entity isimlerini dashboard'da özelleştirme
+  - Oluşturulma: 2025-10-31
+  - Tamamlanma: 2025-10-31
+  - Bağımlılıklar: —
+  - Mevcut: Dashboard'da entity isimleri Home Assistant'daki `friendly_name` kullanıyor, değiştirilemiyor
+  - Hedef: Dashboard'da entity isimlerini özelleştirebilme (HA entity isimlerini değiştirmeden)
+  - Tercih: Edit Mode'da entity ismi üzerine tıklayınca inline edit veya modal ile isim değiştirme
+  - Alternatif: En basit UI yöntemi (örn. Home Settings'te entity seçimi + isim input)
+  - Kapsam:
+    - CustomizationManager'a entity custom name kaydetme/okuma metotları (`setEntityCustomName`, `getEntityCustomName`)
+    - Customizations yapısına `entities: { [entityId]: { custom_name: string } }` eklendi
+    - AppleHomeCard'da öncelik sırası: `custom_name` → `this.name` → `friendly_name` → entity_id
+    - Edit Mode'da entity card'ın isim kısmına tıklayınca inline edit input açılıyor (preferred)
+    - Tüm sayfalarda custom name desteği eklendi (HomePage, RoomPage, GroupPage, ScenesPage, CamerasPage, tüm section'lar)
+    - Custom name ayarlandığında sadece o dashboard'da görünür (kalıcı saklama)
+    - Custom name silme/kaldırma seçeneği (boş/orijinal isme dönme)
+    - Çeviri anahtarları eklendi (`edit.rename_entity`, `edit.custom_name`) - tüm dillere
+  - Kabul Kriterleri:
+    - ✅ Edit Mode'da entity ismi üzerine tıklayınca isim edit edilebilir
+    - ✅ Değiştirilen isimler sadece bu dashboard'da görünür (HA entity isimleri değişmez)
+    - ✅ Custom name ayarı kalıcı olarak saklanır (reload sonrası korunur)
+    - ✅ Tüm sayfalarda (Home, Room, Group, Scenes, Cameras) custom name görünür
+    - ✅ Custom name kaldırıldığında orijinal friendly_name görünür
+    - ✅ Build ve lint hatasız tamamlandı
+
 - [x] T-007 — Home Settings popup altında sürüm numarasını göster
   - Oluşturulma: 2025-10-31
   - Tamamlanma: 2025-10-31

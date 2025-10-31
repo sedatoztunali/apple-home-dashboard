@@ -797,4 +797,42 @@ export class CustomizationManager {
     sectionData[property] = value;
     await this.setCustomization(section, sectionData);
   }
+
+  // Entity custom name methods
+  async setEntityCustomName(entityId: string, customName: string | null): Promise<void> {
+    await this.ensureCustomizationsLoaded();
+    
+    if (!this.customizations.entities) {
+      this.customizations.entities = {};
+    }
+    
+    if (customName === null || customName === '') {
+      // Remove custom name (delete the property)
+      if (this.customizations.entities[entityId]) {
+        delete this.customizations.entities[entityId].custom_name;
+        // If no other customizations exist for this entity, remove the entity entry
+        if (Object.keys(this.customizations.entities[entityId]).length === 0) {
+          delete this.customizations.entities[entityId];
+        }
+      }
+    } else {
+      // Set custom name
+      if (!this.customizations.entities[entityId]) {
+        this.customizations.entities[entityId] = {};
+      }
+      this.customizations.entities[entityId].custom_name = customName;
+    }
+    
+    await this.saveCustomizations();
+    this.triggerGlobalDashboardRefresh();
+  }
+
+  getEntityCustomName(entityId: string): string | null {
+    return this.customizations.entities?.[entityId]?.custom_name || null;
+  }
+
+  async getEntityCustomNameAsync(entityId: string): Promise<string | null> {
+    await this.ensureCustomizationsLoaded();
+    return this.getEntityCustomName(entityId);
+  }
 }

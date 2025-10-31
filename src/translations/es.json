@@ -133,7 +133,9 @@
     "edit_cameras_view": "Editar Vista Cámaras",
     "edit_room_view": "Editar Vista Habitación",
     "make_tall": "Hacer Alto",
-    "make_normal_size": "Tamaño Normal"
+    "make_normal_size": "Tamaño Normal",
+    "rename_entity": "Renombrar",
+    "custom_name": "Nombre Personalizado"
   },
   "toggles": {
     "hide_header": "Ocultar Encabezado",

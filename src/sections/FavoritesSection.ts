@@ -47,9 +47,14 @@ export class FavoritesSection {
           return null;
         }
         
+        // Get custom name from CustomizationManager
+        const customizations = this.customizationManager.getCustomizations();
+        const entityCustomizations = customizations.entities?.[entityId] || null;
+        const customName = entityCustomizations?.custom_name || null;
+
         return {
           entity_id: entityId,
-          name: state.attributes.friendly_name || entityId,
+          name: customName || state.attributes.friendly_name || entityId,
           area_id: state.attributes.area_id || 'favorites_section', // Use special area for favorites
           domain: domain
         };
@@ -148,7 +153,13 @@ export class FavoritesSection {
     }
 
     const domain = entityId.split('.')[0];
-    let friendlyName = state.attributes?.friendly_name || entityId;
+    
+    // Get custom name from CustomizationManager (priority: custom_name → friendly_name → entity_id)
+    const customizations = this.customizationManager.getCustomizations();
+    const entityCustomizations = customizations.entities?.[entityId] || null;
+    const customName = entityCustomizations?.custom_name || null;
+    
+    let friendlyName = customName || state.attributes?.friendly_name || entityId;
     
     // Determine card type and properties
     let cardType = 'custom:apple-home-card';

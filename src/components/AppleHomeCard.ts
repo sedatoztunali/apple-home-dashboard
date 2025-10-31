@@ -88,7 +88,10 @@ export class AppleHomeCard extends HTMLElement {
       return;
     }
 
-    const name = this.name || state.attributes.friendly_name || this.entity.split('.')[1].replace(/_/g, ' ');
+    // Get custom name from CustomizationManager (priority: custom_name → this.name → friendly_name → entity_id)
+    const customizationManager = CustomizationManager.getInstance(this._hass);
+    const customName = customizationManager.getEntityCustomName(this.entity);
+    const name = customName || this.name || state.attributes.friendly_name || this.entity.split('.')[1].replace(/_/g, ' ');
 
     // Check if we're in a status section context (modal or status chips)
     const isInStatusContext = this.closest('.status-modal-cards') || this.closest('.status-chips-container');
@@ -183,14 +186,14 @@ export class AppleHomeCard extends HTMLElement {
         if (!cameraState || cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off') {
           return `
                 <div class="text-content camera-text">
-                  <div class="entity-name">${name}</div>
+                  <div class="entity-name ${isEditMode ? 'editable-name' : ''}" data-edit-mode="${isEditMode ? 'true' : 'false'}">${name}</div>
                   <div class="entity-state camera-status">${localize('status_messages.unavailable')}</div>
                 </div>
               `;
         } else if (this.cameraSnapshotFailed) {
           return `
                 <div class="text-content camera-text">
-                  <div class="entity-name">${name}</div>
+                  <div class="entity-name ${isEditMode ? 'editable-name' : ''}" data-edit-mode="${isEditMode ? 'true' : 'false'}">${name}</div>
                   <div class="entity-state camera-status">${localize('camera.no_snapshot_available')}</div>
                 </div>
               `;
@@ -198,7 +201,7 @@ export class AppleHomeCard extends HTMLElement {
         return ''; // No text content for working cameras
       })() : this.domain === 'camera' ? '' : `
           <div class="text-content">
-            <div class="entity-name">${name}</div>
+            <div class="entity-name ${isEditMode ? 'editable-name' : ''}" data-edit-mode="${isEditMode ? 'true' : 'false'}">${name}</div>
             ${(this.domain === 'scene' || this.domain === 'script') ? '' : `<div class="entity-state">${entityData.stateText}</div>`}
           </div>
           `}
@@ -209,6 +212,9 @@ export class AppleHomeCard extends HTMLElement {
     // Add click handlers only if not in edit mode
     if (!isEditMode) {
       this.setupClickHandlers();
+    } else {
+      // Setup edit mode handlers (name editing)
+      this.setupEditModeHandlers();
     }
 
     // Initialize camera if this is a camera card AND camera is available
@@ -404,6 +410,90 @@ export class AppleHomeCard extends HTMLElement {
     if (icon) {
       icon.addEventListener('click', this.handleIconClick.bind(this));
     }
+  }
+
+  private setupEditModeHandlers() {
+    if (!this.entity || !this._hass) return;
+
+    const entityNameElement = this.shadowRoot?.querySelector('.editable-name') as HTMLElement;
+    if (!entityNameElement) return;
+
+    entityNameElement.style.cursor = 'pointer';
+    entityNameElement.title = localize('edit.rename_entity') || 'Rename';
+
+    entityNameElement.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await this.startNameEdit(entityNameElement);
+    });
+  }
+
+  private async startNameEdit(element: HTMLElement) {
+    if (!this.entity || !this._hass) return;
+
+    const currentName = element.textContent || '';
+    const customizationManager = CustomizationManager.getInstance(this._hass);
+    const state = this._hass.states[this.entity];
+    const originalName = state?.attributes?.friendly_name || this.entity.split('.')[1].replace(/_/g, ' ');
+
+    // Create input element
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentName;
+    input.className = 'entity-name-edit-input';
+    input.style.cssText = `
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      color: white;
+      font-size: inherit;
+      font-weight: inherit;
+      font-family: inherit;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      width: calc(100% + 12px);
+      outline: none;
+    `;
+
+    // Replace element with input
+    const parent = element.parentElement;
+    if (!parent) return;
+
+    element.style.display = 'none';
+    parent.insertBefore(input, element);
+
+    input.focus();
+    input.select();
+
+    const finishEdit = async () => {
+      const newName = input.value.trim();
+      
+      if (newName === '' || newName === originalName) {
+        // Remove custom name (revert to original)
+        await customizationManager.setEntityCustomName(this.entity!, null);
+      } else if (newName !== currentName) {
+        // Set new custom name
+        await customizationManager.setEntityCustomName(this.entity!, newName);
+      }
+
+      // Remove input and restore element
+      parent.removeChild(input);
+      element.style.display = '';
+      
+      // Re-render to update name display
+      this.render();
+    };
+
+    input.addEventListener('blur', finishEdit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        finishEdit();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        parent.removeChild(input);
+        element.style.display = '';
+      }
+    });
   }
 
   // Public method to force re-render when edit mode changes
@@ -647,6 +737,33 @@ export class AppleHomeCard extends HTMLElement {
         -webkit-box-orient: vertical;
         max-height: calc(1.3em * 2);
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      }
+
+      .entity-name.editable-name {
+        position: relative;
+        transition: all 0.2s ease;
+      }
+
+      .entity-name.editable-name:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        padding: 2px 4px;
+        margin: -2px -4px 0 -4px;
+      }
+
+      .entity-name-edit-input {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        border-radius: 6px !important;
+        color: white !important;
+        font-size: inherit !important;
+        font-weight: inherit !important;
+        font-family: inherit !important;
+        padding: 2px 6px !important;
+        margin: -2px -6px 0 -6px !important;
+        width: calc(100% + 12px) !important;
+        outline: none !important;
+        box-sizing: border-box !important;
       }
 
       .entity-state {

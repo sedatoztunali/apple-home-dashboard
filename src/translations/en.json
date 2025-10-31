@@ -146,7 +146,9 @@
     "edit_cameras_view": "Edit Cameras View",
     "edit_room_view": "Edit Room View",
     "make_tall": "Make Tall",
-    "make_normal_size": "Make Normal Size"
+    "make_normal_size": "Make Normal Size",
+    "rename_entity": "Rename",
+    "custom_name": "Custom Name"
   },
   "toggles": {
     "hide_header": "Hide Header",

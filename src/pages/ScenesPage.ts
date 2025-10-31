@@ -180,11 +180,14 @@ export class ScenesPage {
     const customizations = this.customizationManager.getCustomizations();
     const entityCustomizations = customizations.entities?.[entityId] || null;
     
+    // Priority: custom_name → entityCustomizations.name → friendly_name → entity_id
+    const customName = entityCustomizations?.custom_name || null;
+    
     // Create base card configuration
     const cardConfig: any = {
       type: 'custom:apple-home-card',
       entity: entityId,
-      name: entityCustomizations?.name || stateObj.attributes.friendly_name || entityId,
+      name: customName || entityCustomizations?.name || stateObj.attributes.friendly_name || entityId,
       area_id: 'scenes_section',
       is_tall: (entity as any).is_tall !== undefined ? (entity as any).is_tall : false, // Scenes are typically not tall by default
       ...entityCustomizations

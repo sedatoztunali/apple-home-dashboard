@@ -181,7 +181,12 @@ export class ScenesSection {
       return null;
     }
     
-    const friendlyName = state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+    // Get custom name from CustomizationManager (priority: custom_name → friendly_name → entity_id)
+    const customizations = this.customizationManager.getCustomizations();
+    const entityCustomizations = customizations.entities?.[entityId] || null;
+    const customName = entityCustomizations?.custom_name || null;
+    
+    const friendlyName = customName || state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
     const domain = entityId.split('.')[0];
     
     // Determine card type and properties

@@ -129,7 +129,9 @@
     "edit_cameras_view": "Modifica Vista Telecamere",
     "edit_room_view": "Modifica Vista Stanza",
     "make_tall": "Rendi Alto",
-    "make_normal_size": "Dimensione Normale"
+    "make_normal_size": "Dimensione Normale",
+    "rename_entity": "Rinomina",
+    "custom_name": "Nome Personalizzato"
   },
   "toggles": {
     "hide_header": "Nascondi Intestazione",

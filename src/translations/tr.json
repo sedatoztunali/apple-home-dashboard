@@ -146,7 +146,9 @@
     "edit_cameras_view": "Kameralar Görünümünü Düzenle",
     "edit_room_view": "Oda Görünümünü Düzenle",
     "make_tall": "Yüksek Yap",
-    "make_normal_size": "Normal Boyut"
+    "make_normal_size": "Normal Boyut",
+    "rename_entity": "Yeniden Adlandır",
+    "custom_name": "Özel İsim"
   },
   "toggles": {
     "hide_header": "Başlığı Gizle",
@@ -229,5 +231,3 @@
     "loading_automations": "Otomasyonlar Yükleniyor..."
   }
 }
-
-

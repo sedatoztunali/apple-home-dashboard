@@ -92,11 +92,16 @@ export class AreaSection {
       return null;
     }
     
-    let friendlyName = state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+    // Get custom name from CustomizationManager (priority: custom_name → friendly_name → entity_id)
+    const customizations = this.customizationManager.getCustomizations();
+    const entityCustomizations = customizations.entities?.[entityId] || null;
+    const customName = entityCustomizations?.custom_name || null;
+    
+    let friendlyName = customName || state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
     const domain = entityId.split('.')[0];
     
-    // Remove area name from entity name to avoid redundancy
-    if (areaName && friendlyName.includes(areaName)) {
+    // Remove area name from entity name to avoid redundancy (only if not using custom name)
+    if (!customName && areaName && friendlyName.includes(areaName)) {
       const cleanName = friendlyName
         .replace(new RegExp(`^${areaName}\\s+`, 'i'), '')
         .replace(new RegExp(`\\s+${areaName}$`, 'i'), '')

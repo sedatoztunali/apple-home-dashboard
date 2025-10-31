@@ -142,7 +142,9 @@
     "edit_cameras_view": "עריכת תצוגת מצלמות",
     "edit_room_view": "עריכת תצוגת חדר",
     "make_tall": "הפוך לגבוה",
-    "make_normal_size": "הפוך לרגיל"
+    "make_normal_size": "הפוך לרגיל",
+    "rename_entity": "שנה שם",
+    "custom_name": "שם מותאם אישית"
   },
   "toggles": {
     "hide_header": "הסתר פס עליון",

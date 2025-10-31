@@ -148,7 +148,9 @@
     "edit_cameras_view": "Bewerk Camera's Weergave",
     "edit_room_view": "Bewerk Kamer Weergave",
     "make_tall": "Maak Hoog",
-    "make_normal_size": "Normale Grootte"
+    "make_normal_size": "Normale Grootte",
+    "rename_entity": "Hernoemen",
+    "custom_name": "Aangepaste Naam"
   },
   "toggles": {
     "hide_header": "Verberg Header",

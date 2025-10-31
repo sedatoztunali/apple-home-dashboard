@@ -127,7 +127,9 @@
     "edit_cameras_view": "编辑摄像头视图",
     "edit_room_view": "编辑房间视图",
     "make_tall": "变高",
-    "make_normal_size": "正常大小"
+    "make_normal_size": "正常大小",
+    "rename_entity": "重命名",
+    "custom_name": "自定义名称"
   },
   "toggles": {
     "hide_header": "隐藏标题栏",
