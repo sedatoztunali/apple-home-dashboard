@@ -198,7 +198,8 @@
     "search_accessories": "搜索配件...",
     "search_switches": "搜索开关...",
     "hide_ha_header": "隐藏 Home Assistant 标题栏",
-    "hide_ha_sidebar": "隐藏 Home Assistant 侧边栏"
+    "hide_ha_sidebar": "隐藏 Home Assistant 侧边栏",
+    "version_label": "版本"
   },
   "status_messages": {
     "unavailable": "不可用",

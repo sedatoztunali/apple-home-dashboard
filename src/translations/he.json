@@ -213,7 +213,8 @@
     "search_accessories": "חפש אביזרים...",
     "search_switches": "חפש מתגים...",
     "hide_ha_header": "הסתר את הפס העליון של Home Assistant",
-    "hide_ha_sidebar": "הסתר את תפריט הצד של Home Assistant"
+    "hide_ha_sidebar": "הסתר את תפריט הצד של Home Assistant",
+    "version_label": "גרסה"
   },
   "status_messages": {
     "unavailable": "לא זמין",

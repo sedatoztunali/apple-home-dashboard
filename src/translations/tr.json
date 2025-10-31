@@ -221,7 +221,8 @@
     "search_accessories": "Aksesuar ara...",
     "search_switches": "Anahtar ara...",
     "hide_ha_header": "Home Assistant Başlığını Gizle",
-    "hide_ha_sidebar": "Home Assistant Kenar Çubuğunu Gizle"
+    "hide_ha_sidebar": "Home Assistant Kenar Çubuğunu Gizle",
+    "version_label": "Sürüm"
   },
   "status_messages": {
     "unavailable": "Kullanılamıyor",

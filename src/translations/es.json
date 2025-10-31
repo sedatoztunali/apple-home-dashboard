@@ -204,7 +204,8 @@
     "search_accessories": "Buscar accesorios...",
     "search_switches": "Buscar interruptores...",
     "hide_ha_header": "Ocultar Encabezado de Home Assistant",
-    "hide_ha_sidebar": "Ocultar Barra Lateral de Home Assistant"
+    "hide_ha_sidebar": "Ocultar Barra Lateral de Home Assistant",
+    "version_label": "Versión"
   },
   "status_messages": {
     "unavailable": "No disponible",

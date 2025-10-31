@@ -3,6 +3,7 @@ import { DashboardConfig } from '../config/DashboardConfig';
 import { localize } from './LocalizationService';
 import { BackgroundManager } from './BackgroundManager';
 import { HomeAssistantUIManager } from './HomeAssistantUIManager';
+import pkg from '../../package.json';
 
 export interface HomeSettingsData {
   favoriteAccessories: string[];
@@ -42,6 +43,7 @@ export class HomeSettingsManager {
     showSwitches: false
   };
   private availableEntities: any[] = [];
+  private static readonly VERSION: string = (pkg as any).version || '';
 
   constructor(customizationManager: CustomizationManager, onSaveCallback: () => void) {
     this.customizationManager = customizationManager;
@@ -146,6 +148,9 @@ export class HomeSettingsManager {
         </div>
         <div class="modal-body">
           ${this.renderSettingsContent()}
+        </div>
+        <div class="modal-footer">
+          <span class="version-label">${localize('settings.version_label') || 'Version'}: ${HomeSettingsManager.VERSION}</span>
         </div>
       </div>
     `;
@@ -398,6 +403,21 @@ export class HomeSettingsManager {
         overflow-x: visible;
         padding: 0;
         min-height: 0;
+      }
+
+      .modal-footer {
+        padding: 8px 12px 12px 12px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border-top: 0.5px solid rgba(84, 84, 88, 0.3);
+        background: rgba(44, 44, 46, 0.6);
+        border-radius: 0 0 14px 14px;
+      }
+
+      .version-label {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
       }
 
       .settings-section {

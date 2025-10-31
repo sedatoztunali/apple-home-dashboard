@@ -221,7 +221,8 @@
     "search_accessories": "Search for accessories...",
     "search_switches": "Search for switches...",
     "hide_ha_header": "Hide Home Assistant Header",
-    "hide_ha_sidebar": "Hide Home Assistant Sidebar"
+    "hide_ha_sidebar": "Hide Home Assistant Sidebar",
+    "version_label": "Version"
   },
   "status_messages": {
     "unavailable": "Unavailable",

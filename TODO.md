@@ -6,6 +6,22 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Tamamlananlar
 
+- [x] T-007 — Home Settings popup altında sürüm numarasını göster
+  - Oluşturulma: 2025-10-31
+  - Tamamlanma: 2025-10-31
+  - Bağımlılıklar: —
+  - Mevcut: Home Settings ile açılan popup’ta sürüm bilgisi görünmüyor
+  - Hedef: Popup’ın en altında mevcut paket sürümünü (package.json version) göster
+  - Kapsam:
+    - `HomeSettingsManager` popup render’ında alt kısma sürüm etiketi eklendi
+    - Sürüm `package.json` içinden import edilerek kullanıldı (tek kaynak)
+    - Stil: küçük, ikincil/metin rengi; sağ altta
+    - Çeviri: `settings.version_label` anahtarı tüm dillere eklendi
+  - Kabul Kriterleri:
+    - Home Settings popup’ında alt kısımda “Version: x.y.z” görünür
+    - Tüm dillerde etiket çevrilidir
+    - Build temiz
+
 - [x] T-006 — Security chip altında kameralar her zaman görünsün
   - Oluşturulma: 2025-10-31
   - Tamamlanma: 2025-10-31

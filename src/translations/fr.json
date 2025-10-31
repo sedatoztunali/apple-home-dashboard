@@ -212,7 +212,8 @@
     "search_accessories": "Rechercher des accessoires...",
     "search_switches": "Rechercher des commutateurs...",
     "hide_ha_header": "Masquer l'En-tête Home Assistant",
-    "hide_ha_sidebar": "Masquer la Barre Latérale Home Assistant"
+    "hide_ha_sidebar": "Masquer la Barre Latérale Home Assistant",
+    "version_label": "Version"
   },
   "status_messages": {
     "unavailable": "Indisponible",
