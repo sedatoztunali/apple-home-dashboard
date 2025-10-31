@@ -2,6 +2,7 @@ import path from 'path';
 import webpack from 'webpack';
 import { fileURLToPath } from 'url';
 import TerserPlugin from 'terser-webpack-plugin';
+import pkg from './package.json';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,9 @@ const config: webpack.Configuration = {
   plugins: [
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
+    }),
+    new webpack.DefinePlugin({
+      'process.env.PACKAGE_VERSION': JSON.stringify(pkg.version),
     }),
   ],
 };

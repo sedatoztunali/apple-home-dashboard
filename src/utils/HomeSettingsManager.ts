@@ -3,7 +3,6 @@ import { DashboardConfig } from '../config/DashboardConfig';
 import { localize } from './LocalizationService';
 import { BackgroundManager } from './BackgroundManager';
 import { HomeAssistantUIManager } from './HomeAssistantUIManager';
-import pkg from '../../package.json';
 
 export interface HomeSettingsData {
   favoriteAccessories: string[];
@@ -43,7 +42,7 @@ export class HomeSettingsManager {
     showSwitches: false
   };
   private availableEntities: any[] = [];
-  private static readonly VERSION: string = (pkg as any).version || '';
+  private static readonly VERSION: string = (typeof process !== 'undefined' && (process.env as any).PACKAGE_VERSION) || '1.0.16';
 
   constructor(customizationManager: CustomizationManager, onSaveCallback: () => void) {
     this.customizationManager = customizationManager;
