@@ -6,6 +6,22 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Tamamlananlar
 
+- [x] T-006 — Security chip altında kameralar her zaman görünsün
+  - Oluşturulma: 2025-10-31
+  - Tamamlanma: 2025-10-31
+  - Bağımlılıklar: —
+  - Mevcut: Kameralar Home ekranında "Reorder Sections" ile gizlenince, Security chip'e basıldığında da görünmüyor
+  - Hedef: Security chip (Security filtresi) aktifken kameralar daima listelensin; Home görünümünde gizlenmiş olsa bile
+  - Kapsam:
+    - Security chip (filtresi) aktifken sadece kameralar için özel kural: `cameras_section` gizli olsa bile Security'de görünür olmalı
+    - Diğer gizlenen bölümler Security'de de gizli kalmaya devam eder (genel override yok, sadece kameralar için özel durum)
+    - `GroupPage.ts` içinde Security filtresi/State'i yakalayarak `CamerasSection` render koşullarını güncelle
+    - `hiddenSections` kontrolünde Security filtresi aktifken `cameras_section` için istisna uygula
+    - Çeviri anahtarı gerekmiyor (mevcut başlık/etiketler kullanılacak)
+  - Kabul Kriterleri:
+    - Home'da Cameras bölümü gizlense de Security chip'e basıldığında kameralar görünür
+    - Build ve lint hatasız tamamlanır
+
 - [x] T-005 — Commonly Used section (Manuel tracking)
   - Oluşturulma: 2025-10-30
   - Tamamlanma: 2025-10-30

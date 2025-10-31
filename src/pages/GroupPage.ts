@@ -318,8 +318,16 @@ export class GroupPage {
     }
     
     // Render sections in order, respecting visibility settings
+    // Special case: Security group always shows cameras_section, even if hidden
     for (const sectionId of orderedSectionIds) {
-      if (!hiddenSections.includes(sectionId) && availableSections.has(sectionId)) {
+      const isHidden = hiddenSections.includes(sectionId);
+      const isSecurityGroup = this._group === DeviceGroup.SECURITY;
+      const isCamerasSection = sectionId === 'cameras_section';
+      
+      // Always show cameras_section in Security group, even if hidden
+      const shouldRender = !isHidden || (isSecurityGroup && isCamerasSection);
+      
+      if (shouldRender && availableSections.has(sectionId)) {
         await availableSections.get(sectionId)!();
       }
     }

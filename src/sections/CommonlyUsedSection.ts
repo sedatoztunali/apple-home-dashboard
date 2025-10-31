@@ -24,7 +24,7 @@ export class CommonlyUsedSection {
   ): Promise<void> {
     // Get commonly used entities (minimum 2 interactions in last 24 hours)
     const commonlyUsedEntityIds = await this.usageTracker.getCommonlyUsed(2, 24);
-    
+
     if (commonlyUsedEntityIds.length === 0) {
       return; // Don't render if no commonly used entities
     }
@@ -36,23 +36,23 @@ export class CommonlyUsedSection {
         if (!state) {
           return null;
         }
-        
+
         // Check if entity is hidden in the entity registry
         const entityRegistry = hass.entities?.[entityId];
         if (entityRegistry && entityRegistry.hidden_by) {
           return null;
         }
-        
+
         // Check if entity is disabled in the entity registry
         if (entityRegistry && entityRegistry.disabled_by) {
           return null;
         }
-        
+
         const domain = entityId.split('.')[0];
         if (!DashboardConfig.isSupportedDomain(domain)) {
           return null;
         }
-        
+
         return {
           entity_id: entityId,
           name: state.attributes.friendly_name || entityId,
@@ -81,7 +81,7 @@ export class CommonlyUsedSection {
     // Apply saved card order if available
     const savedOrder = this.customizationManager.getSavedCardOrderWithContext('commonly_used', 'home');
     let orderedEntities = [...commonlyUsedEntities];
-    
+
     if (savedOrder && savedOrder.length > 0) {
       orderedEntities = this.customizationManager.applySavedCardOrder(commonlyUsedEntities, savedOrder);
     }
@@ -108,14 +108,14 @@ export class CommonlyUsedSection {
 
       // Use the same card creation logic as AreaSection
       let cardElement: HTMLElement;
-      
+
       if (cardConfig.type === 'custom:apple-home-card') {
         cardElement = document.createElement('apple-home-card') as HTMLElement;
-        
+
         // Determine if card should be tall based on customizations
         const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id || 'commonly_used', 'home') || false;
         const configWithTall = { ...cardConfig, is_tall: shouldBeTall };
-        
+
         (cardElement as any).setConfig(configWithTall);
         (cardElement as any).hass = hass;
       } else {
@@ -132,17 +132,17 @@ export class CommonlyUsedSection {
           cardElement.innerHTML = `<div style="color: red;">Unknown card type: ${cardConfig.type}</div>`;
         }
       }
-      
+
       const wrapper = document.createElement('div');
       wrapper.className = 'entity-card-wrapper';
       wrapper.dataset.entityId = cardConfig.entity;
-      
+
       // Determine if card should be tall based on customizations
       const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id || 'commonly_used', 'home') || false;
       if (shouldBeTall) {
         wrapper.classList.add('tall');
       }
-      
+
       wrapper.appendChild(cardElement);
       container.appendChild(wrapper);
     } catch (error) {
@@ -159,11 +159,11 @@ export class CommonlyUsedSection {
 
     const domain = entityId.split('.')[0];
     let friendlyName = state.attributes?.friendly_name || entityId;
-    
+
     // Determine card type and properties
     let cardType = 'custom:apple-home-card';
     let isTallCard = false;
-    
+
     const card: CardConfig = {
       type: cardType,
       entity: entityId,
@@ -171,12 +171,12 @@ export class CommonlyUsedSection {
       domain: domain,
       is_tall: isTallCard
     };
-    
+
     // Add default icon for scenes/scripts without icons
     if (DashboardConfig.isScenesDomain(domain) && !state.attributes?.icon) {
       (card as any).default_icon = 'mdi:home';
     }
-    
+
     return card;
   }
 }

@@ -43,7 +43,7 @@ export class AppleHomeCard extends HTMLElement {
     this.defaultIcon = (config as any).default_icon;
     this.cameraView = (config as any).camera_view;
     this.refreshInterval = (config as any).refresh_interval || 10000;
-    
+
     // Set design class based on configuration
     this.className = this.isTall ? 'tall-design' : 'regular-design';
   }
@@ -51,21 +51,21 @@ export class AppleHomeCard extends HTMLElement {
   set hass(hass: any) {
     const oldHass = this._hass;
     this._hass = hass;
-    
+
     // Update snapshot manager if it exists
     if (this.snapshotManager) {
       this.snapshotManager.setHass(hass);
     }
-    
+
     if (!oldHass) {
       this.render();
     } else if (this.entity && oldHass.states[this.entity] && hass.states[this.entity]) {
       const oldState = oldHass.states[this.entity];
       const newState = hass.states[this.entity];
-      
-      if (oldState.state !== newState.state || 
-          oldState.attributes.brightness !== newState.attributes.brightness ||
-          JSON.stringify(oldState.attributes.rgb_color) !== JSON.stringify(newState.attributes.rgb_color)) {
+
+      if (oldState.state !== newState.state ||
+        oldState.attributes.brightness !== newState.attributes.brightness ||
+        JSON.stringify(oldState.attributes.rgb_color) !== JSON.stringify(newState.attributes.rgb_color)) {
         this.render();
       }
     } else if (this.entity && (!oldHass.states[this.entity] || !hass.states[this.entity])) {
@@ -81,21 +81,21 @@ export class AppleHomeCard extends HTMLElement {
     if (!this._hass || !this.entity) {
       return;
     }
-    
+
     const state = this._hass.states[this.entity];
     if (!state) {
       this.renderErrorState(localize('errors.entity_not_found'));
       return;
     }
-    
+
     const name = this.name || state.attributes.friendly_name || this.entity.split('.')[1].replace(/_/g, ' ');
-    
+
     // Check if we're in a status section context (modal or status chips)
     const isInStatusContext = this.closest('.status-modal-cards') || this.closest('.status-chips-container');
     const forceWhiteIcons = Boolean(isInStatusContext);
-    
+
     const entityData = DashboardConfig.getEntityData(state, this.domain!, this.isTall, forceWhiteIcons);
-    
+
     if (!this.shadowRoot) {
       this.attachShadow({ mode: 'open' });
     }
@@ -112,7 +112,7 @@ export class AppleHomeCard extends HTMLElement {
     } else {
       tempText = `--.-°`;
     }
-    
+
     if (this.domain === 'climate') {
       iconElement = `
         <div class="info-icon temperature-display">
@@ -122,7 +122,7 @@ export class AppleHomeCard extends HTMLElement {
     } else if (this.domain === 'camera' && this.cameraView === 'snapshot') {
       const state = this._hass.states[this.entity!];
       const cameraState = state?.state;
-      
+
       // Check if camera entity is unavailable
       if (!cameraState || cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off') {
         // Camera entity unavailable - show camera-off icon
@@ -151,7 +151,7 @@ export class AppleHomeCard extends HTMLElement {
     } else {
       // Use default icon if specified, otherwise use entity icon
       const icon = this.defaultIcon || entityData.icon;
-      
+
       // For scenes and scripts, use a button-style icon without circle
       if (this.domain === 'scene' || this.domain === 'script') {
         iconElement = `
@@ -167,7 +167,7 @@ export class AppleHomeCard extends HTMLElement {
         `;
       }
     }
-    
+
     this.shadowRoot!.innerHTML = `
       <style>
         ${this.getCardStyles(entityData, isEditMode)}
@@ -176,27 +176,27 @@ export class AppleHomeCard extends HTMLElement {
         <div class="card-info">
           ${iconElement}
           ${this.domain === 'camera' && this.cameraView === 'snapshot' ? (() => {
-            const state = this._hass.states[this.entity!];
-            const cameraState = state?.state;
-            
-            // Show text content for unavailable cameras or snapshot failures
-            if (!cameraState || cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off') {
-              return `
+        const state = this._hass.states[this.entity!];
+        const cameraState = state?.state;
+
+        // Show text content for unavailable cameras or snapshot failures
+        if (!cameraState || cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off') {
+          return `
                 <div class="text-content camera-text">
                   <div class="entity-name">${name}</div>
                   <div class="entity-state camera-status">${localize('status_messages.unavailable')}</div>
                 </div>
               `;
-            } else if (this.cameraSnapshotFailed) {
-              return `
+        } else if (this.cameraSnapshotFailed) {
+          return `
                 <div class="text-content camera-text">
                   <div class="entity-name">${name}</div>
                   <div class="entity-state camera-status">${localize('camera.no_snapshot_available')}</div>
                 </div>
               `;
-            }
-            return ''; // No text content for working cameras
-          })() : this.domain === 'camera' ? '' : `
+        }
+        return ''; // No text content for working cameras
+      })() : this.domain === 'camera' ? '' : `
           <div class="text-content">
             <div class="entity-name">${name}</div>
             ${(this.domain === 'scene' || this.domain === 'script') ? '' : `<div class="entity-state">${entityData.stateText}</div>`}
@@ -205,26 +205,26 @@ export class AppleHomeCard extends HTMLElement {
         </div>
       </div>
     `;
-    
+
     // Add click handlers only if not in edit mode
     if (!isEditMode) {
       this.setupClickHandlers();
     }
-    
+
     // Initialize camera if this is a camera card AND camera is available
     if (this.domain === 'camera' && this.cameraView === 'snapshot' && this._hass && this.entity) {
       const state = this._hass.states[this.entity];
       const cameraState = state?.state;
-      
+
       // Only clean up if camera is truly unavailable (has a state and it's an unavailable state)
       // Don't cleanup during navigation when state might be temporarily missing
-      if (this.snapshotManager && 
-          cameraState && 
-          (cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off')) {
+      if (this.snapshotManager &&
+        cameraState &&
+        (cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off')) {
         this.cleanupCamera();
         this.cameraSnapshotFailed = false; // Reset snapshot failed flag
       }
-      
+
       // Initialize camera if camera is available AND not already initialized
       if (cameraState && cameraState !== 'unavailable' && cameraState !== 'unknown' && cameraState !== 'off' && !this.snapshotManager) {
         setTimeout(() => {
@@ -233,7 +233,7 @@ export class AppleHomeCard extends HTMLElement {
             this.initializeCamera(cameraContainer, isEditMode);
           }
         }, 100);
-      } 
+      }
       // If camera manager exists but we don't have a query timer, restart it
       else if (cameraState && cameraState !== 'unavailable' && cameraState !== 'unknown' && cameraState !== 'off' && this.snapshotManager && !this.queryTimer) {
         this.queryTimer = window.setInterval(() => {
@@ -249,16 +249,16 @@ export class AppleHomeCard extends HTMLElement {
       this.snapshotManager = SnapshotManager.getInstance();
       this.snapshotManager.setHass(this._hass);
     }
-    
+
     // Setup camera images in the container
     this.setupCameraImages(cameraContainer);
-    
+
     // Register camera with snapshot manager (will reuse existing registration if it exists)
     this.snapshotManager.registerCamera(this.entity!);
-    
+
     // Immediately check for existing snapshot and display it
     this.queryAndUpdateSnapshot();
-    
+
     // Start query timer to check for new snapshots every second
     this.queryTimer = window.setInterval(() => {
       this.queryAndUpdateSnapshot();
@@ -306,11 +306,11 @@ export class AppleHomeCard extends HTMLElement {
         outline: none;
         box-shadow: none;
       `;
-      
+
       // Both images start hidden until we have content to show
       img.style.opacity = '0';
       img.style.zIndex = i === 0 ? '2' : '1';
-      
+
       container.appendChild(img);
       this.cameraImages.push(img);
     }
@@ -320,9 +320,9 @@ export class AppleHomeCard extends HTMLElement {
     if (!this.cameraImages || this.cameraImages.length < 2) {
       return;
     }
-    
+
     this.cameraSnapshotFailed = false;
-    
+
     // Update the visible image
     const hiddenImageIndex = this.visibleImageIndex === 0 ? 1 : 0;
     const hiddenImage = this.cameraImages[hiddenImageIndex];
@@ -337,9 +337,9 @@ export class AppleHomeCard extends HTMLElement {
       hiddenImage.style.zIndex = '2';
       visibleImage.style.opacity = '0';
       visibleImage.style.zIndex = '1';
-      
+
       this.visibleImageIndex = hiddenImageIndex;
-      
+
       hiddenImage.removeEventListener('load', onLoad);
       hiddenImage.removeEventListener('error', onError);
     };
@@ -351,7 +351,7 @@ export class AppleHomeCard extends HTMLElement {
 
     hiddenImage.addEventListener('load', onLoad);
     hiddenImage.addEventListener('error', onError);
-    
+
     hiddenImage.src = base64Data;
   }
 
@@ -361,22 +361,22 @@ export class AppleHomeCard extends HTMLElement {
       clearInterval(this.queryTimer);
       this.queryTimer = undefined;
     }
-    
+
     // Remove camera images from DOM
     this.cameraImages.forEach(img => {
       img.remove();
     });
     this.cameraImages = [];
-    
+
     // Reset display state
     this.lastDisplayedTimestamp = undefined;
-    
+
     // Only unregister from SnapshotManager if camera is actually unavailable
     // Don't unregister during navigation - preserve the background fetching
     if (this._hass && this.entity) {
       const state = this._hass.states[this.entity];
       const cameraState = state?.state;
-      
+
       if (!cameraState || cameraState === 'unavailable' || cameraState === 'unknown' || cameraState === 'off') {
         // Camera is truly unavailable - unregister it
         if (this.snapshotManager) {
@@ -396,11 +396,11 @@ export class AppleHomeCard extends HTMLElement {
   private setupClickHandlers() {
     const card = this.shadowRoot!.querySelector('.apple-home-card') as HTMLElement;
     const icon = this.shadowRoot!.querySelector('.info-icon') as HTMLElement;
-    
+
     if (card) {
       card.addEventListener('click', this.handleCardClick.bind(this));
     }
-    
+
     if (icon) {
       icon.addEventListener('click', this.handleIconClick.bind(this));
     }
@@ -410,7 +410,7 @@ export class AppleHomeCard extends HTMLElement {
   public refreshEditMode() {
     // Check if we're transitioning edit modes for camera cards
     const isEditMode = this.closest('.entity-card-wrapper')?.classList.contains('edit-mode') || false;
-    
+
     if (this.domain === 'camera' && this.cameraView === 'snapshot' && this.snapshotManager) {
       // For camera cards, don't re-render because it destroys the DOM that SnapshotManager references
       // Just update the edit mode class on the existing card
@@ -424,7 +424,7 @@ export class AppleHomeCard extends HTMLElement {
       }
       return; // Don't call render() for camera cards
     }
-    
+
     // For non-camera cards, proceed with normal re-render
     this.render();
   }
@@ -433,7 +433,7 @@ export class AppleHomeCard extends HTMLElement {
     if (!this.shadowRoot) {
       this.attachShadow({ mode: 'open' });
     }
-    
+
     this.shadowRoot!.innerHTML = `
       <style>
         .error-card {
@@ -473,17 +473,17 @@ export class AppleHomeCard extends HTMLElement {
         width: 100%;
         height: 100%;
       }
-      
+
       /* Regular Design - side by side layout */
       :host(.regular-design) {
         grid-row: span 1;
       }
-      
+
       /* Tall Design - stacked layout */
       :host(.tall-design) {
         grid-row: span 2;
       }
-      
+
       .apple-home-card {
         background: ${entityData.backgroundColor};
         padding: 10px;
@@ -503,37 +503,37 @@ export class AppleHomeCard extends HTMLElement {
         height: 100%;
         box-sizing: border-box;
       }
-      
+
       /* Regular Design Card Layout */
       :host(.regular-design) .apple-home-card {
         justify-content: space-between;
       }
-      
+
       /* Tall Design Card Layout */
       :host(.tall-design) .apple-home-card {
         justify-content: flex-start;
       }
-      
+
       /* Camera cards - no padding to allow full background */
       :host(.tall-design) .apple-home-card.camera-card {
         padding: 0;
       }
-      
+
       /* Edit mode - disable interactions */
       .apple-home-card.edit-mode {
         cursor: default !important;
       }
-      
+
       .apple-home-card.edit-mode .info-icon {
         cursor: default !important;
       }
-      
+
       .card-info {
         margin-top: 0;
         display: flex;
         height: 100%;
       }
-      
+
       /* Regular Design - Icon and text side by side */
       :host(.regular-design) .card-info {
         flex-direction: row;
@@ -541,7 +541,7 @@ export class AppleHomeCard extends HTMLElement {
         justify-content: flex-start;
         gap: 16px;
       }
-      
+
       /* Tall Design - Icon and text stacked vertically */
       :host(.tall-design) .card-info {
         flex-direction: column;
@@ -549,7 +549,7 @@ export class AppleHomeCard extends HTMLElement {
         justify-content: flex-start;
         gap: 12px;
       }
-      
+
       .info-icon {
         width: 44px;
         height: 44px;
@@ -564,24 +564,24 @@ export class AppleHomeCard extends HTMLElement {
         justify-content: center;
         box-sizing: border-box;
       }
-      
+
       .info-icon ha-icon {
         display: flex;
         align-items: center;
         justify-content: center;
       }
-      
+
       /* Scene/Script icon - no circle background */
       .info-icon.scene-icon {
         background: transparent !important;
         color: white !important;
       }
-      
+
       .info-icon.scene-icon ha-icon {
         --mdc-icon-size: 32px;
         color: white !important;
       }
-      
+
       /* Regular Design - Small temperature display */
       :host(.regular-design) .info-icon .temperature-text {
         font-size: 14px;
@@ -591,7 +591,7 @@ export class AppleHomeCard extends HTMLElement {
         letter-spacing: -0.3px;
         line-height: 1;
       }
-      
+
       /* Tall Design - Large temperature display */
       :host(.tall-design) .info-icon .temperature-text {
         font-size: 42px;
@@ -601,18 +601,18 @@ export class AppleHomeCard extends HTMLElement {
         letter-spacing: -0.5px;
         line-height: 1;
       }
-      
+
       /* For all climate cards, make the temperature icon transparent */
       .info-icon.temperature-display {
         background: transparent !important;
       }
-      
+
       /* For tall design, make the temperature icon bigger */
       :host(.tall-design) .info-icon.temperature-display {
         width: auto;
         height: auto;
       }
-        
+
       .text-content {
         flex: 1;
         min-width: 0;
@@ -620,18 +620,18 @@ export class AppleHomeCard extends HTMLElement {
         display: flex;
         flex-direction: column;
       }
-      
+
       /* Regular Design - Text centered vertically */
       :host(.regular-design) .text-content {
         justify-content: center;
       }
-      
+
       /* Tall Design - Text at bottom */
       :host(.tall-design) .text-content {
         margin-top: auto;
         justify-content: flex-end;
       }
-      
+
       .entity-name {
         font-size: 17px;
         font-weight: 500;
@@ -648,7 +648,7 @@ export class AppleHomeCard extends HTMLElement {
         max-height: calc(1.3em * 2);
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
       }
-      
+
       .entity-state {
         font-size: 15px;
         font-weight: 500;
@@ -837,7 +837,7 @@ export class AppleHomeCard extends HTMLElement {
         padding: 10px;
       }
 
-      @media (max-width: 768px) { 
+      @media (max-width: 768px) {
         :host(.regular-design) .card-info {
             gap: 10px !important;
         }
@@ -847,16 +847,16 @@ export class AppleHomeCard extends HTMLElement {
 
   private handleCardClick(event: Event) {
     if (!this._hass || !this.entity) return;
-    
+
     // Check if the click was on the icon - if so, don't handle it here
     const target = event.target as HTMLElement;
     if (target.closest('.info-icon')) {
       return;
     }
-    
+
     // Track interaction for commonly used section
     this.trackInteraction('more-info');
-    
+
     // Open more-info dialog for card area clicks
     this.dispatchEvent(new CustomEvent('hass-more-info', {
       bubbles: true,
@@ -867,20 +867,20 @@ export class AppleHomeCard extends HTMLElement {
 
   private handleIconClick(event: Event) {
     if (!this._hass || !this.entity) return;
-    
+
     // Prevent the card click from firing
     event.stopPropagation();
-    
+
     const domain = this.entity.split('.')[0];
     const entityId = this.entity;
-    
+
     // Track interaction for commonly used section
     // Determine action type based on domain
-    const actionType: 'toggle' | 'more-info' = ['climate', 'camera', 'binary_sensor', 'sensor'].includes(domain) 
-      ? 'more-info' 
+    const actionType: 'toggle' | 'more-info' = ['climate', 'camera', 'binary_sensor', 'sensor'].includes(domain)
+      ? 'more-info'
       : 'toggle';
     this.trackInteraction(actionType);
-    
+
     // Handle different domains for icon clicks (toggle behavior)
     switch (domain) {
       case 'light':
@@ -957,7 +957,7 @@ export class AppleHomeCard extends HTMLElement {
    */
   private trackInteraction(actionType: 'tap' | 'toggle' | 'more-info' = 'tap'): void {
     if (!this.entity || !this._hass) return;
-    
+
     try {
       const usageTracker = UsageTracker.getInstance();
       // Fire and forget - don't await to avoid blocking UI
@@ -975,7 +975,7 @@ export class AppleHomeCard extends HTMLElement {
     const timestampElement = this.shadowRoot?.querySelector('.camera-timestamp') as HTMLElement;
     if (timestampElement && this.snapshotManager && this.entity) {
       const snapshotData = this.snapshotManager.getSnapshot(this.entity);
-      
+
       // Only show timestamp if we have actual snapshot data
       if (snapshotData && snapshotData.base64Data && snapshotData.timestamp > 0) {
         const secondsAgo = this.snapshotManager.getSecondsAgo(this.entity);
@@ -985,7 +985,7 @@ export class AppleHomeCard extends HTMLElement {
         // Hide timestamp until we have real data
         timestampElement.style.display = 'none';
       }
-    } 
+    }
   }
 
   private formatTimeAgo(secondsAgo: number): string {
@@ -1020,7 +1020,7 @@ export class AppleHomeCard extends HTMLElement {
     if (this.domain === 'camera' && this.cameraView === 'snapshot' && this._hass) {
       // Clean up existing setup
       this.cleanupCamera();
-      
+
       // Reinitialize with global camera manager
       const cameraContainer = this.shadowRoot?.querySelector('.camera-container') as HTMLElement;
       if (cameraContainer) {
