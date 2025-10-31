@@ -273,12 +273,8 @@ export class CamerasSection {
       await customizationManager.setEntityCustomName(entityId, trimmedName);
     }
 
-    // Trigger a refresh to update all cards showing this entity
-    const event = new CustomEvent('apple-home-dashboard-refresh', {
-      bubbles: true,
-      composed: true
-    });
-    document.dispatchEvent(event);
+    // CustomizationManager will trigger refresh events automatically
+    // AppleHomeCard components listen for 'apple-home-entity-refresh' and re-render
   }
 
   private navigateToPath(path: string) {

@@ -42,7 +42,7 @@ export class HomeSettingsManager {
     showSwitches: false
   };
   private availableEntities: any[] = [];
-  private static readonly VERSION: string = (typeof process !== 'undefined' && (process.env as any).PACKAGE_VERSION) || '1.0.18';
+  private static readonly VERSION: string = (typeof process !== 'undefined' && (process.env as any).PACKAGE_VERSION) || '1.0.19';
 
   constructor(customizationManager: CustomizationManager, onSaveCallback: () => void) {
     this.customizationManager = customizationManager;

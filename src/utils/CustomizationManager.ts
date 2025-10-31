@@ -824,7 +824,28 @@ export class CustomizationManager {
     }
     
     await this.saveCustomizations();
+    
+    // Trigger refresh specifically for this entity
+    this.triggerEntityRefresh(entityId);
     this.triggerGlobalDashboardRefresh();
+  }
+
+  /**
+   * Trigger a refresh for a specific entity (e.g., when its name changes)
+   */
+  private triggerEntityRefresh(entityId: string): void {
+    const event = new CustomEvent('apple-home-entity-refresh', {
+      detail: { 
+        entityId: entityId,
+        customizations: this.customizations,
+        timestamp: Date.now()
+      },
+      bubbles: true,
+      composed: true
+    });
+    
+    document.dispatchEvent(event);
+    window.dispatchEvent(event);
   }
 
   getEntityCustomName(entityId: string): string | null {

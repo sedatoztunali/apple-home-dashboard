@@ -23,8 +23,30 @@ export class AppleHomeCard extends HTMLElement {
   private queryTimer?: number;
   private lastDisplayedTimestamp?: number;
 
+  private entityRefreshHandler?: (event: Event) => void;
+
   constructor() {
     super();
+    
+    // Listen for entity-specific refresh events
+    this.entityRefreshHandler = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const refreshedEntityId = customEvent.detail?.entityId;
+      
+      // If this card's entity was refreshed, re-render
+      if (refreshedEntityId === this.entity) {
+        this.render();
+      }
+    };
+    
+    document.addEventListener('apple-home-entity-refresh', this.entityRefreshHandler);
+  }
+
+  disconnectedCallback() {
+    // Clean up event listener
+    if (this.entityRefreshHandler) {
+      document.removeEventListener('apple-home-entity-refresh', this.entityRefreshHandler);
+    }
   }
 
   static getStubConfig() {
@@ -77,7 +99,7 @@ export class AppleHomeCard extends HTMLElement {
     return this._hass;
   }
 
-  private render() {
+  public render() {
     if (!this._hass || !this.entity) {
       return;
     }
