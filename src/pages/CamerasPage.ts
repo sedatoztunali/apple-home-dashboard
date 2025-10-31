@@ -269,8 +269,29 @@ export class CamerasPage {
       await this.customizationManager.setEntityCustomName(entityId, trimmedName);
     }
 
-    // CustomizationManager will trigger refresh events automatically
-    // AppleHomeCard components listen for 'apple-home-entity-refresh' and re-render
+    // Directly refresh all cards with this entity
+    await this.refreshEntityCards(entityId);
+  }
+
+  private async refreshEntityCards(entityId: string) {
+    // Find all apple-home-card elements with this entity
+    const allCards = document.querySelectorAll('apple-home-card');
+    
+    allCards.forEach((cardElement: any) => {
+      if (cardElement.entity === entityId && cardElement.hass) {
+        // Force re-render
+        if (typeof cardElement.render === 'function') {
+          cardElement.render();
+        }
+      }
+    });
+    
+    // Also trigger global refresh for other components
+    const event = new CustomEvent('apple-home-dashboard-refresh', {
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(event);
   }
 
   public updateDragAndDrop(editMode: boolean, container: HTMLElement) {

@@ -825,6 +825,9 @@ export class CustomizationManager {
     
     await this.saveCustomizations();
     
+    // Small delay to ensure save is complete before triggering refresh
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Trigger refresh specifically for this entity
     this.triggerEntityRefresh(entityId);
     this.triggerGlobalDashboardRefresh();

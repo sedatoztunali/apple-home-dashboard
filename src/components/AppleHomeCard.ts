@@ -27,6 +27,10 @@ export class AppleHomeCard extends HTMLElement {
 
   constructor() {
     super();
+  }
+
+  private setupEntityRefreshListener() {
+    if (this.entityRefreshHandler) return; // Already set up
     
     // Listen for entity-specific refresh events
     this.entityRefreshHandler = (event: Event) => {
@@ -34,8 +38,18 @@ export class AppleHomeCard extends HTMLElement {
       const refreshedEntityId = customEvent.detail?.entityId;
       
       // If this card's entity was refreshed, re-render
-      if (refreshedEntityId === this.entity) {
-        this.render();
+      if (refreshedEntityId && this.entity && refreshedEntityId === this.entity && this._hass) {
+        // Force re-render to pick up new custom name
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+          // Ensure CustomizationManager has the latest data
+          const customizationManager = CustomizationManager.getInstance(this._hass!);
+          // Force re-read of customizations
+          const latestCustomName = customizationManager.getEntityCustomName(this.entity!);
+          
+          // Re-render with updated name
+          this.render();
+        });
       }
     };
     
@@ -46,6 +60,7 @@ export class AppleHomeCard extends HTMLElement {
     // Clean up event listener
     if (this.entityRefreshHandler) {
       document.removeEventListener('apple-home-entity-refresh', this.entityRefreshHandler);
+      this.entityRefreshHandler = undefined;
     }
   }
 
@@ -68,6 +83,9 @@ export class AppleHomeCard extends HTMLElement {
 
     // Set design class based on configuration
     this.className = this.isTall ? 'tall-design' : 'regular-design';
+    
+    // Setup entity refresh listener now that entity is set
+    this.setupEntityRefreshListener();
   }
 
   set hass(hass: any) {
@@ -77,6 +95,11 @@ export class AppleHomeCard extends HTMLElement {
     // Update snapshot manager if it exists
     if (this.snapshotManager) {
       this.snapshotManager.setHass(hass);
+    }
+
+    // Setup entity refresh listener if entity is set
+    if (this.entity && !this.entityRefreshHandler) {
+      this.setupEntityRefreshListener();
     }
 
     if (!oldHass) {

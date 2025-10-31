@@ -841,21 +841,23 @@ export class AppleHomeView extends HTMLElement {
           
           .entity-controls {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            left: -8px;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
             display: none;
-            gap: 4px;
+            pointer-events: none;
             z-index: 10;
-            opacity: 0.99;
-            transform: scaleX(-1);
-            justify-content: space-between;
-            width: calc(100% + 16px);
+          }
+          
+          .entity-control-btn {
+            position: absolute;
+            pointer-events: auto;
           }
           
           .entity-control-btn.rename-btn {
-            transform: scaleX(-1);
-            order: -1;
+            top: -8px;
+            right: -8px;
             background: rgb(234 234 234 / 90%);
             color: #666;
           }
@@ -864,10 +866,15 @@ export class AppleHomeView extends HTMLElement {
             --mdc-icon-size: 16px;
           }
           
+          .entity-control-btn.tall-toggle {
+            bottom: -8px;
+            right: -8px;
+          }
+          
           :host(.edit-mode) .entity-controls,
           .edit-mode .entity-controls,
           .entity-card-wrapper.edit-mode .entity-controls {
-            display: flex !important;
+            display: block !important;
           }
           
           .entity-control-btn {
