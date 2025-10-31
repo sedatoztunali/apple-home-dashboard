@@ -10,7 +10,7 @@ export type InteractionType = 'tap' | 'toggle' | 'more-info';
  * Tracks entity usage/interactions and provides commonly used entities
  */
 export class UsageTracker {
-  private customizationManager: CustomizationManager;
+  private customizationManager?: CustomizationManager;
   private static instance: UsageTracker | null = null;
   private static readonly STORAGE_KEY = 'usage_tracking';
   private static readonly DEFAULT_THRESHOLD = 2; // Minimum interactions to show in commonly used
@@ -18,7 +18,8 @@ export class UsageTracker {
   private static readonly CLEANUP_INTERVAL_MS = 3600000; // Clean up old data every hour (1 hour)
   private cleanupTimer?: number;
 
-  constructor(customizationManager: CustomizationManager) {
+  constructor(customizationManager?: CustomizationManager) {
+    // customizationManager retained for backward-compat reading only; writes go to localStorage
     this.customizationManager = customizationManager;
     this.startCleanupTimer();
   }
@@ -28,9 +29,6 @@ export class UsageTracker {
    */
   static getInstance(customizationManager?: CustomizationManager): UsageTracker {
     if (!UsageTracker.instance) {
-      if (!customizationManager) {
-        customizationManager = CustomizationManager.getInstance();
-      }
       UsageTracker.instance = new UsageTracker(customizationManager);
     }
     return UsageTracker.instance;
@@ -43,26 +41,15 @@ export class UsageTracker {
     if (!entityId) return;
 
     try {
-      await this.customizationManager.ensureCustomizationsLoaded();
-      const homeData = this.customizationManager.getCustomization('home');
-      
-      if (!homeData[UsageTracker.STORAGE_KEY]) {
-        homeData[UsageTracker.STORAGE_KEY] = {};
-      }
-
-      const usageData: UsageData = homeData[UsageTracker.STORAGE_KEY];
+      const usageData = this.loadFromLocalStorage();
       const now = Date.now();
 
-      // Initialize array if needed
       if (!usageData[entityId]) {
         usageData[entityId] = [];
       }
-
-      // Add current timestamp
       usageData[entityId].push(now);
 
-      // Save back to storage
-      await this.customizationManager.setCustomization('home', homeData);
+      this.saveToLocalStorage(usageData);
     } catch (error) {
       console.warn('Failed to track entity interaction:', error);
     }
@@ -88,9 +75,7 @@ export class UsageTracker {
     hours: number = UsageTracker.DEFAULT_HOURS
   ): Promise<string[]> {
     try {
-      await this.customizationManager.ensureCustomizationsLoaded();
-      const homeData = this.customizationManager.getCustomization('home');
-      const usageData: UsageData = homeData[UsageTracker.STORAGE_KEY] || {};
+      const usageData: UsageData = this.loadFromLocalStorage();
 
       const cutoffTime = Date.now() - (hours * 60 * 60 * 1000);
       const entityScores: Array<{ entityId: string; score: number; lastUsed: number }> = [];
@@ -99,11 +84,11 @@ export class UsageTracker {
       for (const [entityId, timestamps] of Object.entries(usageData)) {
         // Filter timestamps within the time window
         const recentTimestamps = timestamps.filter(ts => ts >= cutoffTime);
-        
+
         if (recentTimestamps.length >= minThreshold) {
           const score = recentTimestamps.length; // Usage count
           const lastUsed = Math.max(...recentTimestamps); // Most recent interaction
-          
+
           entityScores.push({
             entityId,
             score,
@@ -133,9 +118,7 @@ export class UsageTracker {
    */
   private async cleanupOldInteractions(): Promise<void> {
     try {
-      await this.customizationManager.ensureCustomizationsLoaded();
-      const homeData = this.customizationManager.getCustomization('home');
-      const usageData: UsageData = homeData[UsageTracker.STORAGE_KEY] || {};
+      const usageData: UsageData = this.loadFromLocalStorage();
 
       // Keep data from the last 48 hours (24h window + 24h buffer)
       const cutoffTime = Date.now() - (48 * 60 * 60 * 1000);
@@ -154,7 +137,7 @@ export class UsageTracker {
       }
 
       if (hasChanges) {
-        await this.customizationManager.setCustomization('home', homeData);
+        this.saveToLocalStorage(usageData);
       }
     } catch (error) {
       console.warn('Failed to cleanup old interactions:', error);
@@ -167,7 +150,7 @@ export class UsageTracker {
   private startCleanupTimer(): void {
     // Run cleanup on initialization
     this.cleanupOldInteractions();
-    
+
     // Set up periodic cleanup
     this.cleanupTimer = window.setInterval(() => {
       this.cleanupOldInteractions();
@@ -181,6 +164,46 @@ export class UsageTracker {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
+    }
+  }
+
+  private loadFromLocalStorage(): UsageData {
+    try {
+      const raw = window.localStorage.getItem(UsageTracker.STORAGE_KEY);
+      if (!raw) {
+        // Attempt one-time migration from CustomizationManager if available
+        const migrated = this.tryMigrateFromCustomizations();
+        return migrated ?? {};
+      }
+      const parsed = JSON.parse(raw);
+      return (parsed && typeof parsed === 'object') ? parsed as UsageData : {};
+    } catch {
+      return {};
+    }
+  }
+
+  private saveToLocalStorage(data: UsageData): void {
+    try {
+      window.localStorage.setItem(UsageTracker.STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      // ignore write errors (e.g., storage full or disabled)
+    }
+  }
+
+  private tryMigrateFromCustomizations(): UsageData | null {
+    try {
+      if (!this.customizationManager) return null;
+      // Best-effort read without writing back (to avoid reload prompts)
+      const homeData = this.customizationManager.getCustomization('home');
+      const usageData: UsageData = homeData?.[UsageTracker.STORAGE_KEY] || {};
+      if (usageData && Object.keys(usageData).length > 0) {
+        // Save into localStorage so future reads don't touch customizations
+        this.saveToLocalStorage(usageData);
+        return usageData;
+      }
+      return null;
+    } catch {
+      return null;
     }
   }
 }

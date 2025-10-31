@@ -959,8 +959,7 @@ export class AppleHomeCard extends HTMLElement {
     if (!this.entity || !this._hass) return;
     
     try {
-      const customizationManager = CustomizationManager.getInstance(this._hass);
-      const usageTracker = UsageTracker.getInstance(customizationManager);
+      const usageTracker = UsageTracker.getInstance();
       // Fire and forget - don't await to avoid blocking UI
       usageTracker.trackInteraction(this.entity, actionType).catch(error => {
         // Silently fail - tracking is not critical

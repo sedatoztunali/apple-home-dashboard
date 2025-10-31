@@ -12,7 +12,7 @@ export class CommonlyUsedSection {
 
   constructor(customizationManager: CustomizationManager, cardManager?: CardManager) {
     this.customizationManager = customizationManager;
-    this.usageTracker = UsageTracker.getInstance(customizationManager);
+    this.usageTracker = UsageTracker.getInstance();
     this.cardManager = cardManager;
   }
 
