@@ -373,7 +373,9 @@ export class ScenesSection {
     const allCards = document.querySelectorAll('apple-home-card');
     
     allCards.forEach((cardElement: any) => {
-      if (cardElement.entity === entityId && cardElement.hass) {
+      // Use entityId getter if available, otherwise try entity property
+      const cardEntityId = cardElement.entityId || cardElement.entity;
+      if (cardEntityId === entityId && cardElement.hass) {
         // Force re-render
         if (typeof cardElement.render === 'function') {
           cardElement.render();

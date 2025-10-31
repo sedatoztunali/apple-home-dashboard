@@ -42,7 +42,7 @@ export class HomeSettingsManager {
     showSwitches: false
   };
   private availableEntities: any[] = [];
-  private static readonly VERSION: string = (typeof process !== 'undefined' && (process.env as any).PACKAGE_VERSION) || '1.0.20';
+  private static readonly VERSION: string = (typeof process !== 'undefined' && (process.env as any).PACKAGE_VERSION) || '1.0.21';
 
   constructor(customizationManager: CustomizationManager, onSaveCallback: () => void) {
     this.customizationManager = customizationManager;
@@ -119,14 +119,20 @@ export class HomeSettingsManager {
 
         return true;
       })
-      .map((state: any) => ({
-        entity_id: state.entity_id,
-        friendly_name: state.attributes.friendly_name || state.entity_id,
-        domain: state.entity_id.split('.')[0],
-        state: state.state,
-        attributes: state.attributes,
-        area_id: state.attributes.area_id || null
-      }))
+      .map((state: any) => {
+        // Get custom name from CustomizationManager (priority: custom_name → friendly_name → entity_id)
+        const customName = this.customizationManager.getEntityCustomName(state.entity_id);
+        const friendlyName = customName || state.attributes.friendly_name || state.entity_id;
+        
+        return {
+          entity_id: state.entity_id,
+          friendly_name: friendlyName,
+          domain: state.entity_id.split('.')[0],
+          state: state.state,
+          attributes: state.attributes,
+          area_id: state.attributes.area_id || null
+        };
+      })
       .sort((a, b) => a.friendly_name.localeCompare(b.friendly_name));
   }
 

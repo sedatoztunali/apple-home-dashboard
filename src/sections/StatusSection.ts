@@ -928,7 +928,9 @@ export class StatusSection {
       return null;
     }
     
-    let friendlyName = state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+    // Get custom name from CustomizationManager (priority: custom_name → friendly_name → entity_id)
+    const customName = this.customizationManager.getEntityCustomName(entityId);
+    let friendlyName = customName || state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
     const domain = entityId.split('.')[0];
     
     // Determine card type and properties

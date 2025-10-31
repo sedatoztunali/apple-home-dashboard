@@ -122,6 +122,10 @@ export class AppleHomeCard extends HTMLElement {
     return this._hass;
   }
 
+  get entityId() {
+    return this.entity;
+  }
+
   public render() {
     if (!this._hass || !this.entity) {
       return;
