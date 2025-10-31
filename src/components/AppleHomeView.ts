@@ -843,11 +843,25 @@ export class AppleHomeView extends HTMLElement {
             position: absolute;
             top: -8px;
             right: -8px;
+            left: -8px;
             display: none;
             gap: 4px;
             z-index: 10;
             opacity: 0.99;
             transform: scaleX(-1);
+            justify-content: space-between;
+            width: calc(100% + 16px);
+          }
+          
+          .entity-control-btn.rename-btn {
+            transform: scaleX(-1);
+            order: -1;
+            background: rgb(234 234 234 / 90%);
+            color: #666;
+          }
+          
+          .entity-control-btn.rename-btn ha-icon {
+            --mdc-icon-size: 16px;
           }
           
           :host(.edit-mode) .entity-controls,

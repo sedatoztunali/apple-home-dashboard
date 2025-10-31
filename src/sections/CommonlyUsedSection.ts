@@ -141,13 +141,32 @@ export class CommonlyUsedSection {
       const wrapper = document.createElement('div');
       wrapper.className = 'entity-card-wrapper';
       wrapper.dataset.entityId = cardConfig.entity;
-
+      
       // Determine if card should be tall based on customizations
       const shouldBeTall = this.cardManager?.shouldCardBeTall(entity.entity_id, entity.area_id || 'commonly_used', 'home') || false;
       if (shouldBeTall) {
         wrapper.classList.add('tall');
       }
-
+      
+      // Add edit mode controls - rename button
+      const controls = document.createElement('div');
+      controls.className = 'entity-controls';
+      
+      // Rename button (left top corner)
+      const renameButton = document.createElement('button');
+      renameButton.className = 'entity-control-btn rename-btn';
+      renameButton.innerHTML = `<ha-icon icon="mdi:rename-box"></ha-icon>`;
+      renameButton.title = localize('edit.rename_entity') || 'Rename';
+      
+      renameButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        await this.handleRenameEntity(cardConfig.entity, hass);
+      });
+      
+      controls.appendChild(renameButton);
+      
+      wrapper.appendChild(controls);
       wrapper.appendChild(cardElement);
       container.appendChild(wrapper);
     } catch (error) {
@@ -189,5 +208,39 @@ export class CommonlyUsedSection {
     }
 
     return card;
+  }
+
+  private async handleRenameEntity(entityId: string, hass: any) {
+    if (!entityId || !hass) return;
+
+    const state = hass.states[entityId];
+    if (!state) return;
+
+    const customizationManager = CustomizationManager.getInstance(hass);
+    const currentCustomName = customizationManager.getEntityCustomName(entityId);
+    const originalName = state.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+    const currentName = currentCustomName || originalName;
+
+    // Create a modal/prompt for renaming
+    const newName = prompt(localize('edit.rename_entity') || 'Rename', currentName);
+    
+    if (newName === null) return; // User cancelled
+    
+    const trimmedName = newName.trim();
+    
+    if (trimmedName === '' || trimmedName === originalName) {
+      // Remove custom name (revert to original)
+      await customizationManager.setEntityCustomName(entityId, null);
+    } else if (trimmedName !== currentName) {
+      // Set new custom name
+      await customizationManager.setEntityCustomName(entityId, trimmedName);
+    }
+
+    // Trigger a refresh to update all cards showing this entity
+    const event = new CustomEvent('apple-home-dashboard-refresh', {
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(event);
   }
 }

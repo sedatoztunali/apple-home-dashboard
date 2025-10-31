@@ -221,14 +221,60 @@ export class CamerasPage {
     cardElement.setConfig(cardConfig);
     cardElement.hass = hass;
 
-    // Add edit mode controls - but no tall toggle for cameras
+    // Add edit mode controls - rename button for cameras
     const controls = document.createElement('div');
     controls.className = 'entity-controls';
-    // Cameras don't have resize controls
+    
+    // Rename button (left top corner)
+    const renameButton = document.createElement('button');
+    renameButton.className = 'entity-control-btn rename-btn';
+    renameButton.innerHTML = `<ha-icon icon="mdi:rename-box"></ha-icon>`;
+    renameButton.title = localize('edit.rename_entity') || 'Rename';
+    
+    renameButton.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      await this.handleRenameEntity(cardConfig.entity, hass);
+    });
+    
+    controls.appendChild(renameButton);
     
     wrapper.appendChild(controls);
     wrapper.appendChild(cardElement);
     gridContainer.appendChild(wrapper);
+  }
+
+  private async handleRenameEntity(entityId: string, hass: any) {
+    if (!entityId || !hass || !this.customizationManager) return;
+
+    const state = hass.states[entityId];
+    if (!state) return;
+
+    const currentCustomName = this.customizationManager.getEntityCustomName(entityId);
+    const originalName = state.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+    const currentName = currentCustomName || originalName;
+
+    // Create a modal/prompt for renaming
+    const newName = prompt(localize('edit.rename_entity') || 'Rename', currentName);
+    
+    if (newName === null) return; // User cancelled
+    
+    const trimmedName = newName.trim();
+    
+    if (trimmedName === '' || trimmedName === originalName) {
+      // Remove custom name (revert to original)
+      await this.customizationManager.setEntityCustomName(entityId, null);
+    } else if (trimmedName !== currentName) {
+      // Set new custom name
+      await this.customizationManager.setEntityCustomName(entityId, trimmedName);
+    }
+
+    // Trigger a refresh to update all cards showing this entity
+    const event = new CustomEvent('apple-home-dashboard-refresh', {
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(event);
   }
 
   public updateDragAndDrop(editMode: boolean, container: HTMLElement) {

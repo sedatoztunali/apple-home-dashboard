@@ -203,9 +203,19 @@ export class AreaSection {
       const entityDomain = cardConfig.entity ? cardConfig.entity.split('.')[0] : '';
       const isFixedSizeEntity = ['camera', 'scene', 'script'].includes(entityDomain);
       
-      // Only show tall toggle for regular entities (not cameras or scenes)
+      // Add rename button (left top corner) - always added, CSS will show/hide it
+      controlsHTML += `
+        <button class="entity-control-btn rename-btn" 
+                data-action="rename" 
+                data-entity-id="${cardConfig.entity}"
+                title="${localize('edit.rename_entity') || 'Rename'}">
+          <ha-icon icon="mdi:rename-box"></ha-icon>
+        </button>
+      `;
+      
+      // Only show tall toggle for regular entities (not cameras or scenes) - right top corner
       if (!isFixedSizeEntity) {
-        controlsHTML = `
+        controlsHTML += `
           <button class="entity-control-btn tall-toggle ${shouldBeTall ? 'active' : ''}" 
                   data-action="toggle-tall" 
                   title="Toggle card design">
@@ -217,6 +227,15 @@ export class AreaSection {
       controlsDiv.innerHTML = controlsHTML;
       
       // Add event listeners for controls
+      const renameBtn = controlsDiv.querySelector('.rename-btn') as HTMLButtonElement;
+      if (renameBtn) {
+        renameBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          await this.handleRenameEntity(cardConfig.entity, hass);
+        });
+      }
+      
       const tallToggle = controlsDiv.querySelector('.tall-toggle') as HTMLButtonElement;
       if (tallToggle && onTallToggle) {
         tallToggle.addEventListener('click', (e) => {
@@ -232,6 +251,40 @@ export class AreaSection {
     } catch (error) {
       console.error('Error creating card:', error);
     }
+  }
+
+  private async handleRenameEntity(entityId: string, hass: any) {
+    if (!entityId || !hass) return;
+
+    const state = hass.states[entityId];
+    if (!state) return;
+
+    const customizationManager = CustomizationManager.getInstance(hass);
+    const currentCustomName = customizationManager.getEntityCustomName(entityId);
+    const originalName = state.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+    const currentName = currentCustomName || originalName;
+
+    // Create a modal/prompt for renaming
+    const newName = prompt(localize('edit.rename_entity') || 'Rename', currentName);
+    
+    if (newName === null) return; // User cancelled
+    
+    const trimmedName = newName.trim();
+    
+    if (trimmedName === '' || trimmedName === originalName) {
+      // Remove custom name (revert to original)
+      await customizationManager.setEntityCustomName(entityId, null);
+    } else if (trimmedName !== currentName) {
+      // Set new custom name
+      await customizationManager.setEntityCustomName(entityId, trimmedName);
+    }
+
+    // Trigger a refresh to update all cards showing this entity
+    const event = new CustomEvent('apple-home-dashboard-refresh', {
+      bubbles: true,
+      composed: true
+    });
+    document.dispatchEvent(event);
   }
 
   private navigateToPath(path: string) {
