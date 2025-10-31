@@ -113,26 +113,26 @@ export class StatusSection {
   private generateStatusData(entities: Entity[], hass: any): StatusData[] {
     const statusMap = new Map<string, StatusData>();
 
-    // Initialize all possible status types
+    // Initialize all possible status types in custom order
     const statusTypes = [
+      { domain: 'security', icon: 'mdi:shield-check', label: localize('status_section.security') },
+      { domain: 'occupancy', icon: 'mdi:account-check', label: localize('status_section.occupancy') },
+      { domain: 'motion', icon: 'mdi:motion-sensor', label: localize('status_section.motion') },
+      { domain: 'locks', icon: 'mdi:lock', label: localize('status_section.locks') },
       { domain: 'lights', icon: 'mdi:lightbulb', label: localize('status_section.lights') },
       { domain: 'switches', icon: 'mdi:toggle-switch', label: localize('status_section.switches') },
       { domain: 'outlets', icon: 'mdi:power-socket', label: localize('status_section.outlets') },
-      { domain: 'temperature', icon: 'mdi:thermometer', label: localize('status_section.temperature') },
-      { domain: 'humidity', icon: 'mdi:water-percent', label: localize('status_section.humidity') },
-      { domain: 'covers', icon: 'mdi:window-shutter', label: localize('status_section.covers') },
-      { domain: 'security', icon: 'mdi:shield-check', label: localize('status_section.security') },
-      { domain: 'locks', icon: 'mdi:lock', label: localize('status_section.locks') },
-      { domain: 'motion', icon: 'mdi:motion-sensor', label: localize('status_section.motion') },
-      { domain: 'occupancy', icon: 'mdi:account-check', label: localize('status_section.occupancy') },
-      { domain: 'light_sensor', icon: 'mdi:brightness-6', label: localize('status_section.light') },
-      { domain: 'smoke', icon: 'mdi:smoke-detector', label: localize('status_section.smoke') },
-      { domain: 'battery', icon: 'mdi:battery-low', label: localize('status_section.battery') },
       { domain: 'doors', icon: 'mdi:door', label: localize('status_section.doors') },
       { domain: 'windows', icon: 'mdi:window-open', label: localize('status_section.windows') },
       { domain: 'contact', icon: 'mdi:door-open', label: localize('contact.contact_sensors') },
+      { domain: 'temperature', icon: 'mdi:thermometer', label: localize('status_section.temperature') },
+      { domain: 'humidity', icon: 'mdi:water-percent', label: localize('status_section.humidity') },
+      { domain: 'light_sensor', icon: 'mdi:brightness-6', label: localize('status_section.light') },
+      { domain: 'covers', icon: 'mdi:window-shutter', label: localize('status_section.covers') },
       { domain: 'tvs', icon: 'mdi:television', label: localize('status_section.tvs') },
-      { domain: 'speakers', icon: 'mdi:speaker', label: localize('status_section.speakers') }
+      { domain: 'speakers', icon: 'mdi:speaker', label: localize('status_section.speakers') },
+      { domain: 'smoke', icon: 'mdi:smoke-detector', label: localize('status_section.smoke') },
+      { domain: 'battery', icon: 'mdi:battery-low', label: localize('status_section.battery') }
     ];
 
     // Initialize status map
@@ -158,7 +158,9 @@ export class StatusSection {
       this.categorizeEntity(entity.entity_id, entityDomain, deviceClass, state, statusMap);
     });
 
-    // Calculate status values for each category
+    // Calculate status values for each category and return in order
+    const orderedStatusItems: StatusData[] = [];
+    
     statusTypes.forEach(type => {
       const status = statusMap.get(type.domain);
       if (status && status.entityIds.length > 0) {
@@ -172,11 +174,12 @@ export class StatusSection {
         if (hasAvailableEntities) {
           status.value = this.calculateStatusValue(type.domain, status.entityIds, hass);
           status.isVisible = true;
+          orderedStatusItems.push(status);
         }
       }
     });
 
-    return Array.from(statusMap.values());
+    return orderedStatusItems;
   }
 
   private categorizeEntity(
