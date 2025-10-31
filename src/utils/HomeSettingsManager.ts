@@ -98,11 +98,20 @@ export class HomeSettingsManager {
   private async loadAvailableEntities() {
     if (!this.hass) return;
 
-    // Get all entities that are supported by the dashboard
+    // Get showSwitches and includedSwitches settings
+    const showSwitches = this.tempSettings.showSwitches || false;
+    const includedSwitches = this.tempSettings.includedSwitches || [];
+
+    // Get all entities that are supported by the dashboard (both SUPPORTED_DOMAINS and STATUS_SECTION_DOMAINS)
     this.availableEntities = Object.values(this.hass.states)
       .filter((state: any) => {
         const domain = state.entity_id.split('.')[0];
-        if (!DashboardConfig.isSupportedDomain(domain)) {
+        
+        // Include both supported domains (for main dashboard) and status section domains (sensor, binary_sensor)
+        const isSupported = DashboardConfig.isSupportedDomain(domain);
+        const isStatusOnlyDomain = DashboardConfig.STATUS_SECTION_DOMAINS.includes(domain as any); // sensor, binary_sensor
+        
+        if (!isSupported && !isStatusOnlyDomain) {
           return false;
         }
 
@@ -115,6 +124,19 @@ export class HomeSettingsManager {
         // Check if entity is disabled in the entity registry
         if (entityRegistry && entityRegistry.disabled_by) {
           return false;
+        }
+
+        // Additional filtering for switches based on showSwitches setting
+        if (domain === 'switch') {
+          if (showSwitches) {
+            // If showSwitches is true, include all switches
+            return true;
+          } else {
+            // If showSwitches is false, only include outlets or included switches
+            const isOutlet = DashboardConfig.isOutlet(state.entity_id, state.attributes);
+            const isIncluded = includedSwitches.includes(state.entity_id);
+            return isOutlet || isIncluded;
+          }
         }
 
         return true;

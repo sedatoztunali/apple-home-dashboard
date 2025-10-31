@@ -6,6 +6,26 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Tamamlananlar
 
+- [x] T-009 — Exclude from Dashboard'a status domain entity'lerini ekle
+  - Oluşturulma: 2025-01-02
+  - Tamamlanma: 2025-01-02
+  - Bağımlılıklar: —
+  - Mevcut: Home Settings'te "EXCLUDE FROM DASHBOARD" seçeneği var ancak sadece `SUPPORTED_DOMAINS` (light, switch, cover, climate, fan, media_player, lock, alarm_control_panel, scene, script, camera) içindeki entity'leri listeliyor. `STATUS_SECTION_DOMAINS` (sensor, binary_sensor) içindeki entity'ler listede görünmüyor. Bu yüzden temperature sensor'ları (örn. 3D printer temperature, power plug temperature) exclude edilemiyor. Ayrıca sadece 9-10 entity görünüyordu.
+  - Hedef: "EXCLUDE FROM DASHBOARD" listesine `STATUS_SECTION_DOMAINS` (sensor, binary_sensor) içindeki entity'leri de ekle. Böylece kullanıcı temperature, humidity, motion, occupancy vb. tüm status chip entity'lerini exclude edebilsin.
+  - Kapsam:
+    - `HomeSettingsManager.loadAvailableEntities()` metodunu güncelle: hem `SUPPORTED_DOMAINS` hem de `STATUS_SECTION_DOMAINS` içindeki entity'leri listele
+    - Entity filtreleme mantığını genişlet: `isSupportedDomain()` veya `STATUS_SECTION_DOMAINS` kontrolü yap
+    - Switch filtreleme mantığı eklendi (`showSwitches` ve `includedSwitches` kontrolü)
+    - Mevcut UI'ı değiştirmeye gerek yok (zaten "EXCLUDE FROM DASHBOARD" section'ı var)
+    - Exclude edilen entity'ler tüm dashboard'tan (main dashboard, status chips, tüm sayfalar) tamamen kaldırılmalı
+    - `CustomizationManager.isEntityExcludedFromDashboard()` zaten çalışıyor, sadece entity listesini genişletmek yeterli
+  - Kabul Kriterleri:
+    - ✅ Temperature, humidity, motion, occupancy, battery vb. sensor entity'leri "EXCLUDE FROM DASHBOARD" listesinde görünür
+    - ✅ Bu entity'ler exclude edildiğinde dashboard'un her yerinden (status chips dahil) tamamen kaldırılır
+    - ✅ Mevcut exclude mekanizması çalışmaya devam eder
+    - ✅ Switch filtreleme mantığı doğru çalışır
+    - ✅ Build ve lint temiz
+
 - [x] T-008 — Entity isimlerini dashboard'da özelleştirme
   - Oluşturulma: 2025-10-31
   - Tamamlanma: 2025-10-31
