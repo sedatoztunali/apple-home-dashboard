@@ -191,29 +191,50 @@ export class HomeAssistantUIManager {
           return;
         }
         
-        // Find header in shadow DOM
+        // Find header in shadow DOM - try multiple selectors
         const headerEl = huiRoot.shadowRoot.querySelector(".header") as HTMLElement;
         const appHeader = huiRoot.shadowRoot.querySelector("app-header") as HTMLElement;
         const mdcTopBar = huiRoot.shadowRoot.querySelector(".mdc-top-app-bar") as HTMLElement;
         
+        // Also try to find app-header outside shadow DOM
+        const globalAppHeader = document.querySelector("app-header") as HTMLElement;
+        
         // Modify all found header elements
-        const elements = [headerEl, appHeader, mdcTopBar].filter(Boolean);
+        const elements = [headerEl, appHeader, mdcTopBar, globalAppHeader].filter(Boolean);
         
         if (elements.length > 0) {
           elements.forEach(el => {
             if (el) {
-              el.style.cssText = 'background: transparent !important; border: none !important; box-shadow: none !important;';
+              // Set multiple style properties to override any theme
+              el.style.setProperty('background', 'transparent', 'important');
+              el.style.setProperty('background-color', 'transparent', 'important');
+              el.style.setProperty('border', 'none', 'important');
+              el.style.setProperty('box-shadow', 'none', 'important');
+              el.style.setProperty('--app-header-background-color', 'transparent', 'important');
               
               // Also modify all child elements with backgrounds
               const children = el.querySelectorAll('*');
               children.forEach((child: any) => {
                 if (child && child.style) {
                   const computedStyle = window.getComputedStyle(child);
-                  if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' && computedStyle.backgroundColor !== 'transparent') {
+                  const bgColor = computedStyle.backgroundColor;
+                  if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+                    child.style.setProperty('background', 'transparent', 'important');
                     child.style.setProperty('background-color', 'transparent', 'important');
                   }
                 }
               });
+              
+              // If it's a web component, try to access its shadow DOM
+              if (el.shadowRoot) {
+                const shadowElements = el.shadowRoot.querySelectorAll('*');
+                shadowElements.forEach((shadowEl: any) => {
+                  if (shadowEl && shadowEl.style) {
+                    shadowEl.style.setProperty('background', 'transparent', 'important');
+                    shadowEl.style.setProperty('background-color', 'transparent', 'important');
+                  }
+                });
+              }
             }
           });
           
