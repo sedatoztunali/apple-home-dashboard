@@ -284,13 +284,9 @@ export class StatusSection {
       statusMap.get('speakers')?.entityIds.push(entityId);
     }
 
-    // Vacuum cleaners (only active ones: cleaning, returning, paused)
+    // Vacuum cleaners (show all vacuums, regardless of state)
     else if (domain === 'vacuum') {
-      const vacuumState = state.state;
-      // Only show active vacuum cleaners
-      if (vacuumState === 'cleaning' || vacuumState === 'returning' || vacuumState === 'paused') {
-        statusMap.get('vacuum')?.entityIds.push(entityId);
-      }
+      statusMap.get('vacuum')?.entityIds.push(entityId);
     }
   }
 
@@ -674,18 +670,10 @@ export class StatusSection {
   }
 
   private calculateVacuumStatus(entityIds: string[], hass: any): string {
-    // Count active vacuum cleaners (cleaning, returning, paused)
-    const activeCount = entityIds.filter(id => {
-      const state = hass.states[id];
-      if (!state) return false;
-      const vacuumState = state.state;
-      return vacuumState === 'cleaning' || vacuumState === 'returning' || vacuumState === 'paused';
-    }).length;
-
-    if (activeCount === 0) {
-      return ''; // Shouldn't happen since we filter in categorizeEntity, but just in case
-    } else if (activeCount === 1) {
-      // Check which state the single vacuum is in
+    if (entityIds.length === 0) {
+      return '';
+    } else if (entityIds.length === 1) {
+      // Single vacuum - show its state
       const state = hass.states[entityIds[0]];
       const vacuumState = state?.state;
       if (vacuumState === 'cleaning') {
@@ -694,11 +682,30 @@ export class StatusSection {
         return localize('vacuum.returning');
       } else if (vacuumState === 'paused') {
         return localize('vacuum.paused');
+      } else if (vacuumState === 'docked') {
+        return localize('vacuum.docked');
+      } else if (vacuumState === 'idle') {
+        return localize('vacuum.idle');
+      } else if (vacuumState === 'error') {
+        return localize('vacuum.error');
       }
-      return localize('vacuum.cleaning'); // fallback
+      return vacuumState ? vacuumState.charAt(0).toUpperCase() + vacuumState.slice(1) : '';
     } else {
-      // Multiple active vacuums - show count and "active" or "cleaning"
-      return `${activeCount} ${localize('vacuum.cleaning')}`;
+      // Multiple vacuums - show count and state summary
+      // Count active ones
+      const activeCount = entityIds.filter(id => {
+        const state = hass.states[id];
+        if (!state) return false;
+        const vacuumState = state.state;
+        return vacuumState === 'cleaning' || vacuumState === 'returning' || vacuumState === 'paused';
+      }).length;
+      
+      if (activeCount > 0) {
+        return `${activeCount} ${localize('vacuum.cleaning')}`;
+      } else {
+        // All are inactive (docked/idle/etc) - just show count
+        return `${entityIds.length} Vacuum${entityIds.length > 1 ? 's' : ''}`;
+      }
     }
   }
 
