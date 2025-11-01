@@ -120,6 +120,75 @@ export class HomeAssistantUIManager {
     }
   }
 
+  private makeHeaderTransparent(): void {
+    // Inject global CSS to make Home Assistant header transparent
+    if (document.querySelector('#apple-ha-header-transparent-styles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'apple-ha-header-transparent-styles';
+    style.textContent = `
+      /* Make Home Assistant native header transparent by default */
+      hui-root .header,
+      hui-root app-header,
+      hui-root .mdc-top-app-bar {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      
+      /* Try to access shadow DOM of hui-root */
+      hui-root::part(header),
+      hui-root::part(app-header) {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      
+      /* Also target via deep selector if shadow DOM access fails */
+      hui-root .header *,
+      hui-root app-header * {
+        background: transparent !important;
+      }
+      
+      /* Remove border from header bottom */
+      hui-root .header::after,
+      hui-root app-header::after {
+        display: none !important;
+      }
+    `;
+    
+    document.head.appendChild(style);
+    
+    // Also try to modify header directly if accessible
+    const tryModifyHeader = () => {
+      const haRoot = document.querySelector("home-assistant");
+      const huiRoot = this.deepQuery(haRoot, "hui-root");
+      const headerEl = huiRoot?.shadowRoot?.querySelector(".header");
+      
+      if (headerEl) {
+        try {
+          (headerEl as HTMLElement).style.cssText = 'background: transparent !important; border: none !important; box-shadow: none !important;';
+          
+          // Also modify app-header if it exists
+          const appHeader = huiRoot?.shadowRoot?.querySelector("app-header");
+          if (appHeader) {
+            (appHeader as HTMLElement).style.cssText = 'background: transparent !important; border: none !important; box-shadow: none !important;';
+          }
+        } catch (error) {
+          // Silently fail if we can't modify
+          console.debug('Could not modify header directly:', error);
+        }
+      }
+    };
+    
+    // Try immediately and after a delay (header may render asynchronously)
+    tryModifyHeader();
+    setTimeout(tryModifyHeader, 500);
+    setTimeout(tryModifyHeader, 1000);
+  }
+
   private collapseSidebar(hide: boolean = true): void {
     if (this.lastSidebarState === hide) {
       return;
@@ -238,7 +307,13 @@ export class HomeAssistantUIManager {
   }
 
   private applyUIState(): void {
-    this.collapseHeader(!this.state.headerVisible);
+    if (this.state.headerVisible) {
+      // Header is visible - make it transparent
+      this.makeHeaderTransparent();
+    } else {
+      // Header is hidden - collapse it
+      this.collapseHeader(true);
+    }
     this.collapseSidebar(!this.state.sidebarVisible);
   }
 
@@ -250,7 +325,13 @@ export class HomeAssistantUIManager {
       await this.customizationManager.setHeaderVisibility(!this.state.headerVisible);
     }
     
-    this.collapseHeader(!this.state.headerVisible);
+    if (this.state.headerVisible) {
+      // Header is visible - make it transparent
+      this.makeHeaderTransparent();
+    } else {
+      // Header is hidden - collapse it
+      this.collapseHeader(true);
+    }
     
     return this.state.headerVisible;
   }
@@ -342,7 +423,13 @@ export class HomeAssistantUIManager {
     this.state.headerVisible = !shouldHideHeader;
     this.state.sidebarVisible = !shouldHideSidebar;
 
-    this.collapseHeader(!this.state.headerVisible);
+    if (this.state.headerVisible) {
+      // Header is visible - make it transparent
+      this.makeHeaderTransparent();
+    } else {
+      // Header is hidden - collapse it
+      this.collapseHeader(true);
+    }
     this.collapseSidebar(!this.state.sidebarVisible);
   }
 
