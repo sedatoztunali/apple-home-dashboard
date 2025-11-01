@@ -49,13 +49,13 @@ export class StatusSection {
     this._entities = entities;
     this._areaId = areaId;
     this._container = container;
-    
+
     // Generate status data
     this.statusItems = this.generateStatusData(entities, hass);
-    
+
     // Filter out items with no entities
     const visibleItems = this.statusItems.filter(item => item.isVisible);
-    
+
     if (visibleItems.length === 0) {
       return; // Don't render empty section
     }
@@ -63,12 +63,12 @@ export class StatusSection {
     // Create status section container
     const statusSection = document.createElement('div');
     statusSection.className = 'apple-status-section';
-    
+
     // Generate HTML with embedded styles (like AppleChips)
     statusSection.innerHTML = this.generateHTML(visibleItems, areaId);
-    
+
     container.appendChild(statusSection);
-    
+
     // Attach event listeners after DOM is created
     this.attachEventListeners(statusSection, areaId);
   }
@@ -132,6 +132,7 @@ export class StatusSection {
       { domain: 'tvs', icon: 'mdi:television', label: localize('status_section.tvs') },
       { domain: 'speakers', icon: 'mdi:speaker', label: localize('status_section.speakers') },
       { domain: 'smoke', icon: 'mdi:smoke-detector', label: localize('status_section.smoke') },
+      { domain: 'vacuum', icon: 'mdi:robot-vacuum', label: localize('status_section.vacuum') },
       { domain: 'battery', icon: 'mdi:battery-low', label: localize('status_section.battery') }
     ];
 
@@ -154,13 +155,13 @@ export class StatusSection {
 
       const entityDomain = entity.entity_id.split('.')[0];
       const deviceClass = state.attributes?.device_class;
-      
+
       this.categorizeEntity(entity.entity_id, entityDomain, deviceClass, state, statusMap);
     });
 
     // Calculate status values for each category and return in order
     const orderedStatusItems: StatusData[] = [];
-    
+
     statusTypes.forEach(type => {
       const status = statusMap.get(type.domain);
       if (status && status.entityIds.length > 0) {
@@ -169,7 +170,7 @@ export class StatusSection {
           const state = hass.states[entityId];
           return state && state.state !== 'unavailable' && state.state !== 'unknown';
         });
-        
+
         // Only show status if there are available entities
         if (hasAvailableEntities) {
           status.value = this.calculateStatusValue(type.domain, status.entityIds, hass);
@@ -183,18 +184,18 @@ export class StatusSection {
   }
 
   private categorizeEntity(
-    entityId: string, 
-    domain: string, 
-    deviceClass: string | undefined, 
-    state: any, 
+    entityId: string,
+    domain: string,
+    deviceClass: string | undefined,
+    state: any,
     statusMap: Map<string, StatusData>
   ): void {
-    
+
     // Lights
     if (domain === 'light') {
       statusMap.get('lights')?.entityIds.push(entityId);
     }
-    
+
     // Switches and Outlets
     else if (domain === 'switch') {
       // Check if this switch is an outlet
@@ -204,7 +205,7 @@ export class StatusSection {
         statusMap.get('switches')?.entityIds.push(entityId);
       }
     }
-    
+
     // Temperature sensors
     else if (domain === 'sensor' && (deviceClass === 'temperature' || state.attributes?.unit_of_measurement === '°C' || state.attributes?.unit_of_measurement === '°F')) {
       statusMap.get('temperature')?.entityIds.push(entityId);
@@ -212,75 +213,84 @@ export class StatusSection {
     else if (domain === 'climate') {
       statusMap.get('temperature')?.entityIds.push(entityId);
     }
-    
+
     // Humidity sensors
     else if (domain === 'sensor' && deviceClass === 'humidity') {
       statusMap.get('humidity')?.entityIds.push(entityId);
     }
-    
+
     // Covers
     else if (domain === 'cover') {
       statusMap.get('covers')?.entityIds.push(entityId);
     }
-    
+
     // Security systems
     else if (domain === 'alarm_control_panel') {
       statusMap.get('security')?.entityIds.push(entityId);
     }
-    
+
     // Locks
     else if (domain === 'lock') {
       statusMap.get('locks')?.entityIds.push(entityId);
     }
-    
+
     // Motion sensors
     else if (domain === 'binary_sensor' && deviceClass === 'motion') {
       statusMap.get('motion')?.entityIds.push(entityId);
     }
-    
+
     // Occupancy sensors
     else if (domain === 'binary_sensor' && deviceClass === 'occupancy') {
       statusMap.get('occupancy')?.entityIds.push(entityId);
     }
-    
+
     // Light sensors (illuminance)
     else if (domain === 'sensor' && (deviceClass === 'illuminance' || state.attributes?.unit_of_measurement === 'lx')) {
       statusMap.get('light_sensor')?.entityIds.push(entityId);
     }
-    
+
     // Smoke detectors
     else if (domain === 'binary_sensor' && deviceClass === 'smoke') {
       statusMap.get('smoke')?.entityIds.push(entityId);
     }
-    
+
     // Battery sensors (only low battery ones)
     else if (domain === 'sensor' && deviceClass === 'battery' && parseFloat(state.state) < 20) {
       statusMap.get('battery')?.entityIds.push(entityId);
     }
-    
+
     // Door sensors
     else if (domain === 'binary_sensor' && deviceClass === 'door') {
       statusMap.get('doors')?.entityIds.push(entityId);
     }
-    
+
     // Window sensors
     else if (domain === 'binary_sensor' && deviceClass === 'window') {
       statusMap.get('windows')?.entityIds.push(entityId);
     }
-    
+
     // General contact sensors (not doors or windows)
     else if (domain === 'binary_sensor' && (deviceClass === 'opening' && !['door', 'window'].includes(deviceClass || ''))) {
       statusMap.get('contact')?.entityIds.push(entityId);
     }
-    
+
     // TVs (media players with TV device class)
     else if (domain === 'media_player' && (deviceClass === 'tv' || entityId.includes('tv'))) {
       statusMap.get('tvs')?.entityIds.push(entityId);
     }
-    
+
     // Speakers (other media players)
     else if (domain === 'media_player' && deviceClass !== 'tv' && !entityId.includes('tv')) {
       statusMap.get('speakers')?.entityIds.push(entityId);
+    }
+
+    // Vacuum cleaners (only active ones: cleaning, returning, paused)
+    else if (domain === 'vacuum') {
+      const vacuumState = state.state;
+      // Only show active vacuum cleaners
+      if (vacuumState === 'cleaning' || vacuumState === 'returning' || vacuumState === 'paused') {
+        statusMap.get('vacuum')?.entityIds.push(entityId);
+      }
     }
   }
 
@@ -290,46 +300,49 @@ export class StatusSection {
       case 'switches':
       case 'outlets':
         return this.calculateOnOffStatus(entityIds, hass);
-      
+
       case 'temperature':
         return this.calculateTemperatureRange(entityIds, hass);
-      
+
       case 'humidity':
         return this.calculateHumidityRange(entityIds, hass);
-      
+
       case 'covers':
         return this.calculateCoverStatus(entityIds, hass);
-      
+
       case 'security':
         return this.calculateSecurityStatus(entityIds, hass);
-      
+
       case 'locks':
         return this.calculateLockStatus(entityIds, hass);
-      
+
       case 'motion':
         return this.calculateMotionStatus(entityIds, hass);
-      
+
       case 'occupancy':
         return this.calculateOccupancyStatus(entityIds, hass);
-      
+
       case 'light_sensor':
         return this.calculateLightSensorRange(entityIds, hass);
-      
+
       case 'smoke':
         return this.calculateSmokeStatus(entityIds, hass);
-      
+
       case 'battery':
         return entityIds.length === 1 ? localize('battery.low_battery') : localize('battery.low_battery_count').replace('{count}', entityIds.length.toString());
-      
+
       case 'doors':
       case 'windows':
       case 'contact':
         return this.calculateContactStatus(entityIds, hass);
-      
+
       case 'tvs':
       case 'speakers':
         return this.calculateMediaStatus(entityIds, hass);
-      
+
+      case 'vacuum':
+        return this.calculateVacuumStatus(entityIds, hass);
+
       default:
         return '';
     }
@@ -340,7 +353,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && (state.state === 'on' || state.state === 'playing');
     }).length;
-    
+
     if (onCount === 0) {
       return localize('lights.all_off');
     } else if (onCount === entityIds.length) {
@@ -352,41 +365,41 @@ export class StatusSection {
 
   private calculateTemperatureRange(entityIds: string[], hass: any): string {
     const temperatures: number[] = [];
-    
+
     entityIds.forEach(id => {
       const state = hass.states[id];
       if (!state) return;
-      
+
       let temp: number | undefined;
-      
+
       const domain = id.split('.')[0];
       if (domain === 'climate') {
         temp = state.attributes?.current_temperature;
       } else {
         temp = parseFloat(state.state);
       }
-      
+
       if (temp !== undefined && !isNaN(temp) && temp > -100 && temp < 200) { // Reasonable temperature range
         temperatures.push(temp);
       }
     });
-    
+
     if (temperatures.length === 0) return '';
     if (temperatures.length === 1) return `${temperatures[0].toFixed(1)}°`;
-    
+
     const min = Math.min(...temperatures);
     const max = Math.max(...temperatures);
-    
+
     if (Math.abs(min - max) < 0.1) { // If temperatures are essentially the same
       return `${min.toFixed(1)}°`;
     }
-    
+
     return `${min.toFixed(1)}°-${max.toFixed(1)}°`;
   }
 
   private calculateHumidityRange(entityIds: string[], hass: any): string {
     const humidities: number[] = [];
-    
+
     entityIds.forEach(id => {
       const state = hass.states[id];
       if (state) {
@@ -396,17 +409,17 @@ export class StatusSection {
         }
       }
     });
-    
+
     if (humidities.length === 0) return '';
     if (humidities.length === 1) return `${humidities[0]}%`;
-    
+
     const min = Math.min(...humidities);
     const max = Math.max(...humidities);
-    
+
     if (min === max) { // If all humidity values are the same
       return `${min}%`;
     }
-    
+
     return `${min}%-${max}%`;
   }
 
@@ -420,7 +433,7 @@ export class StatusSection {
           width: 100%;
           height: 56px;
         }
-        
+
         .status-chips-container {
           display: flex;
           gap: 36px;
@@ -436,11 +449,11 @@ export class StatusSection {
           width: 100%;
           height: 56px;
         }
-        
+
         .status-chips-container::-webkit-scrollbar {
           display: none;
         }
-        
+
         .status-chip {
           display: flex;
           align-items: center;
@@ -466,19 +479,19 @@ export class StatusSection {
           justify-content: center;
           color: white;
         }
-        
+
         .status-chip-icon ha-icon {
           width: 24px;
           height: 24px;
           color: white;
         }
-        
+
         .status-chip-content {
           display: flex;
           flex-direction: column;
           gap: 1px;
         }
-        
+
         .status-chip-label {
           font-size: 14px;
           font-weight: 600;
@@ -486,7 +499,7 @@ export class StatusSection {
           line-height: 1.2;
           letter-spacing: -0.2px;
         }
-        
+
         .status-chip-value {
           font-size: 12px;
           font-weight: 500;
@@ -517,7 +530,7 @@ export class StatusSection {
       chip.addEventListener('click', () => {
         const domain = chip.getAttribute('data-domain');
         const entityIds = chip.getAttribute('data-entity-ids')?.split(',') || [];
-        
+
         const statusData: StatusData = {
           domain: domain || '',
           icon: '',
@@ -526,7 +539,7 @@ export class StatusSection {
           entityIds,
           isVisible: true
         };
-        
+
         // Find the full status data
         const fullStatusData = this.statusItems.find(item => item.domain === domain);
         if (fullStatusData) {
@@ -541,7 +554,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && state.state === 'open';
     }).length;
-    
+
     if (openCount === 0) {
       return localize('covers.all_closed');
     } else if (openCount === entityIds.length) {
@@ -556,12 +569,12 @@ export class StatusSection {
       const state = hass.states[entityIds[0]];
       return state?.state?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Unknown';
     }
-    
+
     const armed = entityIds.filter(id => {
       const state = hass.states[id];
       return state && state.state !== "disarmed" && state.state.includes('armed');
     }).length;
-    
+
     return armed === 0 ? localize('status.disarmed') : `${armed} ${localize('status.armed')}`;
   }
 
@@ -570,7 +583,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && state.state === 'unlocked';
     }).length;
-    
+
     if (unlockedCount === 0) {
       return localize('status_section.all_locked');
     } else if (unlockedCount === entityIds.length) {
@@ -585,7 +598,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && state.state === 'on';
     }).length;
-    
+
     if (activeCount === 0) {
       return localize('motion.not_detected');
     } else if (activeCount === 1) {
@@ -600,7 +613,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && state.state === 'on';
     }).length;
-    
+
     if (activeCount === 0) {
       return localize('occupancy.not_detected');
     } else if (activeCount === 1) {
@@ -612,7 +625,7 @@ export class StatusSection {
 
   private calculateLightSensorRange(entityIds: string[], hass: any): string {
     const luxValues: number[] = [];
-    
+
     entityIds.forEach(id => {
       const state = hass.states[id];
       if (state) {
@@ -622,17 +635,17 @@ export class StatusSection {
         }
       }
     });
-    
+
     if (luxValues.length === 0) return '';
     if (luxValues.length === 1) return `${luxValues[0]} lux`;
-    
+
     const min = Math.min(...luxValues);
     const max = Math.max(...luxValues);
-    
+
     if (min === max) { // If all values are the same
       return `${min} lux`;
     }
-    
+
     return `${min}-${max} lux`;
   }
 
@@ -641,7 +654,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && state.state === 'on';
     }).length;
-    
+
     return detectedCount === 0 ? localize('smoke.not_detected') : localize('smoke.detected');
   }
 
@@ -650,7 +663,7 @@ export class StatusSection {
       const state = hass.states[id];
       return state && state.state === 'on';
     }).length;
-    
+
     if (openCount === 0) {
       return localize('contact.all_closed');
     } else if (openCount === 1) {
@@ -660,21 +673,50 @@ export class StatusSection {
     }
   }
 
+  private calculateVacuumStatus(entityIds: string[], hass: any): string {
+    // Count active vacuum cleaners (cleaning, returning, paused)
+    const activeCount = entityIds.filter(id => {
+      const state = hass.states[id];
+      if (!state) return false;
+      const vacuumState = state.state;
+      return vacuumState === 'cleaning' || vacuumState === 'returning' || vacuumState === 'paused';
+    }).length;
+
+    if (activeCount === 0) {
+      return ''; // Shouldn't happen since we filter in categorizeEntity, but just in case
+    } else if (activeCount === 1) {
+      // Check which state the single vacuum is in
+      const state = hass.states[entityIds[0]];
+      const vacuumState = state?.state;
+      if (vacuumState === 'cleaning') {
+        return localize('vacuum.cleaning');
+      } else if (vacuumState === 'returning') {
+        return localize('vacuum.returning');
+      } else if (vacuumState === 'paused') {
+        return localize('vacuum.paused');
+      }
+      return localize('vacuum.cleaning'); // fallback
+    } else {
+      // Multiple active vacuums - show count and "active" or "cleaning"
+      return `${activeCount} ${localize('vacuum.cleaning')}`;
+    }
+  }
+
   private calculateMediaStatus(entityIds: string[], hass: any): string {
     const playingCount = entityIds.filter(id => {
       const state = hass.states[id];
       return state && state.state === 'playing';
     }).length;
-    
+
     if (playingCount > 0) {
       return playingCount === 1 ? localize('media.playing') : `${playingCount} ${localize('media.multiple_playing')}`;
     }
-    
+
     const onCount = entityIds.filter(id => {
       const state = hass.states[id];
       return state && state.state !== 'off' && state.state !== 'unavailable' && state.state !== 'standby';
     }).length;
-    
+
     if (onCount === 0) {
       return localize('lights.all_off');
     } else if (onCount === entityIds.length) {
@@ -702,15 +744,15 @@ export class StatusSection {
         bubbles: true,
         composed: true
       });
-      
+
       // Try to dispatch from the main Home Assistant app elements
       const targets = [
         document.querySelector('ha-app'),
-        document.querySelector('home-assistant'), 
+        document.querySelector('home-assistant'),
         document.querySelector('hui-root'),
         document.querySelector('ha-panel-lovelace')
       ].filter(Boolean);
-      
+
       let dispatched = false;
       for (const target of targets) {
         if (target) {
@@ -719,7 +761,7 @@ export class StatusSection {
           break; // Only need to dispatch from one target
         }
       }
-      
+
       // Fallback to document body if no Home Assistant elements found
       if (!dispatched) {
         document.body.dispatchEvent(event);
@@ -729,7 +771,7 @@ export class StatusSection {
 
   private async groupEntitiesByArea(entityIds: string[]): Promise<{ [areaId: string]: string[] }> {
     const entitiesByArea: { [areaId: string]: string[] } = {};
-    
+
     // Get areas, devices, and entities from Home Assistant
     let areas: Area[] = [];
     let devices: any[] = [];
@@ -741,22 +783,22 @@ export class StatusSection {
     } catch (error) {
       // Silently handle error
     }
-    
+
     // Initialize areas
     areas.forEach(area => {
       entitiesByArea[area.area_id] = [];
     });
-    
+
     // Add entities without area to 'no_area'
     entitiesByArea['no_area'] = [];
-    
+
     // Group entities by area
     for (const entityId of entityIds) {
       // Find the entity in the registry
       const entityRegistry = entities.find(e => e.entity_id === entityId);
-      
+
       let entityAreaId = entityRegistry?.area_id;
-      
+
       // If entity doesn't have an area but has a device, check device's area
       if (!entityAreaId && entityRegistry?.device_id) {
         const device = devices.find(d => d.id === entityRegistry.device_id);
@@ -764,27 +806,27 @@ export class StatusSection {
           entityAreaId = device.area_id;
         }
       }
-      
+
       // If still no area, put in 'no_area'
       if (!entityAreaId) {
         entityAreaId = 'no_area';
       }
-      
+
       // Initialize area if it doesn't exist (shouldn't happen, but just in case)
       if (!entitiesByArea[entityAreaId]) {
         entitiesByArea[entityAreaId] = [];
       }
-      
+
       entitiesByArea[entityAreaId].push(entityId);
     }
-    
+
     // Remove empty areas
     Object.keys(entitiesByArea).forEach(areaId => {
       if (entitiesByArea[areaId].length === 0) {
         delete entitiesByArea[areaId];
       }
     });
-    
+
     return entitiesByArea;
   }
 
@@ -792,11 +834,11 @@ export class StatusSection {
     // Create modal backdrop
     const modal = document.createElement('div');
     modal.className = 'status-modal-backdrop';
-    
+
     // Create modal content
     const modalContent = document.createElement('div');
     modalContent.className = 'status-modal-content';
-    
+
     // Modal header
     const header = document.createElement('div');
     header.className = 'status-modal-header';
@@ -805,18 +847,18 @@ export class StatusSection {
       <h2>${statusData.label}</h2>
       <button class="modal-done">${localize('ui_actions.done')}</button>
     `;
-    
+
     // Modal body
     const body = document.createElement('div');
     body.className = 'status-modal-body';
-    
+
     // Group entities by room
     const entitiesByArea = await this.groupEntitiesByArea(statusData.entityIds);
-    
+
     // Create sections for each room
     for (const [roomAreaId, roomEntityIds] of Object.entries(entitiesByArea) as [string, string[]][]) {
       if (roomEntityIds.length === 0) continue;
-      
+
       // Get area name (capitalized like home screen titles)
       let areaName = roomAreaId;
       if (roomAreaId !== 'no_area') {
@@ -830,18 +872,18 @@ export class StatusSection {
       } else {
         areaName = localize('pages.default_room');
       }
-      
+
       // Create room title
       const roomTitle = document.createElement('div');
       roomTitle.className = 'status-modal-room-title';
       roomTitle.innerHTML = `<span>${areaName}</span>`;
       body.appendChild(roomTitle);
-      
+
       // Create cards grid for this room
       const cardsGrid = document.createElement('div');
       cardsGrid.className = 'status-modal-cards';
       cardsGrid.dataset.areaId = roomAreaId;
-      
+
       // Create cards for entities in this room
       for (const entityId of roomEntityIds) {
         const cardConfig = this.createEntityCard(entityId, this._hass);
@@ -849,37 +891,37 @@ export class StatusSection {
           await this.createAndAppendCard(cardConfig, cardsGrid, this._hass, roomAreaId);
         }
       }
-      
+
       body.appendChild(cardsGrid);
     }
-    
+
     modalContent.appendChild(header);
     modalContent.appendChild(body);
     modal.appendChild(modalContent);
-    
+
     // Add event listeners
     const cancelBtn = header.querySelector('.modal-cancel');
     const doneBtn = header.querySelector('.modal-done');
-    
+
     const closeModal = () => {
       modal.classList.remove('show');
       setTimeout(() => modal.remove(), 300);
     };
-    
+
     cancelBtn?.addEventListener('click', closeModal);
     doneBtn?.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal();
     });
-    
+
     // Forward hass-more-info events from cards to main app
     modal.addEventListener('hass-more-info', (e: Event) => {
       e.stopPropagation(); // Stop the event from bubbling further
       const event = e as CustomEvent;
-      
+
       // Close the modal first
       closeModal();
-      
+
       // Then dispatch the more-info event to the main app
       setTimeout(() => {
         // Try multiple Home Assistant app selectors
@@ -889,7 +931,7 @@ export class StatusSection {
           document.querySelector('hui-root'),
           document.querySelector('ha-panel-lovelace')
         ].filter(Boolean);
-        
+
         targets.forEach(target => {
           if (target) {
             const forwardedEvent = new CustomEvent('hass-more-info', {
@@ -900,7 +942,7 @@ export class StatusSection {
             target.dispatchEvent(forwardedEvent);
           }
         });
-        
+
         // Also try dispatching from document body as fallback
         if (targets.length === 0) {
           const fallbackEvent = new CustomEvent('hass-more-info', {
@@ -912,13 +954,13 @@ export class StatusSection {
         }
       }, 100);
     });
-    
+
     // Add to DOM and show
     document.body.appendChild(modal);
-    
+
     // Add styles for modal
     this.addModalStyles();
-    
+
     // Trigger animation
     requestAnimationFrame(() => {
       modal.classList.add('show');
@@ -930,21 +972,21 @@ export class StatusSection {
     if (!state) {
       return null;
     }
-    
+
     // Get custom name from CustomizationManager (priority: custom_name → friendly_name → entity_id)
     const customName = this.customizationManager.getEntityCustomName(entityId);
     let friendlyName = customName || state?.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
     const domain = entityId.split('.')[0];
-    
+
     // Determine card type and properties
     let cardType = 'custom:apple-home-card';
     let isTallCard = false;
-    
+
     // Check if domain should be tall by default
     if (DashboardConfig.isDefaultTallDomain(domain)) {
       isTallCard = true;
     }
-    
+
     const card: CardConfig = {
       type: cardType,
       entity: entityId,
@@ -952,11 +994,11 @@ export class StatusSection {
       domain: domain,
       is_tall: isTallCard
     };
-    
+
     // Add default icons for entities without icons
     if (!state.attributes?.icon) {
       let defaultIcon = '';
-      
+
       if (DashboardConfig.isScenesDomain(domain)) {
         defaultIcon = 'mdi:home';
       } else if (domain === 'sensor') {
@@ -1002,12 +1044,12 @@ export class StatusSection {
             defaultIcon = 'mdi:checkbox-marked-circle';
         }
       }
-      
+
       if (defaultIcon) {
         (card as any).default_icon = defaultIcon;
       }
     }
-    
+
     return card;
   }
 
@@ -1019,24 +1061,24 @@ export class StatusSection {
   ): Promise<void> {
     try {
       let cardElement: HTMLElement;
-      
+
       if (cardConfig.type === 'custom:apple-home-card') {
         cardElement = document.createElement('apple-home-card') as HTMLElement;
-        
+
         // Determine if card should be tall based on customizations
         const shouldBeTall = this.cardManager?.shouldCardBeTall(
-          cardConfig.entity, 
-          areaId || 'unknown', 
+          cardConfig.entity,
+          areaId || 'unknown',
           'modal'
         ) || cardConfig.is_tall;
-        
+
         const configWithTall = { ...cardConfig, is_tall: shouldBeTall };
-        
+
         // Add default icon if specified
         if ((cardConfig as any).default_icon) {
           configWithTall.default_icon = (cardConfig as any).default_icon;
         }
-        
+
         (cardElement as any).setConfig(configWithTall);
         (cardElement as any).hass = hass;
       } else {
@@ -1053,25 +1095,25 @@ export class StatusSection {
           cardElement.innerHTML = `<div style="color: red;">Unknown card type: ${cardConfig.type}</div>`;
         }
       }
-      
+
       const wrapper = document.createElement('div');
       wrapper.className = 'entity-card-wrapper';
       wrapper.dataset.entityId = cardConfig.entity;
-      
+
       // Apply tall class if needed
       const shouldBeTall = this.cardManager?.shouldCardBeTall(
-        cardConfig.entity, 
-        areaId || 'unknown', 
+        cardConfig.entity,
+        areaId || 'unknown',
         'modal'
       ) || cardConfig.is_tall;
-      
+
       if (shouldBeTall) {
         wrapper.classList.add('tall');
       }
-      
+
       wrapper.appendChild(cardElement);
       container.appendChild(wrapper);
-      
+
     } catch (error) {
       console.error('Error creating status modal card:', error);
     }
@@ -1079,7 +1121,7 @@ export class StatusSection {
 
   private addModalStyles(): void {
     if (document.querySelector('#status-modal-styles')) return;
-    
+
     const style = document.createElement('style');
     style.id = 'status-modal-styles';
     style.textContent = `
@@ -1099,11 +1141,11 @@ export class StatusSection {
         opacity: 0;
         transition: opacity 0.3s ease;
       }
-      
+
       .status-modal-backdrop.show {
         opacity: 1;
       }
-      
+
       .status-modal-content {
         position: relative;
         width: 800px;
@@ -1121,12 +1163,12 @@ export class StatusSection {
         display: flex;
         flex-direction: column;
       }
-      
+
       .status-modal-backdrop.show .status-modal-content {
         transform: scale(1);
         opacity: 1;
       }
-      
+
       .status-modal-header {
         display: flex;
         align-items: center;
@@ -1134,7 +1176,7 @@ export class StatusSection {
         padding: 16px 20px;
         border-bottom: 0.5px solid rgba(84, 84, 88, 0.3);
       }
-      
+
       .status-modal-header h2 {
         margin: 0;
         font-size: 17px;
@@ -1143,7 +1185,7 @@ export class StatusSection {
         text-align: center;
         flex: 1;
       }
-      
+
       .modal-cancel,
       .modal-done {
         background: none;
@@ -1156,18 +1198,18 @@ export class StatusSection {
         min-width: 60px;
         text-align: center;
       }
-      
+
       .modal-done {
         font-weight: 600;
       }
-      
+
       .status-modal-body {
         flex: 1;
         overflow-y: auto;
         padding: 20px;
         min-height: 0;
       }
-      
+
       .status-modal-room-title {
         margin: 0 0 8px 0;
         font-size: 13px;
@@ -1176,11 +1218,11 @@ export class StatusSection {
         color: rgba(255, 255, 255, 0.6);
         text-transform: uppercase;
       }
-      
+
       .status-modal-room-title:first-child {
         margin-top: 0;
       }
-      
+
       .status-modal-cards {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
@@ -1189,11 +1231,11 @@ export class StatusSection {
         auto-rows: min-content;
         margin-bottom: 32px;
       }
-      
+
       .status-modal-cards:last-child {
         margin-bottom: 0;
       }
-      
+
       .entity-card-wrapper {
         display: flex;
         flex-direction: column;
@@ -1202,29 +1244,29 @@ export class StatusSection {
         border-radius: 16px;
         overflow: hidden;
       }
-      
+
       .entity-card-wrapper.tall {
         grid-row: span 2;
       }
-      
+
       .entity-card-wrapper apple-home-card {
         width: 100%;
         height: 100%;
         border-radius: 16px;
       }
-      
+
       @media (max-width: 1199px) {
         .entity-card-wrapper {
           grid-column: span 4;
         }
       }
-      
+
       @media (max-width: 767px) {
         .entity-card-wrapper {
           grid-column: span 6;
         }
       }
-      
+
       @media (max-width: 768px) {
         .status-modal-content {
           width: 100vw;
@@ -1234,21 +1276,21 @@ export class StatusSection {
           border-radius: 16px 16px 0 0;
           transform: translateY(100%);
         }
-        
+
         .status-modal-backdrop.show .status-modal-content {
           transform: translateY(0);
         }
-        
+
         .status-card-wrapper {
           height: 120px;
         }
-        
+
         .status-card-wrapper.tall {
           height: 240px;
         }
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 }

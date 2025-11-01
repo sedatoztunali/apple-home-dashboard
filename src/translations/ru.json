@@ -75,7 +75,8 @@
     "switches": "Выключатели",
     "outlets": "Розетки",
     "temperature": "Температура",
-    "humidity": "Влажность"
+    "humidity": "Влажность",
+    "vacuum": "Пылесос"
   },
   "section_reorder": {
     "title": "Перестроить секции",

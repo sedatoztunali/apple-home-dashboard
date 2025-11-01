@@ -90,7 +90,8 @@
     "switches": "מתגים",
     "outlets": "שקעים",
     "temperature": "טמפרטורה",
-    "humidity": "לחות"
+    "humidity": "לחות",
+    "vacuum": "שואב אבק"
   },
   "section_reorder": {
     "title": "סידור מקטעים",

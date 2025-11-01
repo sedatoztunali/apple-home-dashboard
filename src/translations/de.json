@@ -90,7 +90,8 @@
     "switches": "Schalter",
     "outlets": "Steckdosen",
     "temperature": "Temperatur",
-    "humidity": "Feuchtigkeit"
+    "humidity": "Feuchtigkeit",
+    "vacuum": "Staubsauger"
   },
   "section_reorder": {
     "title": "Bereiche neu anordnen",

@@ -97,7 +97,8 @@
     "switches": "Anahtarlar",
     "outlets": "Prizler",
     "temperature": "Sıcaklık",
-    "humidity": "Nem"
+    "humidity": "Nem",
+    "vacuum": "Süpürge"
   },
   "section_reorder": {
     "title": "Bölümleri Yeniden Sırala",

@@ -96,7 +96,8 @@
     "switches": "Schakelaars",
     "outlets": "Stopcontacten",
     "temperature": "Temperatuur",
-    "humidity": "Vochtigheid"
+    "humidity": "Vochtigheid",
+    "vacuum": "Stofzuiger"
   },
   "section_reorder": {
     "title": "Secties herordenen",

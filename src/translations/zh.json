@@ -75,7 +75,8 @@
     "switches": "开关",
     "outlets": "插座",
     "temperature": "温度",
-    "humidity": "湿度"
+    "humidity": "湿度",
+    "vacuum": "吸尘器"
   },
   "section_reorder": {
     "title": "重新排序部分",

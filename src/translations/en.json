@@ -97,7 +97,8 @@
     "switches": "Switches",
     "outlets": "Outlets",
     "temperature": "Temperature",
-    "humidity": "Humidity"
+    "humidity": "Humidity",
+    "vacuum": "Vacuum"
   },
   "section_reorder": {
     "title": "Reorder Sections",

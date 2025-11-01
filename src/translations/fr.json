@@ -89,7 +89,8 @@
     "switches": "Interrupteurs",
     "outlets": "Prises",
     "temperature": "Température",
-    "humidity": "Humidité"
+    "humidity": "Humidité",
+    "vacuum": "Aspirateur"
   },
   "section_reorder": {
     "title": "Réorganiser les sections",
