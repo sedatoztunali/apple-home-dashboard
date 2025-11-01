@@ -1912,7 +1912,7 @@ export class AppleHeader {
       .apple-header-scrolled-title {
         font-size: 17px;
         font-weight: 600;
-        color: #ffffff;
+        color: var(--primary-text-color, var(--text-primary-color, #000000));
         margin: 0;
         letter-spacing: -0.4px;
         white-space: nowrap;

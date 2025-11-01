@@ -597,7 +597,7 @@ export class AppleHomeView extends HTMLElement {
           .area-title {
             font-weight: 500;
             font-size: 20px;
-            color: #fff;
+            color: var(--primary-text-color, var(--text-primary-color, #000000));
             margin: 30px 0 6px;
             padding: 0;
             letter-spacing: 0.3px;
@@ -610,7 +610,7 @@ export class AppleHomeView extends HTMLElement {
           .apple-home-section-title {
             font-size: 20px;
             font-weight: 500;
-            color: #fff;
+            color: var(--primary-text-color, var(--text-primary-color, #000000));
             margin: 30px 0 6px;
             padding: 0;
             letter-spacing: 0.4px;
@@ -761,7 +761,7 @@ export class AppleHomeView extends HTMLElement {
           .room-group-title {
             font-size: 20px;
             font-weight: 600;
-            color: #fff;
+            color: var(--primary-text-color, var(--text-primary-color, #000000));
             margin: 30px 0 16px;
             padding: 0;
             letter-spacing: 0.3px;
