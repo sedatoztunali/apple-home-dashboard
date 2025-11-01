@@ -245,6 +245,7 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "uncategorized": "Uncategorized",
-    "no_automations": "No automations found"
+    "no_automations": "No automations found",
+    "no_automation": "No Automation"
   }
 }

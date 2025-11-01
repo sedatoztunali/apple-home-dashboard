@@ -247,6 +247,7 @@
     "enabled": "Ingeschakeld",
     "disabled": "Uitgeschakeld",
     "uncategorized": "Niet gecategoriseerd",
-    "no_automations": "Geen automatiseringen gevonden"
+    "no_automations": "Geen automatiseringen gevonden",
+    "no_automation": "Geen Automatisering"
   }
 }

@@ -224,6 +224,7 @@
     "enabled": "Habilitado",
     "disabled": "Desabilitado",
     "uncategorized": "Sem categoria",
-    "no_automations": "Nenhuma automação encontrada"
+    "no_automations": "Nenhuma automação encontrada",
+    "no_automation": "Sem Automação"
   }
 }

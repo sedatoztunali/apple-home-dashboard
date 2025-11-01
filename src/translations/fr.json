@@ -236,6 +236,7 @@
     "enabled": "Activé",
     "disabled": "Désactivé",
     "uncategorized": "Non catégorisé",
-    "no_automations": "Aucune automatisation trouvée"
+    "no_automations": "Aucune automatisation trouvée",
+    "no_automation": "Aucune Automatisation"
   }
 }

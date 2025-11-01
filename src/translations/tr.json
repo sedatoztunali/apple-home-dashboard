@@ -245,6 +245,7 @@
     "enabled": "Etkin",
     "disabled": "Devre Dışı",
     "uncategorized": "Kategorisiz",
-    "no_automations": "Otomasyon bulunamadı"
+    "no_automations": "Otomasyon bulunamadı",
+    "no_automation": "Otomasyon Yok"
   }
 }

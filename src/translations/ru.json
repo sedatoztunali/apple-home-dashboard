@@ -222,6 +222,7 @@
     "enabled": "Включено",
     "disabled": "Отключено",
     "uncategorized": "Без категории",
-    "no_automations": "Автоматизации не найдены"
+    "no_automations": "Автоматизации не найдены",
+    "no_automation": "Нет Автоматизации"
   }
 }

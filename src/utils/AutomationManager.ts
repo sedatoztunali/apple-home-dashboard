@@ -24,10 +24,10 @@ export class AutomationManager {
   public async showAutomationsModal(hass: any, areaId?: string) {
     this.hass = hass;
     this.filteredAreaId = areaId;
-    
+
     // Prepare automations data
     await this.prepareAutomationsData(hass, areaId);
-    
+
     // Create and show modal
     this.createModal();
     this.setupEventListeners();
@@ -36,7 +36,7 @@ export class AutomationManager {
 
   private async prepareAutomationsData(hass: any, areaId?: string): Promise<void> {
     this.automations = [];
-    
+
     // Get all automation entities from hass.states
     const automationStates = Object.values(hass.states).filter((state: any) => {
       return state.entity_id.startsWith('automation.');
@@ -94,15 +94,15 @@ export class AutomationManager {
     for (const state of automationStates) {
       const entityId = state.entity_id;
       const entityReg = entityRegistryMap.get(entityId);
-      
+
       // Get automation ID from entity ID (remove 'automation.' prefix)
       const automationId = entityId.replace('automation.', '');
       const automationConfig = automationConfigs[automationId];
-      
+
       // Get enabled state - automation.state is 'on' when enabled, 'off' when disabled
       // Also check attributes.enabled (some versions use this)
       const enabled = state.attributes?.enabled !== false && state.state === 'on';
-      
+
       // Get category - priority: automation config > entity registry > entity attributes
       let category: string | undefined = undefined;
       if (automationConfig?.category) {
@@ -112,10 +112,10 @@ export class AutomationManager {
       } else if (state.attributes?.category) {
         category = state.attributes.category;
       }
-      
+
       // Get area_id - priority: automation config area > entity registry area > device area
       let automationAreaId: string | undefined = undefined;
-      
+
       // First try automation config
       if (automationConfig?.area_id) {
         automationAreaId = automationConfig.area_id;
@@ -129,7 +129,7 @@ export class AutomationManager {
           automationAreaId = device.area_id;
         }
       }
-      
+
       // If area filter is set, only include automations from that area
       if (areaId && automationAreaId !== areaId) {
         continue;
@@ -154,7 +154,7 @@ export class AutomationManager {
 
     this.modal = document.createElement('div');
     this.modal.className = `apple-automations-modal ${RTLHelper.isRTL() ? 'rtl' : 'ltr'}`;
-    
+
     this.modal.innerHTML = `
       <div class="modal-backdrop"></div>
       <div class="modal-content">
@@ -174,7 +174,7 @@ export class AutomationManager {
                 <div class="automations-list">
                   ${group.automations.map((automation) => `
                     <div class="automation-item" data-entity-id="${automation.entityId}">
-                      <button class="automation-toggle ${automation.enabled ? 'enabled' : 'disabled'}" 
+                      <button class="automation-toggle ${automation.enabled ? 'enabled' : 'disabled'}"
                               data-entity-id="${automation.entityId}">
                         <ha-icon icon="${automation.enabled ? 'mdi:eye' : 'mdi:eye-off'}"></ha-icon>
                       </button>
@@ -188,7 +188,7 @@ export class AutomationManager {
             `).join('')}
           ` : `
             <div class="no-automations">
-              <span>${localize('automations.no_automations')}</span>
+              <span>${localize('automations.no_automation')}</span>
             </div>
           `}
         </div>
@@ -201,7 +201,7 @@ export class AutomationManager {
 
   private groupByCategory(automations: AutomationItem[]): CategoryGroup[] {
     const categoryMap = new Map<string, AutomationItem[]>();
-    
+
     // Group by category
     automations.forEach(automation => {
       const category = automation.category || localize('automations.uncategorized');
@@ -444,13 +444,13 @@ export class AutomationManager {
           transform: translateY(0);
           opacity: 1;
         }
-        
+
         .automation-item {
           padding: 16px 20px;
         }
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -517,26 +517,47 @@ export class AutomationManager {
     try {
       // Call Home Assistant service to enable/disable automation
       // Use turn_on/turn_off which work reliably, or toggle
+      let serviceCallSuccessful = false;
       if (newEnabledState) {
         // Try enable service first, fall back to turn_on
         try {
           await this.hass.callService('automation', 'enable', { entity_id: entityId });
+          serviceCallSuccessful = true;
         } catch (enableError) {
-          // Fall back to turn_on if enable doesn't work
-          await this.hass.callService('automation', 'turn_on', { entity_id: entityId });
+          // Fall back to turn_on if enable doesn't work (silently)
+          try {
+            await this.hass.callService('automation', 'turn_on', { entity_id: entityId });
+            serviceCallSuccessful = true;
+          } catch (turnOnError) {
+            // If both fail, throw the original error
+            throw enableError;
+          }
         }
       } else {
         // Try disable service first, fall back to turn_off
         try {
           await this.hass.callService('automation', 'disable', { entity_id: entityId });
+          serviceCallSuccessful = true;
         } catch (disableError) {
-          // Fall back to turn_off if disable doesn't work
-          await this.hass.callService('automation', 'turn_off', { entity_id: entityId });
+          // Fall back to turn_off if disable doesn't work (silently)
+          try {
+            await this.hass.callService('automation', 'turn_off', { entity_id: entityId });
+            serviceCallSuccessful = true;
+          } catch (turnOffError) {
+            // If both fail, throw the original error
+            throw disableError;
+          }
         }
       }
-      
+
       // Refresh the automation state after service call
-      await this.hass.callService('homeassistant', 'update_entity', { entity_id: entityId });
+      if (serviceCallSuccessful) {
+        try {
+          await this.hass.callService('homeassistant', 'update_entity', { entity_id: entityId });
+        } catch (updateError) {
+          // Silently ignore update errors
+        }
+      }
 
       // Update local state
       automation.enabled = newEnabledState;
@@ -582,7 +603,7 @@ export class AutomationManager {
 
   private showModal() {
     if (!this.modal) return;
-    
+
     setTimeout(() => {
       this.modal?.classList.add('show');
     }, 10);
@@ -590,7 +611,7 @@ export class AutomationManager {
 
   private closeModal() {
     if (!this.modal) return;
-    
+
     this.modal.classList.remove('show');
     setTimeout(() => {
       this.modal?.remove();
@@ -599,9 +620,9 @@ export class AutomationManager {
   }
 
   /**
-   * Get count of enabled automations (optionally filtered by area)
+   * Get total count of automations (optionally filtered by area)
    */
-  public static async getEnabledAutomationsCount(hass: any, areaId?: string): Promise<number> {
+  public static async getTotalAutomationsCount(hass: any, areaId?: string): Promise<number> {
     const automationStates = Object.values(hass.states).filter((state: any) => {
       return state.entity_id.startsWith('automation.');
     }) as any[];
@@ -611,7 +632,7 @@ export class AutomationManager {
       let automationConfigs: any = {};
       let entityRegistry: any[] = [];
       let devices: any[] = [];
-      
+
       try {
         // Get automation configs for area info
         const automationsList = await hass.callWS({ type: 'automation/list' });
@@ -622,7 +643,7 @@ export class AutomationManager {
             }
           });
         }
-        
+
         entityRegistry = await hass.callWS({ type: 'config/entity_registry/list' });
         devices = await DataService.getDevices(hass);
       } catch (error) {
@@ -642,7 +663,7 @@ export class AutomationManager {
         const automationId = entityId.replace('automation.', '');
         const automationConfig = automationConfigs[automationId];
         const entityReg = entityRegistryMap.get(entityId);
-        
+
         // Get area_id - priority: automation config > entity registry > device
         let automationAreaId: string | undefined = undefined;
         if (automationConfig?.area_id) {
@@ -655,7 +676,77 @@ export class AutomationManager {
             automationAreaId = device.area_id;
           }
         }
-        
+
+        if (automationAreaId === areaId) {
+          count++;
+        }
+      }
+
+      return count;
+    } else {
+      // Count all automations
+      return automationStates.length;
+    }
+  }
+
+  /**
+   * Get count of enabled automations (optionally filtered by area)
+   */
+  public static async getEnabledAutomationsCount(hass: any, areaId?: string): Promise<number> {
+    const automationStates = Object.values(hass.states).filter((state: any) => {
+      return state.entity_id.startsWith('automation.');
+    }) as any[];
+
+    if (areaId) {
+      // Need to filter by area - get automation configs, entity registry and devices
+      let automationConfigs: any = {};
+      let entityRegistry: any[] = [];
+      let devices: any[] = [];
+
+      try {
+        // Get automation configs for area info
+        const automationsList = await hass.callWS({ type: 'automation/list' });
+        if (automationsList) {
+          automationsList.forEach((automation: any) => {
+            if (automation.automation_id) {
+              automationConfigs[automation.automation_id] = automation;
+            }
+          });
+        }
+
+        entityRegistry = await hass.callWS({ type: 'config/entity_registry/list' });
+        devices = await DataService.getDevices(hass);
+      } catch (error) {
+        console.warn('Failed to fetch automation data:', error);
+      }
+
+      const entityRegistryMap = new Map();
+      entityRegistry.forEach((entity: any) => {
+        if (entity.entity_id.startsWith('automation.')) {
+          entityRegistryMap.set(entity.entity_id, entity);
+        }
+      });
+
+      let count = 0;
+      for (const state of automationStates) {
+        const entityId = state.entity_id;
+        const automationId = entityId.replace('automation.', '');
+        const automationConfig = automationConfigs[automationId];
+        const entityReg = entityRegistryMap.get(entityId);
+
+        // Get area_id - priority: automation config > entity registry > device
+        let automationAreaId: string | undefined = undefined;
+        if (automationConfig?.area_id) {
+          automationAreaId = automationConfig.area_id;
+        } else if (entityReg?.area_id) {
+          automationAreaId = entityReg.area_id;
+        } else if (entityReg?.device_id) {
+          const device = devices.find(d => d.id === entityReg.device_id);
+          if (device?.area_id) {
+            automationAreaId = device.area_id;
+          }
+        }
+
         if (automationAreaId === areaId) {
           const enabled = state.attributes?.enabled !== false && state.state === 'on';
           if (enabled) {
@@ -663,7 +754,7 @@ export class AutomationManager {
           }
         }
       }
-      
+
       return count;
     } else {
       // Count all enabled automations

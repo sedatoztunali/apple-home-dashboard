@@ -237,6 +237,7 @@
     "enabled": "מופעל",
     "disabled": "מושבת",
     "uncategorized": "ללא קטגוריה",
-    "no_automations": "לא נמצאו אוטומציות"
+    "no_automations": "לא נמצאו אוטומציות",
+    "no_automation": "אין אוטומציה"
   }
 }

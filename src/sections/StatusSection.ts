@@ -168,20 +168,22 @@ export class StatusSection {
       // Special handling for automations
       if (type.domain === 'automations') {
         try {
-          const enabledCount = await AutomationManager.getEnabledAutomationsCount(hass, areaId);
-          // Always show in area pages, show in home only if > 0
-          if (enabledCount > 0 || areaId) {
+          if (areaId) {
+            // In area pages, show total count (not just enabled)
+            const totalCount = await AutomationManager.getTotalAutomationsCount(hass, areaId);
             let statusValue: string;
-            if (areaId) {
-              // In area pages, show appropriate message
-              if (enabledCount === 0) {
-                statusValue = localize('automations.no_automations');
-              } else {
-                statusValue = `${enabledCount} ${localize('automations.enabled')}`;
-              }
+            if (totalCount === 0) {
+              statusValue = localize('automations.no_automation');
             } else {
-              // In home page, show count or off
-              statusValue = enabledCount > 0 ? `${enabledCount} ${localize('automations.enabled')}` : localize('status.off');
+              const enabledCount = await AutomationManager.getEnabledAutomationsCount(hass, areaId);
+              if (enabledCount === 0) {
+                // Show total count even if none are enabled
+                statusValue = `${totalCount}`;
+              } else if (enabledCount === totalCount) {
+                statusValue = `${totalCount} ${localize('automations.enabled')}`;
+              } else {
+                statusValue = `${enabledCount}/${totalCount} ${localize('automations.enabled')}`;
+              }
             }
             
             const automationsStatus: StatusData = {
@@ -193,6 +195,21 @@ export class StatusSection {
               isVisible: true
             };
             orderedStatusItems.push(automationsStatus);
+          } else {
+            // In home page, show enabled count only
+            const enabledCount = await AutomationManager.getEnabledAutomationsCount(hass);
+            if (enabledCount > 0) {
+              const statusValue = `${enabledCount} ${localize('automations.enabled')}`;
+              const automationsStatus: StatusData = {
+                domain: 'automations',
+                icon: type.icon,
+                label: type.label,
+                value: statusValue,
+                entityIds: [],
+                isVisible: true
+              };
+              orderedStatusItems.push(automationsStatus);
+            }
           }
         } catch (error) {
           console.warn('Failed to load automations count:', error);
