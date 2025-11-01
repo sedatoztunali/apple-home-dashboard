@@ -1689,6 +1689,8 @@ export class AppleHeader {
         right: 0;
         z-index: 3;
         background: transparent;
+        border: none;
+        box-shadow: none;
         transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
         width: calc(100% + 44px);
@@ -1723,6 +1725,7 @@ export class AppleHeader {
         background: rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(50px);
         -webkit-backdrop-filter: blur(50px);
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
       }
 
       /* When scrolled, make buttons and icons white */

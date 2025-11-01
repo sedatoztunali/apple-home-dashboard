@@ -156,6 +156,7 @@ export class SectionReorderManager {
       const areaName = area.name || areaId;
       const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + 
                        (hasCommonlyUsed ? 1 : 0) + 
+                       (weatherState ? 1 : 0) +
                        (cameraEntities.length > 0 ? 1 : 0) + 
                        (scenesEntities.length > 0 ? 1 : 0) + 
                        index;

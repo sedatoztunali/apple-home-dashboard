@@ -73,10 +73,17 @@ export class WeatherSection {
   }
 
   private createWeatherCardElement(cardConfig: any, hass: any): HTMLElement {
-    // Create ha-card wrapper
-    const weatherCard = document.createElement('ha-card');
-    weatherCard.style.cssText = 'background: transparent; box-shadow: none; overflow: hidden;';
+    // Add CSS to make weather card transparent using card-mod-like approach
+    // We'll inject styles directly since we can't use card-mod dynamically
+    this.addWeatherCardStyles();
 
+    // Create ha-card wrapper with transparent background
+    const weatherCard = document.createElement('ha-card');
+    weatherCard.style.cssText = 'background: transparent !important; box-shadow: none !important; overflow: visible !important; border: none !important;';
+    
+    // Try to set card-mod attribute for transparency (if card-mod is installed)
+    weatherCard.setAttribute('style-mod-card', 'background: transparent; box-shadow: none; border: none;');
+    
     // Create weather-forecast element
     const weatherForecast = document.createElement('hui-weather-forecast-card') as any;
     
@@ -87,9 +94,80 @@ export class WeatherSection {
     if (weatherForecast.hass !== undefined) {
       weatherForecast.hass = hass;
     }
+    
+    // Wait for card to be rendered and then try to modify shadow DOM
+    setTimeout(() => {
+      this.makeWeatherCardTransparent(weatherCard, weatherForecast);
+    }, 100);
 
     weatherCard.appendChild(weatherForecast);
     return weatherCard;
+  }
+
+  private makeWeatherCardTransparent(weatherCard: HTMLElement, weatherForecast: any): void {
+    try {
+      // Try to access shadow DOM of weather-forecast-card
+      if (weatherForecast.shadowRoot) {
+        const cardInShadow = weatherForecast.shadowRoot.querySelector('ha-card');
+        if (cardInShadow) {
+          (cardInShadow as HTMLElement).style.cssText = 'background: transparent !important; box-shadow: none !important; border: none !important;';
+        }
+      }
+      
+      // Also try to modify the outer ha-card
+      weatherCard.style.cssText = 'background: transparent !important; box-shadow: none !important; overflow: visible !important; border: none !important;';
+    } catch (error) {
+      // Silently fail if we can't access shadow DOM
+      console.debug('Could not modify weather card shadow DOM:', error);
+    }
+  }
+
+  private addWeatherCardStyles(): void {
+    // Check if styles already added
+    if (document.querySelector('#apple-weather-card-styles')) {
+      return;
+    }
+
+    const style = document.createElement('style');
+    style.id = 'apple-weather-card-styles';
+    style.textContent = `
+      .weather-section-container ha-card {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        overflow: visible !important;
+      }
+      
+      .weather-section-container hui-weather-forecast-card {
+        background: transparent !important;
+      }
+      
+      /* Try to access shadow DOM content */
+      .weather-section-container hui-weather-forecast-card::part(card) {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      
+      /* Use a more aggressive approach - wait for card to be rendered and then modify */
+      .weather-section-container ha-card:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: -1;
+      }
+      
+      /* Apply card-mod style via attribute if possible */
+      .weather-section-container ha-card[style-mod-card] {
+        background: transparent !important;
+      }
+    `;
+    
+    document.head.appendChild(style);
   }
 }
 
