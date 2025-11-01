@@ -645,6 +645,14 @@ export class AutomationManager {
     setTimeout(() => {
       this.modal?.remove();
       this.modal = undefined;
+      
+      // Trigger dashboard refresh to update chips and status sections when modal closes
+      // This ensures the automation count is updated on the main screen
+      window.dispatchEvent(new CustomEvent('apple-home-dashboard-refresh', {
+        bubbles: true,
+        composed: true,
+        detail: { reason: 'automation-modal-closed' }
+      }));
     }, 300);
   }
 

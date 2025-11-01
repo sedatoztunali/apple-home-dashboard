@@ -182,7 +182,8 @@ export class StatusSection {
               } else if (enabledCount === totalCount) {
                 statusValue = `${totalCount} ${localize('automations.enabled')}`;
               } else {
-                statusValue = `${enabledCount}/${totalCount} ${localize('automations.enabled')}`;
+                // Show enabled count with label
+                statusValue = `${enabledCount} ${localize('automations.enabled')}`;
               }
             }
             
