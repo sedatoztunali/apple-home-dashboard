@@ -215,5 +215,13 @@
     "docked": "На базе",
     "idle": "Ожидание",
     "error": "Ошибка"
+  },
+  "automations": {
+    "title": "Автоматизации",
+    "chip_label": "Автоматизации",
+    "enabled": "Включено",
+    "disabled": "Отключено",
+    "uncategorized": "Без категории",
+    "no_automations": "Автоматизации не найдены"
   }
 }

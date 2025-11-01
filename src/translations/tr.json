@@ -238,5 +238,13 @@
     "docked": "İstasyonda",
     "idle": "Boşta",
     "error": "Hata"
+  },
+  "automations": {
+    "title": "Otomasyonlar",
+    "chip_label": "Otomasyonlar",
+    "enabled": "Etkin",
+    "disabled": "Devre Dışı",
+    "uncategorized": "Kategorisiz",
+    "no_automations": "Otomasyon bulunamadı"
   }
 }

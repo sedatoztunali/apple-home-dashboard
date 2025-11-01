@@ -217,5 +217,13 @@
     "docked": "Na base",
     "idle": "Inativo",
     "error": "Erro"
+  },
+  "automations": {
+    "title": "Automações",
+    "chip_label": "Automações",
+    "enabled": "Habilitado",
+    "disabled": "Desabilitado",
+    "uncategorized": "Sem categoria",
+    "no_automations": "Nenhuma automação encontrada"
   }
 }

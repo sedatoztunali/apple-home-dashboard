@@ -229,5 +229,13 @@
     "docked": "À la base",
     "idle": "Inactif",
     "error": "Erreur"
+  },
+  "automations": {
+    "title": "Automatisations",
+    "chip_label": "Automatisations",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "uncategorized": "Non catégorisé",
+    "no_automations": "Aucune automatisation trouvée"
   }
 }

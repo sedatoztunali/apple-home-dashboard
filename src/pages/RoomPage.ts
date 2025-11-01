@@ -180,12 +180,14 @@ export class RoomPage {
       const filteredStatusEntities = statusEntities.filter(entity => !excludedSet.has(entity.entity_id));
 
       // Group regular entities by area (excluding sensors)
+      // Note: Cameras are included in filteredEntities and will be separated later
       const entitiesByArea = DataService.groupEntitiesByArea(filteredEntities, areas, devices);
 
       // Group status entities by area (including sensors)
       const statusEntitiesByArea = DataService.groupEntitiesByArea(filteredStatusEntities, areas, devices);
 
       // Get entities for this specific area
+      // This includes cameras if they are assigned to this area
       const areaEntities = entitiesByArea[areaId] || [];
       const statusAreaEntities = statusEntitiesByArea[areaId] || [];
 

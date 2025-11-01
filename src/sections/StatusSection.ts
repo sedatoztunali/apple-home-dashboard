@@ -4,6 +4,7 @@ import { DataService } from '../utils/DataService';
 import { Entity, CardConfig, Area } from '../types/types';
 import { DashboardConfig } from '../config/DashboardConfig';
 import { localize } from '../utils/LocalizationService';
+import { AutomationManager } from '../utils/AutomationManager';
 
 export interface StatusData {
   domain: string;
@@ -51,7 +52,7 @@ export class StatusSection {
     this._container = container;
 
     // Generate status data
-    this.statusItems = this.generateStatusData(entities, hass);
+    this.statusItems = await this.generateStatusData(entities, hass, areaId);
 
     // Filter out items with no entities
     const visibleItems = this.statusItems.filter(item => item.isVisible);
@@ -84,8 +85,8 @@ export class StatusSection {
     if (!existingStatusSection) return;
 
     // Generate new status data
-    const newStatusItems = this.generateStatusData(entities, hass);
-    const newVisibleItems = newStatusItems.filter(item => item.isVisible);
+    const newStatusItems = await this.generateStatusData(entities, hass, areaId);
+    const newVisibleItems = newStatusItems.filter((item: StatusData) => item.isVisible);
 
     // If no visible items, remove the section
     if (newVisibleItems.length === 0) {
@@ -94,7 +95,7 @@ export class StatusSection {
     }
 
     // Update only the values in the existing DOM elements
-    newVisibleItems.forEach(item => {
+    newVisibleItems.forEach((item: StatusData) => {
       const chipElement = existingStatusSection.querySelector(`[data-domain="${item.domain}"]`);
       if (chipElement) {
         const valueElement = chipElement.querySelector('.status-chip-value');
@@ -110,7 +111,7 @@ export class StatusSection {
     this.statusItems = newStatusItems;
   }
 
-  private generateStatusData(entities: Entity[], hass: any): StatusData[] {
+  private async generateStatusData(entities: Entity[], hass: any, areaId?: string): Promise<StatusData[]> {
     const statusMap = new Map<string, StatusData>();
 
     // Initialize all possible status types in custom order
@@ -133,7 +134,8 @@ export class StatusSection {
       { domain: 'speakers', icon: 'mdi:speaker', label: localize('status_section.speakers') },
       { domain: 'smoke', icon: 'mdi:smoke-detector', label: localize('status_section.smoke') },
       { domain: 'vacuum', icon: 'mdi:robot-vacuum', label: localize('status_section.vacuum') },
-      { domain: 'battery', icon: 'mdi:battery-low', label: localize('status_section.battery') }
+      { domain: 'battery', icon: 'mdi:battery-low', label: localize('status_section.battery') },
+      { domain: 'automations', icon: 'mdi:robot', label: localize('automations.chip_label') }
     ];
 
     // Initialize status map
@@ -162,7 +164,28 @@ export class StatusSection {
     // Calculate status values for each category and return in order
     const orderedStatusItems: StatusData[] = [];
 
-    statusTypes.forEach(type => {
+    for (const type of statusTypes) {
+      // Special handling for automations
+      if (type.domain === 'automations') {
+        try {
+          const enabledCount = await AutomationManager.getEnabledAutomationsCount(hass, areaId);
+          if (enabledCount > 0 || areaId) { // Always show in area pages, show in home only if > 0
+            const automationsStatus: StatusData = {
+              domain: 'automations',
+              icon: type.icon,
+              label: type.label,
+              value: enabledCount > 0 ? `${enabledCount} ${localize('automations.enabled')}` : localize('status.off'),
+              entityIds: [], // Automations don't have entityIds in the traditional sense
+              isVisible: true
+            };
+            orderedStatusItems.push(automationsStatus);
+          }
+        } catch (error) {
+          console.warn('Failed to load automations count:', error);
+        }
+        continue;
+      }
+
       const status = statusMap.get(type.domain);
       if (status && status.entityIds.length > 0) {
         // Check if there's at least one available entity (not unavailable/unknown)
@@ -178,7 +201,7 @@ export class StatusSection {
           orderedStatusItems.push(status);
         }
       }
-    });
+    }
 
     return orderedStatusItems;
   }
@@ -734,6 +757,15 @@ export class StatusSection {
   }
 
   private handleStatusChipClick(statusData: StatusData, areaId?: string): void {
+    // Special handling for automations
+    if (statusData.domain === 'automations') {
+      if (this._hass) {
+        const automationManager = new AutomationManager();
+        automationManager.showAutomationsModal(this._hass, areaId);
+      }
+      return;
+    }
+
     if (statusData.entityIds.length === 1) {
       // Single entity - open native Home Assistant more info
       this.openMoreInfoDialog(statusData.entityIds[0]);

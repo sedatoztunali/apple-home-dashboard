@@ -240,5 +240,13 @@
     "docked": "Gedockt",
     "idle": "Inactief",
     "error": "Fout"
+  },
+  "automations": {
+    "title": "Automatiseringen",
+    "chip_label": "Automatiseringen",
+    "enabled": "Ingeschakeld",
+    "disabled": "Uitgeschakeld",
+    "uncategorized": "Niet gecategoriseerd",
+    "no_automations": "Geen automatiseringen gevonden"
   }
 }

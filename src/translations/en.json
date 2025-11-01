@@ -238,5 +238,13 @@
     "docked": "Docked",
     "idle": "Idle",
     "error": "Error"
+  },
+  "automations": {
+    "title": "Automations",
+    "chip_label": "Automations",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "uncategorized": "Uncategorized",
+    "no_automations": "No automations found"
   }
 }

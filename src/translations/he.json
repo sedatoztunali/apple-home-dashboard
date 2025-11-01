@@ -230,5 +230,13 @@
     "docked": "בעמדת עגינה",
     "idle": "ממתין",
     "error": "שגיאה"
+  },
+  "automations": {
+    "title": "אוטומציות",
+    "chip_label": "אוטומציות",
+    "enabled": "מופעל",
+    "disabled": "מושבת",
+    "uncategorized": "ללא קטגוריה",
+    "no_automations": "לא נמצאו אוטומציות"
   }
 }

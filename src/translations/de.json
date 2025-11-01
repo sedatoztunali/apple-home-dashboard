@@ -230,5 +230,13 @@
     "docked": "Andockstation",
     "idle": "Untätig",
     "error": "Fehler"
+  },
+  "automations": {
+    "title": "Automatisierungen",
+    "chip_label": "Automatisierungen",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "uncategorized": "Nicht kategorisiert",
+    "no_automations": "Keine Automatisierungen gefunden"
   }
 }

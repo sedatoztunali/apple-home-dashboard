@@ -4,6 +4,47 @@ Bu dosya, geliştirme sırasında takip edeceğimiz işleri içerir. Her maddeye
 
 ## Aktif İşler
 
+- [ ] T-010 — Otomasyonlar modal'ı ile enable/disable yönetimi
+  - Oluşturulma: 2025-11-01
+  - Bağımlılıklar: —
+  - Mevcut: Home Assistant'da birçok otomasyon var ancak dashboard üzerinden görüntülenemiyor ve enable/disable edilemiyor
+  - Hedef:
+    1. Ana ekranda (Home Page) Security, Lights gibi çiplerin sonuna "Automations" çipi eklenecek. Çip üzerinde kaç tane enabled otomasyon olduğu gösterilecek. Çipe tıklayınca modal açılacak.
+    2. Room sayfalarında (Room Page) Security, Motion gibi status kartlarının sonuna "Automations" status kartı eklenecek. Üzerinde kaç tane enabled otomasyon olduğu gösterilecek (area bazında filtrelenmiş). Karta tıklayınca modal açılacak.
+    3. Modal'da otomasyonlar kategori bazında gruplandırılacak ve enable/disable yapılabilecek.
+  - Kapsam:
+    - Yeni `AutomationManager.ts` utility sınıfı oluşturulması (`SectionReorderManager` benzeri yapı)
+    - Modal'da otomasyonların listelenmesi (`hass.states` üzerinden `automation.` prefix'li entity'ler)
+    - Göz ikonu ile enable/disable toggle (Reorder Sections modal'ındaki gibi)
+    - Drag handle/reorder özelliği olmayacak (sadece liste görünecek)
+    - Kategorilere göre gruplandırma (entity registry'den `category` field'ı, kategori yoksa "Uncategorized" veya "General")
+    - **Ana ekranda çip eklenecek:**
+      - `AppleChips.ts` içine "Automations" çipi eklenmesi (diğer çiplerden sonra)
+      - Enabled otomasyon sayısının hesaplanması (tüm otomasyonlar içinden)
+      - Çipe tıklayınca `AutomationManager` modal'ının açılması (area filtresi yok)
+    - **Room sayfalarında status kartı eklenecek:**
+      - `StatusSection.ts` içine "Automations" status kartı eklenmesi (`statusTypes` array'ine, en sona)
+      - Enabled otomasyon sayısının hesaplanması (area'ya atanmış otomasyonlar içinden)
+      - `DataService.groupEntitiesByArea()` veya benzer bir mantık ile area bazında filtreleme
+      - Karta tıklayınca `AutomationManager` modal'ının açılması (area filtresi ile)
+    - Area bazında filtreleme: Entity registry'de `area_id` field'ı kullanılabilir veya device üzerinden area'ya bağlanabilir
+    - Enable/disable işlemleri: `hass.callService('automation', 'enable', { entity_id })` ve `hass.callService('automation', 'disable', { entity_id })`
+    - Modal açılırken area parametresi geçilirse sadece o area'ya ait otomasyonlar gösterilecek
+    - Çeviri anahtarları: `automations.title`, `automations.chip_label`, `automations.enabled`, `automations.disabled`, `automations.uncategorized`, `automations.count` (örn. "5 Enabled") (tüm dillere)
+  - Kabul Kriterleri:
+    - Ana ekranda çiplerin sonunda "Automations" çipi görünür
+    - Çip üzerinde enabled otomasyon sayısı doğru gösterilir
+    - Çipe tıklayınca modal açılır ve tüm otomasyonlar kategori bazında listelenir
+    - Room sayfalarında status kartlarının sonunda "Automations" status kartı görünür
+    - Status kartı üzerinde o area'ya ait enabled otomasyon sayısı doğru gösterilir
+    - Status kartına tıklayınca modal açılır ve sadece o area'ya ait otomasyonlar kategori bazında listelenir
+    - Modal'da otomasyonlar kategori bazında gruplandırılır (kategori varsa)
+    - Göz ikonu ile enable/disable toggle çalışır
+    - Enable/disable işlemleri Home Assistant'a başarıyla gönderilir
+    - Modal görünümü "Reorder Sections" modal'ına benzer (drag handle yok)
+    - Area filtresi doğru çalışır (room sayfalarında sadece o area'ya ait otomasyonlar gösterilir)
+    - Build ve lint temiz
+
 ## Tamamlananlar
 
 - [x] T-009 — Exclude from Dashboard'a status domain entity'lerini ekle
