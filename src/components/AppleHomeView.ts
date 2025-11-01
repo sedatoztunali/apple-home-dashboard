@@ -119,7 +119,11 @@ export class AppleHomeView extends HTMLElement {
     document.addEventListener('visibilitychange', this.visibilityChangeHandler);
 
     // Create and store global refresh handler
-    this.globalRefreshHandler = (event: Event) => {
+    this.globalRefreshHandler = async (event: Event) => {
+      // Refresh chips when automation state changes
+      if (this.chipsElement) {
+        await this.chipsElement.refresh();
+      }
       const customEvent = event as CustomEvent;
       // Only refresh if we have hass and this is a different customization update
       if (this._hass && customEvent.detail?.customizations) {

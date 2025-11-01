@@ -238,6 +238,14 @@ export class AppleChips {
     return orderedChips;
   }
 
+  public async refresh() {
+    // Public method to force refresh chips data
+    if (this._hass && this.config) {
+      await this.updateChipData();
+      await this.render();
+    }
+  }
+
   private async render() {
     if (!this._hass || !this.config || !this.container) {
       return;

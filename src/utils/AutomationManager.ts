@@ -1,6 +1,7 @@
 import { localize } from './LocalizationService';
 import { RTLHelper } from './RTLHelper';
 import { DataService } from './DataService';
+import { Entity } from '../types/types';
 
 interface AutomationItem {
   entityId: string;
@@ -82,18 +83,27 @@ export class AutomationManager {
       console.warn('Failed to fetch devices:', error);
     }
 
-    // Get areas for area name mapping
-    let areas: any[] = [];
+    // Get entities from DataService which has better area mapping
+    let allEntities: Entity[] = [];
     try {
-      areas = await DataService.getAreas(hass);
+      allEntities = await DataService.getEntities(hass);
     } catch (error) {
-      console.warn('Failed to fetch areas:', error);
+      console.warn('Failed to fetch entities from DataService:', error);
     }
+
+    // Create a map of entities by entity_id for faster lookup
+    const entitiesMap = new Map<string, Entity>();
+    allEntities.forEach((entity: Entity) => {
+      if (entity.entity_id.startsWith('automation.')) {
+        entitiesMap.set(entity.entity_id, entity);
+      }
+    });
 
     // Process each automation
     for (const state of automationStates) {
       const entityId = state.entity_id;
       const entityReg = entityRegistryMap.get(entityId);
+      const entityFromDataService = entitiesMap.get(entityId);
 
       // Get automation ID from entity ID (remove 'automation.' prefix)
       const automationId = entityId.replace('automation.', '');
@@ -113,11 +123,20 @@ export class AutomationManager {
         category = state.attributes.category;
       }
 
-      // Get area_id - priority: automation config area > entity registry area > device area
+      // Get area_id - priority: DataService entity > automation config > entity registry > device
       let automationAreaId: string | undefined = undefined;
 
-      // First try automation config
-      if (automationConfig?.area_id) {
+      // First try DataService entity (most reliable)
+      if (entityFromDataService?.area_id) {
+        automationAreaId = entityFromDataService.area_id;
+      } else if (entityFromDataService?.device_id) {
+        // If entity doesn't have area but has device, check device's area
+        const device = devices.find(d => d.id === entityFromDataService.device_id);
+        if (device?.area_id) {
+          automationAreaId = device.area_id;
+        }
+      } else if (automationConfig?.area_id) {
+        // Try automation config
         automationAreaId = automationConfig.area_id;
       } else if (entityReg?.area_id) {
         // Try entity registry
@@ -516,46 +535,38 @@ export class AutomationManager {
 
     try {
       // Call Home Assistant service to enable/disable automation
-      // Use turn_on/turn_off which work reliably, or toggle
-      let serviceCallSuccessful = false;
+      // Use turn_on/turn_off directly - these are the reliable services for automations
       if (newEnabledState) {
-        // Try enable service first, fall back to turn_on
-        try {
-          await this.hass.callService('automation', 'enable', { entity_id: entityId });
-          serviceCallSuccessful = true;
-        } catch (enableError) {
-          // Fall back to turn_on if enable doesn't work (silently)
-          try {
-            await this.hass.callService('automation', 'turn_on', { entity_id: entityId });
-            serviceCallSuccessful = true;
-          } catch (turnOnError) {
-            // If both fail, throw the original error
-            throw enableError;
-          }
-        }
+        // Enable automation using turn_on
+        await this.hass.callService('automation', 'turn_on', { entity_id: entityId });
       } else {
-        // Try disable service first, fall back to turn_off
-        try {
-          await this.hass.callService('automation', 'disable', { entity_id: entityId });
-          serviceCallSuccessful = true;
-        } catch (disableError) {
-          // Fall back to turn_off if disable doesn't work (silently)
-          try {
-            await this.hass.callService('automation', 'turn_off', { entity_id: entityId });
-            serviceCallSuccessful = true;
-          } catch (turnOffError) {
-            // If both fail, throw the original error
-            throw disableError;
-          }
-        }
+        // Disable automation using turn_off
+        await this.hass.callService('automation', 'turn_off', { entity_id: entityId });
       }
 
+      // Wait a bit for state to update in Home Assistant
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Refresh the automation state after service call
-      if (serviceCallSuccessful) {
-        try {
-          await this.hass.callService('homeassistant', 'update_entity', { entity_id: entityId });
-        } catch (updateError) {
-          // Silently ignore update errors
+      try {
+        await this.hass.callService('homeassistant', 'update_entity', { entity_id: entityId });
+      } catch (updateError) {
+        // Silently ignore update errors - state will update via websocket anyway
+      }
+      
+      // Update hass.states directly to reflect the change immediately
+      if (this.hass.states && this.hass.states[entityId]) {
+        const currentState = this.hass.states[entityId];
+        if (newEnabledState) {
+          currentState.state = 'on';
+          if (currentState.attributes) {
+            currentState.attributes.enabled = true;
+          }
+        } else {
+          currentState.state = 'off';
+          if (currentState.attributes) {
+            currentState.attributes.enabled = false;
+          }
         }
       }
 
@@ -578,9 +589,27 @@ export class AutomationManager {
 
       // Update automation count in category header if needed
       this.updateCategoryCounts();
+      
+      // Trigger dashboard refresh to update chips and status sections
+      window.dispatchEvent(new CustomEvent('apple-home-dashboard-refresh', {
+        bubbles: true,
+        composed: true,
+        detail: { entityId: entityId }
+      }));
     } catch (error) {
       console.error('Failed to toggle automation:', error);
-      // Could show an error message here
+      // Revert UI state if service call fails
+      automation.enabled = !newEnabledState;
+      button.classList.toggle('enabled', !newEnabledState);
+      button.classList.toggle('disabled', newEnabledState);
+      const icon = button.querySelector('ha-icon');
+      if (icon) {
+        icon.setAttribute('icon', !newEnabledState ? 'mdi:eye' : 'mdi:eye-off');
+      }
+      const automationItem = button.closest('.automation-item');
+      if (automationItem) {
+        automationItem.classList.toggle('disabled', newEnabledState);
+      }
     }
   }
 
@@ -657,26 +686,56 @@ export class AutomationManager {
         }
       });
 
+      // Also get entities from DataService which has better area mapping
+      let allEntities: Entity[] = [];
+      try {
+        allEntities = await DataService.getEntities(hass);
+      } catch (error) {
+        console.warn('Failed to fetch entities from DataService:', error);
+      }
+      
+      // Create a map of entities by entity_id for faster lookup
+      const entitiesMap = new Map<string, Entity>();
+      allEntities.forEach((entity: Entity) => {
+        if (entity.entity_id.startsWith('automation.')) {
+          entitiesMap.set(entity.entity_id, entity);
+        }
+      });
+
       let count = 0;
       for (const state of automationStates) {
         const entityId = state.entity_id;
         const automationId = entityId.replace('automation.', '');
         const automationConfig = automationConfigs[automationId];
         const entityReg = entityRegistryMap.get(entityId);
-
-        // Get area_id - priority: automation config > entity registry > device
+        const entityFromDataService = entitiesMap.get(entityId);
+        
+        // Get area_id - priority: DataService entity > automation config > entity registry > device
         let automationAreaId: string | undefined = undefined;
-        if (automationConfig?.area_id) {
+        
+        // First try DataService entity (most reliable)
+        if (entityFromDataService?.area_id) {
+          automationAreaId = entityFromDataService.area_id;
+        } else if (entityFromDataService?.device_id) {
+          // If entity doesn't have area but has device, check device's area
+          const device = devices.find(d => d.id === entityFromDataService.device_id);
+          if (device?.area_id) {
+            automationAreaId = device.area_id;
+          }
+        } else if (automationConfig?.area_id) {
+          // Try automation config
           automationAreaId = automationConfig.area_id;
         } else if (entityReg?.area_id) {
+          // Try entity registry
           automationAreaId = entityReg.area_id;
         } else if (entityReg?.device_id) {
+          // Fall back to device area
           const device = devices.find(d => d.id === entityReg.device_id);
           if (device?.area_id) {
             automationAreaId = device.area_id;
           }
         }
-
+        
         if (automationAreaId === areaId) {
           count++;
         }
