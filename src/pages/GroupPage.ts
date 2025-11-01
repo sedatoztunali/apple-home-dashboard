@@ -111,23 +111,13 @@ export class GroupPage {
         return DashboardConfig.isStatusDomain(domain);
       });
 
-      // Now apply exclusions asynchronously to both lists
-      const filteredEntities = [];
-      const filteredStatusEntities = [];
+      // Load excluded entities list once (performance optimization)
+      const excludedFromDashboard = await this.customizationManager?.getExcludedFromDashboard() || [];
+      const excludedSet = new Set(excludedFromDashboard);
       
-      for (const entity of supportedEntities) {
-        const isExcluded = await this.customizationManager?.isEntityExcludedFromDashboard(entity.entity_id) || false;
-        if (!isExcluded) {
-          filteredEntities.push(entity);
-        }
-      }
-      
-      for (const entity of statusEntities) {
-        const isExcluded = await this.customizationManager?.isEntityExcludedFromDashboard(entity.entity_id) || false;
-        if (!isExcluded) {
-          filteredStatusEntities.push(entity);
-        }
-      }
+      // Now apply exclusions efficiently using Set lookup (O(1))
+      const filteredEntities = supportedEntities.filter(entity => !excludedSet.has(entity.entity_id));
+      const filteredStatusEntities = statusEntities.filter(entity => !excludedSet.has(entity.entity_id));
       
       // Get all special section entities
       const scenesEntities = filteredEntities.filter(entity => 

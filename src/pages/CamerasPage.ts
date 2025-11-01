@@ -83,14 +83,12 @@ export class CamerasPage {
         return DashboardConfig.isCamerasDomain(domain);
       });
 
-      // Now apply exclusions asynchronously
-      const camerasEntities = [];
-      for (const entity of allCamerasEntities) {
-        const isExcluded = await this.customizationManager?.isEntityExcludedFromDashboard(entity.entity_id) || false;
-        if (!isExcluded) {
-          camerasEntities.push(entity);
-        }
-      }
+      // Load excluded entities list once (performance optimization)
+      const excludedFromDashboard = await this.customizationManager?.getExcludedFromDashboard() || [];
+      const excludedSet = new Set(excludedFromDashboard);
+      
+      // Now apply exclusions efficiently using Set lookup (O(1))
+      const camerasEntities = allCamerasEntities.filter(entity => !excludedSet.has(entity.entity_id));
 
       // Apply user customizations
       if (!this.customizationManager) {

@@ -122,14 +122,12 @@ export class HomePage {
         return true;
       });
 
-      // Now apply exclusions asynchronously
-      const filteredEntities = [];
-      for (const entity of supportedEntities) {
-        const isExcluded = await this.customizationManager?.isEntityExcludedFromDashboard(entity.entity_id) || false;
-        if (!isExcluded) {
-          filteredEntities.push(entity);
-        }
-      }
+      // Load excluded entities list once (performance optimization)
+      const excludedFromDashboard = await this.customizationManager?.getExcludedFromDashboard() || [];
+      const excludedSet = new Set(excludedFromDashboard);
+      
+      // Now apply exclusions efficiently using Set lookup (O(1))
+      const filteredEntities = supportedEntities.filter(entity => !excludedSet.has(entity.entity_id));
       
       // Separate special section entities from regular area entities
       const scenesEntities = [];

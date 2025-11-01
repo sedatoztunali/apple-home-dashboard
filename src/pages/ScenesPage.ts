@@ -82,14 +82,12 @@ export class ScenesPage {
         return DashboardConfig.isScenesDomain(domain);
       });
 
-      // Now apply exclusions asynchronously
-      const scenesEntities = [];
-      for (const entity of allScenesEntities) {
-        const isExcluded = await this.customizationManager?.isEntityExcludedFromDashboard(entity.entity_id) || false;
-        if (!isExcluded) {
-          scenesEntities.push(entity);
-        }
-      }
+      // Load excluded entities list once (performance optimization)
+      const excludedFromDashboard = await this.customizationManager?.getExcludedFromDashboard() || [];
+      const excludedSet = new Set(excludedFromDashboard);
+      
+      // Now apply exclusions efficiently using Set lookup (O(1))
+      const scenesEntities = allScenesEntities.filter(entity => !excludedSet.has(entity.entity_id));
 
       // Apply user customizations
       if (!this.customizationManager) {
