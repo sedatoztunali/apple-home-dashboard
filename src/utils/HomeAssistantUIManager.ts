@@ -131,11 +131,27 @@ export class HomeAssistantUIManager {
     const style = document.createElement('style');
     style.id = 'apple-ha-header-transparent-styles';
     style.textContent = `
-      /* Override theme variables at root level first */
+      /* Override theme variables at root level first - must override theme YAML values */
       :root,
-      html {
+      html,
+      body {
         --app-header-background-color: transparent !important;
         --mdc-theme-primary: transparent !important;
+        /* Override theme-specific variables if they exist */
+        --theme-bright-gray-color: transparent !important;
+      }
+      
+      /* Override at ha-app-layout level where theme is applied */
+      ha-app-layout {
+        --app-header-background-color: transparent !important;
+      }
+      
+      home-assistant {
+        --app-header-background-color: transparent !important;
+      }
+      
+      home-assistant-main {
+        --app-header-background-color: transparent !important;
       }
       
       /* Make Home Assistant native header transparent by default - most aggressive selectors */
