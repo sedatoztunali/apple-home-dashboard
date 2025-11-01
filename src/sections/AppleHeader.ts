@@ -1722,23 +1722,31 @@ export class AppleHeader {
       }
 
       .apple-home-header.scrolled {
-        background: rgba(0, 0, 0, 0.3);
+        background: rgba(0, 0, 0, 0.7);
         backdrop-filter: blur(50px);
         -webkit-backdrop-filter: blur(50px);
         border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
       }
 
-      /* When scrolled, make buttons and icons white */
+      /* When scrolled, keep buttons black with white background for visibility */
       .apple-home-header.scrolled .apple-header-back-button {
-        color: #ffffff;
+        color: #000000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        padding: 6px 12px;
       }
 
       .apple-home-header.scrolled .apple-header-sidebar-button {
-        color: #ffffff;
+        color: #000000;
+        background: rgba(255, 255, 255, 0.9);
       }
 
       .apple-home-header.scrolled .apple-header-menu-button {
-        color: #ffffff;
+        color: #000000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        padding: 6px 12px;
+        min-width: auto;
       }
 
       .apple-header-content {
@@ -1820,7 +1828,7 @@ export class AppleHeader {
         border: none;
         color: #000000;
         cursor: pointer;
-        transition: color 0.2s ease;
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1831,7 +1839,6 @@ export class AppleHeader {
         border-radius: 12px;
         width: 44px;
         height: 44px;
-        transition: all 0.2s ease;
       }
 
       .apple-header-sidebar-button ha-icon {
@@ -1951,6 +1958,7 @@ export class AppleHeader {
         transform: translateY(-50%);
         right: 16px;
         z-index: 10;
+        border-radius: 12px;
       }
 
       /* Fixed top position for group pages */
