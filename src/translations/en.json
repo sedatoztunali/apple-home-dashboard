@@ -229,5 +229,13 @@
   "status_messages": {
     "unavailable": "Unavailable",
     "loading_automations": "Loading Automations..."
+  },
+  "vacuum": {
+    "cleaning": "Cleaning",
+    "paused": "Paused",
+    "returning": "Returning",
+    "docked": "Docked",
+    "idle": "Idle",
+    "error": "Error"
   }
 }

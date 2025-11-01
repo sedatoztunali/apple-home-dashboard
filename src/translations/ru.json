@@ -206,5 +206,13 @@
   "status_messages": {
     "unavailable": "Недоступно",
     "loading_automations": "Загрузка Автоматизаций..."
+  },
+  "vacuum": {
+    "cleaning": "Уборка",
+    "paused": "Пауза",
+    "returning": "Возврат",
+    "docked": "На базе",
+    "idle": "Ожидание",
+    "error": "Ошибка"
   }
 }

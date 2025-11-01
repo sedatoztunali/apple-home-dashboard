@@ -991,6 +991,19 @@ export class AppleHomeCard extends HTMLElement {
           detail: { entityId }
         }));
         break;
+      case 'vacuum':
+        const vacuumState = this._hass.states[entityId]?.state;
+        if (vacuumState === 'cleaning' || vacuumState === 'returning') {
+          // Pause if cleaning or returning
+          this._hass.callService('vacuum', 'pause', { entity_id: entityId });
+        } else if (vacuumState === 'paused') {
+          // Resume if paused
+          this._hass.callService('vacuum', 'start', { entity_id: entityId });
+        } else {
+          // Start cleaning for idle/docked states
+          this._hass.callService('vacuum', 'start', { entity_id: entityId });
+        }
+        break;
       default:
         // For unknown domains, icon click toggles if possible, otherwise opens more-info
         if (['binary_sensor', 'sensor'].includes(domain)) {

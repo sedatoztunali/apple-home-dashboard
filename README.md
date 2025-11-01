@@ -71,6 +71,7 @@ No manual YAML card definitions required.
 | scene | Activate | Activate | Action pill style |
 | script | Run | Run | Same as scenes |
 | camera | Open live view | Open live view | Tall snapshot tile |
+| vacuum | Start / Pause / Resume | More‑info | Robot vacuum cleaners (start if idle/docked, pause if cleaning, resume if paused) |
 | binary_sensor / sensor | Status only | More‑info | Used in Status/Security summaries |
 
 **Switch handling:** Regular switches are excluded by default (to avoid clutter from technical / helper switches). Outlets (device_class=outlet) are always shown. You can enable all switches or selectively add specific ones via customization.

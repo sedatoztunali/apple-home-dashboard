@@ -220,5 +220,13 @@
   "status_messages": {
     "unavailable": "Indisponible",
     "loading_automations": "Chargement des Automatisations..."
+  },
+  "vacuum": {
+    "cleaning": "Nettoyage",
+    "paused": "En pause",
+    "returning": "Retour",
+    "docked": "À la base",
+    "idle": "Inactif",
+    "error": "Erreur"
   }
 }

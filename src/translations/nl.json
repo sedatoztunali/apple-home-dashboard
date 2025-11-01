@@ -231,5 +231,13 @@
   "status_messages": {
     "unavailable": "Niet beschikbaar",
     "loading_automations": "Automatiseringen Laden..."
+  },
+  "vacuum": {
+    "cleaning": "Schoonmaken",
+    "paused": "Gepauzeerd",
+    "returning": "Terugkeren",
+    "docked": "Gedockt",
+    "idle": "Inactief",
+    "error": "Fout"
   }
 }

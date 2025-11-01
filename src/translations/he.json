@@ -221,5 +221,13 @@
   "status_messages": {
     "unavailable": "לא זמין",
     "loading_automations": "טוען אוטומציות..."
+  },
+  "vacuum": {
+    "cleaning": "מנקה",
+    "paused": "מושהה",
+    "returning": "חוזר",
+    "docked": "בעמדת עגינה",
+    "idle": "ממתין",
+    "error": "שגיאה"
   }
 }

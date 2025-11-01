@@ -111,6 +111,7 @@ export class DashboardConfig {
     'alarm_control_panel': DeviceGroup.SECURITY,
     'media_player': DeviceGroup.MEDIA,
     'camera': DeviceGroup.SECURITY,
+    'vacuum': DeviceGroup.OTHER, // Vacuum cleaners
     'binary_sensor': DeviceGroup.SECURITY, // Motion, occupancy, contact sensors
     'sensor': DeviceGroup.SECURITY
   };
@@ -124,7 +125,7 @@ export class DashboardConfig {
    */
   static readonly SUPPORTED_DOMAINS = [
     'light', 'switch', 'cover', 'climate', 'fan', 'media_player', 
-    'lock', 'alarm_control_panel', 'scene', 'script', 'camera'
+    'lock', 'alarm_control_panel', 'scene', 'script', 'camera', 'vacuum'
   ] as const;
 
   /**
@@ -376,6 +377,22 @@ export class DashboardConfig {
         return entityState === 'unlocked' ? 'mdi:lock-open' : 'mdi:lock';
       case 'alarm_control_panel':
         return 'mdi:alarm-light';
+      case 'vacuum':
+        // State-based icons for vacuum
+        switch (entityState) {
+          case 'cleaning':
+            return 'mdi:robot-vacuum';
+          case 'returning':
+            return 'mdi:robot-vacuum-variant';
+          case 'paused':
+            return 'mdi:robot-vacuum-pause';
+          case 'docked':
+            return 'mdi:robot-vacuum-variant-alert';
+          case 'error':
+            return 'mdi:robot-vacuum-alert';
+          default:
+            return 'mdi:robot-vacuum';
+        }
       default:
         return 'mdi:help-circle';
     }
@@ -522,6 +539,10 @@ export class DashboardConfig {
         // Disarmed state should look like "off" (inactive), all other states are active
         result = entityState !== 'disarmed';
         break;
+      case 'vacuum':
+        // Vacuum is active when cleaning, returning, or paused
+        result = ['cleaning', 'returning', 'paused'].includes(entityState);
+        break;
       case 'binary_sensor':
         // Most binary sensors are active when 'on', which corresponds to detected/open/unsafe states
         result = entityState === 'on';
@@ -583,6 +604,9 @@ export class DashboardConfig {
 
       case 'alarm_control_panel':
         return this.getAlarmStateText(entityState);
+
+      case 'vacuum':
+        return this.getVacuumStateText(entityState);
 
       case 'binary_sensor':
         return this.getBinarySensorStateText(entityState, attributes);
@@ -695,6 +719,28 @@ export class DashboardConfig {
         return localize('status.triggered');
       default:
         return localize('status.unknown');
+    }
+  }
+
+  /**
+   * Get vacuum-specific state text
+   */
+  private static getVacuumStateText(entityState: string): string {
+    switch (entityState) {
+      case 'cleaning':
+        return localize('vacuum.cleaning') || 'Cleaning';
+      case 'paused':
+        return localize('vacuum.paused') || 'Paused';
+      case 'returning':
+        return localize('vacuum.returning') || 'Returning';
+      case 'docked':
+        return localize('vacuum.docked') || 'Docked';
+      case 'idle':
+        return localize('vacuum.idle') || 'Idle';
+      case 'error':
+        return localize('vacuum.error') || 'Error';
+      default:
+        return entityState.charAt(0).toUpperCase() + entityState.slice(1);
     }
   }
 

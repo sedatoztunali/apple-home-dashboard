@@ -221,5 +221,13 @@
   "status_messages": {
     "unavailable": "Nicht verfügbar",
     "loading_automations": "Automatisierungen werden geladen..."
+  },
+  "vacuum": {
+    "cleaning": "Reinigt",
+    "paused": "Pausiert",
+    "returning": "Kehrt zurück",
+    "docked": "Andockstation",
+    "idle": "Untätig",
+    "error": "Fehler"
   }
 }

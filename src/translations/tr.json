@@ -229,5 +229,13 @@
   "status_messages": {
     "unavailable": "Kullanılamıyor",
     "loading_automations": "Otomasyonlar Yükleniyor..."
+  },
+  "vacuum": {
+    "cleaning": "Temizleniyor",
+    "paused": "Duraklatıldı",
+    "returning": "Döndürülüyor",
+    "docked": "İstasyonda",
+    "idle": "Boşta",
+    "error": "Hata"
   }
 }

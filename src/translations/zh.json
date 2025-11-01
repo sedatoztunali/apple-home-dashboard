@@ -206,5 +206,13 @@
   "status_messages": {
     "unavailable": "不可用",
     "loading_automations": "正在加载自动化..."
+  },
+  "vacuum": {
+    "cleaning": "清洁中",
+    "paused": "已暂停",
+    "returning": "返回中",
+    "docked": "已停靠",
+    "idle": "空闲",
+    "error": "错误"
   }
 }
