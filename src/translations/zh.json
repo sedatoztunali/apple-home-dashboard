@@ -97,7 +97,8 @@
     "favorites": "收藏夹",
     "commonly_used": "常用",
     "scenes": "场景",
-    "cameras": "摄像头"
+    "cameras": "摄像头",
+    "weather": "天气"
   },
   "ui_actions": {
     "done": "完成",

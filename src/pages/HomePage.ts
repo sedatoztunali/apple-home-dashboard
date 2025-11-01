@@ -6,6 +6,7 @@ import { CamerasSection } from '../sections/CamerasSection';
 import { AreaSection } from '../sections/AreaSection';
 import { FavoritesSection } from '../sections/FavoritesSection';
 import { CommonlyUsedSection } from '../sections/CommonlyUsedSection';
+import { WeatherSection } from '../sections/WeatherSection';
 import { Entity, Area } from '../types/types';
 import { CardManager } from '../utils/CardManager';
 
@@ -16,6 +17,7 @@ export class HomePage {
   private areaSection?: AreaSection;
   private favoritesSection?: FavoritesSection;
   private commonlyUsedSection?: CommonlyUsedSection;
+  private weatherSection?: WeatherSection;
   private cardManager?: CardManager;
   private _hass?: any;
   private _title?: string;
@@ -49,6 +51,7 @@ export class HomePage {
       this.areaSection = new AreaSection(this.customizationManager, this.cardManager);
       this.favoritesSection = new FavoritesSection(this.customizationManager);
       this.commonlyUsedSection = new CommonlyUsedSection(this.customizationManager, this.cardManager);
+      this.weatherSection = new WeatherSection(this.customizationManager);
     }
   }
 
@@ -185,7 +188,7 @@ export class HomePage {
     hass: any,
     onTallToggle?: (entityId: string, areaId: string) => void | Promise<void | boolean>
   ): Promise<void> {
-    if (!this.customizationManager || !this.scenesSection || !this.camerasSection || !this.areaSection || !this.favoritesSection || !this.commonlyUsedSection) {
+    if (!this.customizationManager || !this.scenesSection || !this.camerasSection || !this.areaSection || !this.favoritesSection || !this.commonlyUsedSection || !this.weatherSection) {
       throw new Error('Required sections not initialized');
     }
     
@@ -223,6 +226,15 @@ export class HomePage {
       });
     }
     
+    // Add weather section if weather entity exists
+    const weatherEntityId = 'weather.forecast_home';
+    const weatherState = hass.states[weatherEntityId];
+    if (weatherState) {
+      availableSections.set('weather_section', async () => {
+        await this.weatherSection!.render(container, weatherEntityId, hass);
+      });
+    }
+    
     // Add area sections
     for (const areaId of Object.keys(entitiesByArea)) {
       if (entitiesByArea[areaId].length > 0) {
@@ -246,12 +258,14 @@ export class HomePage {
         }
       }
     } else {
-      // Default order: favorites, commonly_used, cameras, scenes, then areas alphabetically
+      // Default order: favorites, commonly_used, weather, cameras, scenes, then areas alphabetically
       orderedSectionIds = Array.from(availableSections.keys()).sort((a, b) => {
         if (a === 'favorites_section') return -1;
         if (b === 'favorites_section') return 1;
         if (a === 'commonly_used_section') return -1;
         if (b === 'commonly_used_section') return 1;
+        if (a === 'weather_section') return -1;
+        if (b === 'weather_section') return 1;
         if (a === 'cameras_section') return -1;
         if (b === 'cameras_section') return 1;
         if (a === 'scenes_section') return -1;

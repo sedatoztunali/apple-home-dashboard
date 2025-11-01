@@ -7,7 +7,7 @@ import { RTLHelper } from './RTLHelper';
 interface SectionItem {
   id: string;
   name: string;
-  type: 'area' | 'scenes' | 'cameras' | 'favorites' | 'commonly_used';
+  type: 'area' | 'scenes' | 'cameras' | 'favorites' | 'commonly_used' | 'weather';
   visible: boolean;
   order: number;
 }
@@ -124,9 +124,23 @@ export class SectionReorderManager {
       });
     }
 
+    // Add Weather section (after commonly_used, before cameras)
+    const weatherEntityId = 'weather.forecast_home';
+    const weatherState = hass.states[weatherEntityId];
+    if (weatherState) {
+      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + (hasCommonlyUsed ? 1 : 0);
+      sections.push({
+        id: 'weather_section',
+        name: localize('section_titles.weather'),
+        type: 'weather',
+        visible: !hiddenSections.includes('weather_section'),
+        order: sectionOrder.indexOf('weather_section') !== -1 ? sectionOrder.indexOf('weather_section') : baseOrder
+      });
+    }
+
     // Add Scenes section (fourth in default order, after cameras)
     if (scenesEntities.length > 0) {
-      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + (hasCommonlyUsed ? 1 : 0) + (cameraEntities.length > 0 ? 1 : 0);
+      const baseOrder = (favoriteAccessories.length > 0 ? 1 : 0) + (hasCommonlyUsed ? 1 : 0) + (weatherState ? 1 : 0) + (cameraEntities.length > 0 ? 1 : 0);
       sections.push({
         id: 'scenes_section',
         name: localize('section_titles.scenes'),

@@ -97,7 +97,8 @@
     "favorites": "Избранное",
     "commonly_used": "Часто Используемые",
     "scenes": "Сцены",
-    "cameras": "Камеры"
+    "cameras": "Камеры",
+    "weather": "Погода"
   },
   "ui_actions": {
     "done": "Готово",

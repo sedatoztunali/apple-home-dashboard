@@ -118,7 +118,8 @@
     "favorites": "Favorieten",
     "commonly_used": "Vaak Gebruikt",
     "scenes": "Scènes",
-    "cameras": "Camera's"
+    "cameras": "Camera's",
+    "weather": "Weer"
   },
   "ui_actions": {
     "done": "Klaar",

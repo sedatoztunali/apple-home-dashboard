@@ -103,7 +103,8 @@
     "favorites": "Favoritos",
     "commonly_used": "Más Usados",
     "scenes": "Escenas",
-    "cameras": "Cámaras"
+    "cameras": "Cámaras",
+    "weather": "Clima"
   },
   "ui_actions": {
     "done": "Hecho",

@@ -112,7 +112,8 @@
     "favorites": "מועדפים",
     "commonly_used": "בשימוש תכוף",
     "scenes": "תרחישים", 
-    "cameras": "מצלמות"
+    "cameras": "מצלמות",
+    "weather": "מזג אוויר"
   },
   "ui_actions": {
     "done": "סיום",

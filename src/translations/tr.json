@@ -116,7 +116,8 @@
     "favorites": "Favoriler",
     "commonly_used": "Sık Kullanılanlar",
     "scenes": "Sahneler",
-    "cameras": "Kameralar"
+    "cameras": "Kameralar",
+    "weather": "Hava Durumu"
   },
   "ui_actions": {
     "done": "Bitti",

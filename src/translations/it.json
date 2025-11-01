@@ -99,7 +99,8 @@
     "favorites": "Preferiti",
     "commonly_used": "Usati Spesso",
     "scenes": "Scene",
-    "cameras": "Telecamere"
+    "cameras": "Telecamere",
+    "weather": "Meteo"
   },
   "ui_actions": {
     "done": "Fatto",
