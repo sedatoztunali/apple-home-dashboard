@@ -120,12 +120,12 @@ export class AppleHomeView extends HTMLElement {
 
     // Create and store global refresh handler
     this.globalRefreshHandler = async (event: Event) => {
-      // Refresh chips when automation state changes
+      // Always refresh chips when refresh event is triggered (e.g., automation state changes, modal closes)
       if (this.chipsElement) {
         await this.chipsElement.refresh();
       }
       const customEvent = event as CustomEvent;
-      // Only refresh if we have hass and this is a different customization update
+      // Also handle customization updates if present
       if (this._hass && customEvent.detail?.customizations) {
         this.handleGlobalRefresh(customEvent.detail.customizations);
       }

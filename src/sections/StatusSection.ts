@@ -176,14 +176,12 @@ export class StatusSection {
               statusValue = localize('automations.no_automation');
             } else {
               const enabledCount = await AutomationManager.getEnabledAutomationsCount(hass, areaId);
-              if (enabledCount === 0) {
-                // Show total count even if none are enabled
-                statusValue = `${totalCount}`;
-              } else if (enabledCount === totalCount) {
-                statusValue = `${totalCount} ${localize('automations.enabled')}`;
-              } else {
-                // Show enabled count with label
+              // Always show enabled count with label when there are enabled automations
+              if (enabledCount > 0) {
                 statusValue = `${enabledCount} ${localize('automations.enabled')}`;
+              } else {
+                // Show total count when none are enabled
+                statusValue = `${totalCount}`;
               }
             }
             
