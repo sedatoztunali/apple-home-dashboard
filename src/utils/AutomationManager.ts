@@ -546,14 +546,14 @@ export class AutomationManager {
 
       // Wait a bit for state to update in Home Assistant
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       // Refresh the automation state after service call
       try {
         await this.hass.callService('homeassistant', 'update_entity', { entity_id: entityId });
       } catch (updateError) {
         // Silently ignore update errors - state will update via websocket anyway
       }
-      
+
       // Update hass.states directly to reflect the change immediately
       if (this.hass.states && this.hass.states[entityId]) {
         const currentState = this.hass.states[entityId];
@@ -589,7 +589,7 @@ export class AutomationManager {
 
       // Update automation count in category header if needed
       this.updateCategoryCounts();
-      
+
       // Trigger dashboard refresh to update chips and status sections
       window.dispatchEvent(new CustomEvent('apple-home-dashboard-refresh', {
         bubbles: true,
@@ -693,7 +693,7 @@ export class AutomationManager {
       } catch (error) {
         console.warn('Failed to fetch entities from DataService:', error);
       }
-      
+
       // Create a map of entities by entity_id for faster lookup
       const entitiesMap = new Map<string, Entity>();
       allEntities.forEach((entity: Entity) => {
@@ -709,10 +709,10 @@ export class AutomationManager {
         const automationConfig = automationConfigs[automationId];
         const entityReg = entityRegistryMap.get(entityId);
         const entityFromDataService = entitiesMap.get(entityId);
-        
+
         // Get area_id - priority: DataService entity > automation config > entity registry > device
         let automationAreaId: string | undefined = undefined;
-        
+
         // First try DataService entity (most reliable)
         if (entityFromDataService?.area_id) {
           automationAreaId = entityFromDataService.area_id;
@@ -735,7 +735,7 @@ export class AutomationManager {
             automationAreaId = device.area_id;
           }
         }
-        
+
         if (automationAreaId === areaId) {
           count++;
         }
