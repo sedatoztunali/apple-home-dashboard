@@ -23,7 +23,7 @@ export class GroupPage {
 
   set hass(hass: any) {
     this._hass = hass;
-    
+
     // Update status section if it exists
     if (this.statusSection) {
       this.statusSection.hass = hass;
@@ -37,7 +37,7 @@ export class GroupPage {
   async setConfig(config: any) {
     this._config = config;
     this._group = config.group;
-    
+
     // Initialize customization manager from config
     if (config.customizations && this._hass) {
       this.customizationManager = CustomizationManager.getInstance(this._hass);
@@ -58,11 +58,11 @@ export class GroupPage {
   private createGroupTitle(group: DeviceGroup): HTMLElement {
     const titleElement = document.createElement('h1');
     titleElement.className = 'apple-page-title';
-    
+
     // Get the proper group name from DashboardConfig
     const groupStyle = DashboardConfig.getGroupStyle(group);
     titleElement.textContent = typeof groupStyle.name === 'function' ? groupStyle.name() : groupStyle.name;
-    
+
     return titleElement;
   }
 
@@ -75,19 +75,19 @@ export class GroupPage {
     // Preserve existing header and permanent chips elements
     const existingHeader = container.querySelector('.apple-home-header');
     const existingPermanentChips = container.querySelector('.permanent-chips');
-    
+
     // Clear container but preserve important elements
     container.innerHTML = '';
-    
+
     // Re-insert preserved elements in correct order
     if (existingHeader) {
       container.appendChild(existingHeader);
     }
-    
+
     // Add group title
     const groupTitle = this.createGroupTitle(group);
     container.appendChild(groupTitle);
-    
+
     // Re-insert permanent chips after title (this ensures chips are always below h1)
     if (existingPermanentChips) {
       container.appendChild(existingPermanentChips);
@@ -98,55 +98,68 @@ export class GroupPage {
       const areas = await DataService.getAreas(hass);
       const entities = await DataService.getEntities(hass);
       const devices = await DataService.getDevices(hass);
-      
+
       // Filter entities for supported domains and exclude those marked for exclusion
       const supportedEntities = entities.filter(entity => {
         const domain = entity.entity_id.split('.')[0];
         return DashboardConfig.isSupportedDomain(domain);
       });
 
-      // Create a separate list for status section that includes sensor domains
+      // Create a separate list for status section
+      // Include status domains (sensor, binary_sensor) and SUPPORTED_DOMAINS that can appear in status chip
+      // Exclude special section domains (scenes, cameras) as they have their own sections
       const statusEntities = entities.filter(entity => {
         const domain = entity.entity_id.split('.')[0];
-        return DashboardConfig.isStatusDomain(domain);
+
+        // Include status domains (sensor, binary_sensor)
+        if (DashboardConfig.STATUS_SECTION_DOMAINS.includes(domain as any)) {
+          return true;
+        }
+
+        // Include SUPPORTED_DOMAINS except special sections (scenes, cameras) as they appear elsewhere
+        if (DashboardConfig.isSupportedDomain(domain) && !DashboardConfig.isSpecialSectionDomain(domain)) {
+          return true;
+        }
+
+        return false;
       });
 
       // Load excluded entities list once (performance optimization)
       const excludedFromDashboard = await this.customizationManager?.getExcludedFromDashboard() || [];
       const excludedSet = new Set(excludedFromDashboard);
-      
+
       // Now apply exclusions efficiently using Set lookup (O(1))
       const filteredEntities = supportedEntities.filter(entity => !excludedSet.has(entity.entity_id));
       const filteredStatusEntities = statusEntities.filter(entity => !excludedSet.has(entity.entity_id));
-      
+
       // Get all special section entities
-      const scenesEntities = filteredEntities.filter(entity => 
+      const scenesEntities = filteredEntities.filter(entity =>
         DashboardConfig.isScenesDomain(entity.entity_id.split('.')[0])
       );
-      
-      const camerasEntities = filteredEntities.filter(entity => 
+
+      const camerasEntities = filteredEntities.filter(entity =>
         DashboardConfig.isCamerasDomain(entity.entity_id.split('.')[0])
       );
-      
-      const regularEntities = filteredEntities.filter(entity => 
+
+      const regularEntities = filteredEntities.filter(entity =>
         !DashboardConfig.isSpecialSectionDomain(entity.entity_id.split('.')[0])
       );
-      
+
       // Group regular entities by area
       const entitiesByArea = DataService.groupEntitiesByArea(regularEntities, areas, devices);
-      
+
       // Get showSwitches and includedSwitches settings
       const showSwitches = await this.customizationManager?.getShowSwitches() || false;
       const includedSwitches = await this.customizationManager?.getIncludedSwitches() || [];
-      
+
       // Filter entities for this group across all areas
       const groupEntitiesByArea: { [areaId: string]: Entity[] } = {};
-      
+
       for (const [areaId, entities] of Object.entries(entitiesByArea)) {
         const groupEntities = entities.filter(entity => {
           const domain = entity.entity_id.split('.')[0];
           const entityState = this.hass?.states[entity.entity_id];
-          
+
           // Special handling for switches
           if (domain === 'switch') {
             if (showSwitches) {
@@ -167,7 +180,7 @@ export class GroupPage {
             return entityGroup === group;
           }
         });
-        
+
         if (groupEntities.length > 0) {
           groupEntitiesByArea[areaId] = groupEntities;
         }
@@ -177,8 +190,8 @@ export class GroupPage {
       const statusGroupEntities = filteredStatusEntities.filter(entity => {
         const domain = entity.entity_id.split('.')[0];
         const entityState = this.hass?.states[entity.entity_id];
-        
-        // Special handling for switches  
+
+        // Special handling for switches
         if (domain === 'switch') {
           if (showSwitches) {
             const entityGroup = DashboardConfig.getDeviceGroup(domain, entity.entity_id, entityState?.attributes, showSwitches);
@@ -198,44 +211,44 @@ export class GroupPage {
           return entityGroup === group;
         }
       });
-      
+
       // Add status section after chips
       if (this.statusSection && statusGroupEntities.length > 0) {
         await this.statusSection.render(container, statusGroupEntities, hass, this._group || 'group');
       }
-      
+
       // Apply user customizations
       if (!this.customizationManager) {
         throw new Error('CustomizationManager not initialized');
       }
-      
+
       const customizations = this.customizationManager.getCustomizations();
       const customizedAreas = this.applyCustomizations(groupEntitiesByArea, customizations);
-      
+
       // Determine which special entities belong to this group
       let groupScenesEntities: Entity[] = [];
       let groupCamerasEntities: Entity[] = [];
-      
+
       // For security group, include cameras
       if (group === DeviceGroup.SECURITY) {
         groupCamerasEntities = camerasEntities;
       }
-      
+
       // For lighting group, include scenes (since they typically control lights)
       if (group === DeviceGroup.LIGHTING) {
         groupScenesEntities = scenesEntities;
       }
-      
+
       // Render sections in order based on customizations
       await this.renderSectionsInOrder(
-        container, 
-        customizedAreas, 
-        groupScenesEntities, 
-        groupCamerasEntities, 
-        hass, 
+        container,
+        customizedAreas,
+        groupScenesEntities,
+        groupCamerasEntities,
+        hass,
         onTallToggle
       );
-      
+
     } catch (error) {
       console.error('Error rendering group page:', error);
     }
@@ -252,28 +265,28 @@ export class GroupPage {
     if (!this.customizationManager || !this.scenesSection || !this.camerasSection || !this.areaSection) {
       throw new Error('Required sections not initialized');
     }
-    
+
     // Get section order and hidden sections
     const sectionOrder = this.customizationManager.getSavedSectionOrder();
     const hiddenSections = this.customizationManager.getHiddenSections();
-    
+
     // Create a map of all available sections
     const availableSections = new Map<string, () => Promise<void>>();
-    
+
     // Add scenes section if there are any scenes or scripts
     if (scenesEntities.length > 0) {
       availableSections.set('scenes_section', async () => {
         await this.scenesSection!.render(container, scenesEntities, hass, onTallToggle, 'room', false);
       });
     }
-    
+
     // Add cameras section if there are any cameras
     if (camerasEntities.length > 0) {
       availableSections.set('cameras_section', async () => {
         await this.camerasSection!.render(container, camerasEntities, hass, onTallToggle, 'room', false);
       });
     }
-    
+
     // Add area sections
     for (const areaId of Object.keys(entitiesByArea)) {
       if (entitiesByArea[areaId].length > 0) {
@@ -282,14 +295,14 @@ export class GroupPage {
         });
       }
     }
-    
+
     // Apply section ordering
     let orderedSectionIds: string[] = [];
-    
+
     if (sectionOrder.length > 0) {
       // Use saved order
       orderedSectionIds = sectionOrder.filter(id => availableSections.has(id));
-      
+
       // Add any new sections that weren't in the saved order
       for (const sectionId of availableSections.keys()) {
         if (!orderedSectionIds.includes(sectionId)) {
@@ -306,17 +319,17 @@ export class GroupPage {
         return a.localeCompare(b);
       });
     }
-    
+
     // Render sections in order, respecting visibility settings
     // Special case: Security group always shows cameras_section, even if hidden
     for (const sectionId of orderedSectionIds) {
       const isHidden = hiddenSections.includes(sectionId);
       const isSecurityGroup = this._group === DeviceGroup.SECURITY;
       const isCamerasSection = sectionId === 'cameras_section';
-      
+
       // Always show cameras_section in Security group, even if hidden
       const shouldRender = !isHidden || (isSecurityGroup && isCamerasSection);
-      
+
       if (shouldRender && availableSections.has(sectionId)) {
         await availableSections.get(sectionId)!();
       }
@@ -325,16 +338,16 @@ export class GroupPage {
 
   private applyCustomizations(entitiesByArea: { [areaId: string]: Entity[] }, customizations: any): { [areaId: string]: Entity[] } {
     const result: { [areaId: string]: Entity[] } = {};
-    
+
     // Apply area order customizations
     const areaIds = Object.keys(entitiesByArea);
     let sortedAreaIds = areaIds;
-    
+
     if (customizations.home?.sections?.order) {
       sortedAreaIds = [...areaIds].sort((a, b) => {
         const aOrder = customizations.home.sections.order!.indexOf(a);
         const bOrder = customizations.home.sections.order!.indexOf(b);
-        
+
         // If both areas have custom order, use it
         if (aOrder !== -1 && bOrder !== -1) {
           return aOrder - bOrder;
@@ -346,12 +359,12 @@ export class GroupPage {
         return 0;
       });
     }
-    
+
     // Apply entity customizations within each area
     for (const areaId of sortedAreaIds) {
       const areaEntities = [...entitiesByArea[areaId]];
       const areaCustomizations = customizations.home?.entities_order?.[areaId];
-      
+
       if (areaCustomizations) {
         // Apply entity order - areaCustomizations is now the array directly
         const entityOrder = Array.isArray(areaCustomizations) ? areaCustomizations : [];
@@ -359,7 +372,7 @@ export class GroupPage {
           areaEntities.sort((a, b) => {
             const aOrder = entityOrder.indexOf(a.entity_id);
             const bOrder = entityOrder.indexOf(b.entity_id);
-            
+
             if (aOrder !== -1 && bOrder !== -1) {
               return aOrder - bOrder;
             }
@@ -369,7 +382,7 @@ export class GroupPage {
           });
         }
       }
-        
+
       // Apply tall card settings from home.tall_cards
       if (customizations.home?.tall_cards) {
         areaEntities.forEach(entity => {
@@ -380,10 +393,10 @@ export class GroupPage {
           }
         });
       }
-      
+
       result[areaId] = areaEntities;
     }
-    
+
     return result;
   }
 }

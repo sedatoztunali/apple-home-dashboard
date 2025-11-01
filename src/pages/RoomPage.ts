@@ -136,31 +136,39 @@ export class RoomPage {
         return true;
       });
 
-      // Create a separate list for status section that includes sensor domains
+      // Create a separate list for status section
+      // Include status domains (sensor, binary_sensor) and SUPPORTED_DOMAINS that can appear in status chip
+      // Exclude special section domains (scenes, cameras) as they have their own sections
       const statusEntities = entities.filter(entity => {
         const domain = entity.entity_id.split('.')[0];
 
-        if (!DashboardConfig.isStatusDomain(domain)) {
-          return false;
+        // Include status domains (sensor, binary_sensor)
+        if (DashboardConfig.STATUS_SECTION_DOMAINS.includes(domain as any)) {
+          return true;
         }
 
-        // Apply same switch filtering logic for status section
-        if (domain === 'switch') {
-          const entityState = hass.states[entity.entity_id];
+        // Include SUPPORTED_DOMAINS except special sections (scenes, cameras) as they appear elsewhere
+        if (DashboardConfig.isSupportedDomain(domain) && !DashboardConfig.isSpecialSectionDomain(domain)) {
+          // Apply same switch filtering logic for status section
+          if (domain === 'switch') {
+            const entityState = hass.states[entity.entity_id];
 
-          // If showSwitches is true, use the standard device group logic
-          if (showSwitches) {
-            const entityGroup = DashboardConfig.getDeviceGroup(domain, entity.entity_id, entityState?.attributes, showSwitches);
-            return entityGroup !== undefined;
-          } else {
-            // If showSwitches is false, only show switches that are in includedSwitches or are outlets
-            const isOutlet = DashboardConfig.isOutlet(entity.entity_id, entityState?.attributes);
-            const isIncluded = includedSwitches.includes(entity.entity_id);
-            return isOutlet || isIncluded;
+            // If showSwitches is true, use the standard device group logic
+            if (showSwitches) {
+              const entityGroup = DashboardConfig.getDeviceGroup(domain, entity.entity_id, entityState?.attributes, showSwitches);
+              return entityGroup !== undefined;
+            } else {
+              // If showSwitches is false, only show switches that are in includedSwitches or are outlets
+              const isOutlet = DashboardConfig.isOutlet(entity.entity_id, entityState?.attributes);
+              const isIncluded = includedSwitches.includes(entity.entity_id);
+              return isOutlet || isIncluded;
+            }
           }
+
+          return true;
         }
 
-        return true;
+        return false;
       });
 
       // Load excluded entities list once (performance optimization)
