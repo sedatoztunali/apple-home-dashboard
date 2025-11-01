@@ -131,6 +131,13 @@ export class HomeAssistantUIManager {
     const style = document.createElement('style');
     style.id = 'apple-ha-header-transparent-styles';
     style.textContent = `
+      /* Override theme variables at root level first */
+      :root,
+      html {
+        --app-header-background-color: transparent !important;
+        --mdc-theme-primary: transparent !important;
+      }
+      
       /* Make Home Assistant native header transparent by default - most aggressive selectors */
       app-header,
       .header,
@@ -139,20 +146,37 @@ export class HomeAssistantUIManager {
       hui-root .mdc-top-app-bar,
       app-header[main-title],
       app-header[mode],
-      ha-app-layout app-header {
+      ha-app-layout app-header,
+      home-assistant app-header,
+      home-assistant-main app-header {
         background: transparent !important;
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
         --app-header-background-color: transparent !important;
         --mdc-theme-primary: transparent !important;
+        /* Override any theme-specific background colors */
+        background-image: none !important;
+      }
+      
+      /* Target header toolbar and toolbar content specifically */
+      app-header app-toolbar,
+      app-header .toolbar,
+      app-header .toolbar-content,
+      app-header ha-menu-button,
+      app-header .action-items {
+        background: transparent !important;
+        background-color: transparent !important;
+        --app-header-background-color: transparent !important;
       }
       
       /* Remove border from header bottom */
       hui-root .header::after,
       hui-root app-header::after,
       app-header::after,
-      app-header::before {
+      app-header::before,
+      app-header app-toolbar::after,
+      app-header app-toolbar::before {
         display: none !important;
       }
       
@@ -161,14 +185,17 @@ export class HomeAssistantUIManager {
       hui-root app-header *,
       app-header *,
       app-header ha-menu-button *,
-      app-header .toolbar * {
+      app-header .toolbar *,
+      app-header app-toolbar * {
         background: transparent !important;
         background-color: transparent !important;
       }
       
-      /* Override any theme variables */
-      :root {
-        --app-header-background-color: transparent !important;
+      /* Override theme-specific styles that might be using background-color via CSS variables */
+      app-header[style*="background-color"],
+      app-header[style*="background"] {
+        background: transparent !important;
+        background-color: transparent !important;
       }
     `;
     
@@ -211,6 +238,20 @@ export class HomeAssistantUIManager {
               el.style.setProperty('border', 'none', 'important');
               el.style.setProperty('box-shadow', 'none', 'important');
               el.style.setProperty('--app-header-background-color', 'transparent', 'important');
+              el.style.setProperty('background-image', 'none', 'important');
+              
+              // Remove any inline styles that might override
+              if (el.hasAttribute('style')) {
+                const currentStyle = el.getAttribute('style') || '';
+                // Remove background-color and background from inline styles
+                const cleanedStyle = currentStyle
+                  .replace(/background-color[^;]*;?/gi, '')
+                  .replace(/background[^;]*;?/gi, '');
+                el.setAttribute('style', cleanedStyle);
+                // Re-apply our transparent styles
+                el.style.setProperty('background', 'transparent', 'important');
+                el.style.setProperty('background-color', 'transparent', 'important');
+              }
               
               // Also modify all child elements with backgrounds
               const children = el.querySelectorAll('*');
