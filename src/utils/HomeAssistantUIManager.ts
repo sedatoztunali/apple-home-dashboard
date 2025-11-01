@@ -120,6 +120,8 @@ export class HomeAssistantUIManager {
     }
   }
 
+  private headerTransparentObserver: MutationObserver | null = null;
+
   private makeHeaderTransparent(): void {
     // Inject global CSS to make Home Assistant header transparent
     if (document.querySelector('#apple-ha-header-transparent-styles')) {
@@ -129,64 +131,129 @@ export class HomeAssistantUIManager {
     const style = document.createElement('style');
     style.id = 'apple-ha-header-transparent-styles';
     style.textContent = `
-      /* Make Home Assistant native header transparent by default */
-      hui-root .header,
+      /* Make Home Assistant native header transparent by default - most aggressive selectors */
+      app-header,
+      .header,
       hui-root app-header,
-      hui-root .mdc-top-app-bar {
+      hui-root .header,
+      hui-root .mdc-top-app-bar,
+      app-header[main-title],
+      app-header[mode],
+      ha-app-layout app-header {
         background: transparent !important;
+        background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
-      }
-      
-      /* Try to access shadow DOM of hui-root */
-      hui-root::part(header),
-      hui-root::part(app-header) {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-      }
-      
-      /* Also target via deep selector if shadow DOM access fails */
-      hui-root .header *,
-      hui-root app-header * {
-        background: transparent !important;
+        --app-header-background-color: transparent !important;
+        --mdc-theme-primary: transparent !important;
       }
       
       /* Remove border from header bottom */
       hui-root .header::after,
-      hui-root app-header::after {
+      hui-root app-header::after,
+      app-header::after,
+      app-header::before {
         display: none !important;
+      }
+      
+      /* Make sure all child elements are also transparent */
+      hui-root .header *,
+      hui-root app-header *,
+      app-header *,
+      app-header ha-menu-button *,
+      app-header .toolbar * {
+        background: transparent !important;
+        background-color: transparent !important;
+      }
+      
+      /* Override any theme variables */
+      :root {
+        --app-header-background-color: transparent !important;
       }
     `;
     
     document.head.appendChild(style);
     
-    // Also try to modify header directly if accessible
-    const tryModifyHeader = () => {
-      const haRoot = document.querySelector("home-assistant");
-      const huiRoot = this.deepQuery(haRoot, "hui-root");
-      const headerEl = huiRoot?.shadowRoot?.querySelector(".header");
+    // Aggressively modify header directly in shadow DOM
+    const tryModifyHeader = (attempt: number = 0): void => {
+      if (attempt > 20) return; // Max 20 attempts
       
-      if (headerEl) {
-        try {
-          (headerEl as HTMLElement).style.cssText = 'background: transparent !important; border: none !important; box-shadow: none !important;';
+      try {
+        const haRoot = document.querySelector("home-assistant");
+        if (!haRoot) {
+          setTimeout(() => tryModifyHeader(attempt + 1), 100);
+          return;
+        }
+        
+        const huiRoot = this.deepQuery(haRoot, "hui-root");
+        if (!huiRoot || !huiRoot.shadowRoot) {
+          setTimeout(() => tryModifyHeader(attempt + 1), 100);
+          return;
+        }
+        
+        // Find header in shadow DOM
+        const headerEl = huiRoot.shadowRoot.querySelector(".header") as HTMLElement;
+        const appHeader = huiRoot.shadowRoot.querySelector("app-header") as HTMLElement;
+        const mdcTopBar = huiRoot.shadowRoot.querySelector(".mdc-top-app-bar") as HTMLElement;
+        
+        // Modify all found header elements
+        const elements = [headerEl, appHeader, mdcTopBar].filter(Boolean);
+        
+        if (elements.length > 0) {
+          elements.forEach(el => {
+            if (el) {
+              el.style.cssText = 'background: transparent !important; border: none !important; box-shadow: none !important;';
+              
+              // Also modify all child elements with backgrounds
+              const children = el.querySelectorAll('*');
+              children.forEach((child: any) => {
+                if (child && child.style) {
+                  const computedStyle = window.getComputedStyle(child);
+                  if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' && computedStyle.backgroundColor !== 'transparent') {
+                    child.style.setProperty('background-color', 'transparent', 'important');
+                  }
+                }
+              });
+            }
+          });
           
-          // Also modify app-header if it exists
-          const appHeader = huiRoot?.shadowRoot?.querySelector("app-header");
-          if (appHeader) {
-            (appHeader as HTMLElement).style.cssText = 'background: transparent !important; border: none !important; box-shadow: none !important;';
+          // Also check huiRoot's direct style
+          if (huiRoot instanceof HTMLElement) {
+            const huiRootStyle = window.getComputedStyle(huiRoot);
+            // Only modify if it has a background
+            if (huiRootStyle.backgroundColor && huiRootStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' && huiRootStyle.backgroundColor !== 'transparent') {
+              // Try to clear it via CSS variable or direct style
+            }
           }
-        } catch (error) {
-          // Silently fail if we can't modify
-          console.debug('Could not modify header directly:', error);
+          
+          // Setup MutationObserver to watch for header changes
+          if (!this.headerTransparentObserver && huiRoot.shadowRoot) {
+            this.headerTransparentObserver = new MutationObserver(() => {
+              // Re-apply transparency when header changes
+              setTimeout(() => tryModifyHeader(0), 50);
+            });
+            
+            this.headerTransparentObserver.observe(huiRoot.shadowRoot, {
+              childList: true,
+              subtree: true,
+              attributes: true,
+              attributeFilter: ['style', 'class']
+            });
+          }
+        } else {
+          // Header not found yet, try again
+          setTimeout(() => tryModifyHeader(attempt + 1), 100);
+        }
+      } catch (error) {
+        // Silently fail and retry
+        if (attempt < 20) {
+          setTimeout(() => tryModifyHeader(attempt + 1), 100);
         }
       }
     };
     
-    // Try immediately and after a delay (header may render asynchronously)
+    // Start trying immediately and continuously
     tryModifyHeader();
-    setTimeout(tryModifyHeader, 500);
-    setTimeout(tryModifyHeader, 1000);
   }
 
   private collapseSidebar(hide: boolean = true): void {
