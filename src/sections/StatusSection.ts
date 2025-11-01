@@ -169,12 +169,26 @@ export class StatusSection {
       if (type.domain === 'automations') {
         try {
           const enabledCount = await AutomationManager.getEnabledAutomationsCount(hass, areaId);
-          if (enabledCount > 0 || areaId) { // Always show in area pages, show in home only if > 0
+          // Always show in area pages, show in home only if > 0
+          if (enabledCount > 0 || areaId) {
+            let statusValue: string;
+            if (areaId) {
+              // In area pages, show appropriate message
+              if (enabledCount === 0) {
+                statusValue = localize('automations.no_automations');
+              } else {
+                statusValue = `${enabledCount} ${localize('automations.enabled')}`;
+              }
+            } else {
+              // In home page, show count or off
+              statusValue = enabledCount > 0 ? `${enabledCount} ${localize('automations.enabled')}` : localize('status.off');
+            }
+            
             const automationsStatus: StatusData = {
               domain: 'automations',
               icon: type.icon,
               label: type.label,
-              value: enabledCount > 0 ? `${enabledCount} ${localize('automations.enabled')}` : localize('status.off'),
+              value: statusValue,
               entityIds: [], // Automations don't have entityIds in the traditional sense
               isVisible: true
             };

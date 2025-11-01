@@ -50,6 +50,22 @@ export class AutomationManager {
       console.warn('Failed to fetch entity registry:', error);
     }
 
+    // Get automation configs to access category and area from automation configuration
+    let automationConfigs: any = {};
+    try {
+      // Get automation list with full config
+      const automationsList = await hass.callWS({ type: 'automation/list' });
+      if (automationsList) {
+        automationsList.forEach((automation: any) => {
+          if (automation.automation_id) {
+            automationConfigs[automation.automation_id] = automation;
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('Failed to fetch automation configs:', error);
+    }
+
     // Create a map of entity registry entries by entity_id
     const entityRegistryMap = new Map();
     entityRegistry.forEach((entity: any) => {
@@ -66,22 +82,48 @@ export class AutomationManager {
       console.warn('Failed to fetch devices:', error);
     }
 
+    // Get areas for area name mapping
+    let areas: any[] = [];
+    try {
+      areas = await DataService.getAreas(hass);
+    } catch (error) {
+      console.warn('Failed to fetch areas:', error);
+    }
+
     // Process each automation
     for (const state of automationStates) {
       const entityId = state.entity_id;
       const entityReg = entityRegistryMap.get(entityId);
       
-      // Get enabled state from automation entity state
-      // In Home Assistant, automation.state can be 'on' (enabled) or 'off' (disabled)
-      // But we should check the 'enabled' attribute
-      const enabled = state.attributes?.enabled !== false && state.state !== 'off';
+      // Get automation ID from entity ID (remove 'automation.' prefix)
+      const automationId = entityId.replace('automation.', '');
+      const automationConfig = automationConfigs[automationId];
       
-      // Get category from entity registry
-      const category = entityReg?.category || null;
+      // Get enabled state - automation.state is 'on' when enabled, 'off' when disabled
+      // Also check attributes.enabled (some versions use this)
+      const enabled = state.attributes?.enabled !== false && state.state === 'on';
       
-      // Get area_id - automations don't have direct area_id, but we can check via device
+      // Get category - priority: automation config > entity registry > entity attributes
+      let category: string | undefined = undefined;
+      if (automationConfig?.category) {
+        category = automationConfig.category;
+      } else if (entityReg?.category) {
+        category = entityReg.category;
+      } else if (state.attributes?.category) {
+        category = state.attributes.category;
+      }
+      
+      // Get area_id - priority: automation config area > entity registry area > device area
       let automationAreaId: string | undefined = undefined;
-      if (entityReg?.device_id) {
+      
+      // First try automation config
+      if (automationConfig?.area_id) {
+        automationAreaId = automationConfig.area_id;
+      } else if (entityReg?.area_id) {
+        // Try entity registry
+        automationAreaId = entityReg.area_id;
+      } else if (entityReg?.device_id) {
+        // Fall back to device area
         const device = devices.find(d => d.id === entityReg.device_id);
         if (device?.area_id) {
           automationAreaId = device.area_id;
@@ -94,13 +136,13 @@ export class AutomationManager {
       }
 
       // Get friendly name
-      const name = state.attributes?.friendly_name || entityId.split('.')[1].replace(/_/g, ' ');
+      const name = state.attributes?.friendly_name || automationConfig?.name || entityId.split('.')[1].replace(/_/g, ' ');
 
       this.automations.push({
         entityId,
         name,
         enabled,
-        category: category || undefined,
+        category: category,
         areaId: automationAreaId
       });
     }
@@ -474,11 +516,27 @@ export class AutomationManager {
 
     try {
       // Call Home Assistant service to enable/disable automation
+      // Use turn_on/turn_off which work reliably, or toggle
       if (newEnabledState) {
-        await this.hass.callService('automation', 'enable', { entity_id: entityId });
+        // Try enable service first, fall back to turn_on
+        try {
+          await this.hass.callService('automation', 'enable', { entity_id: entityId });
+        } catch (enableError) {
+          // Fall back to turn_on if enable doesn't work
+          await this.hass.callService('automation', 'turn_on', { entity_id: entityId });
+        }
       } else {
-        await this.hass.callService('automation', 'disable', { entity_id: entityId });
+        // Try disable service first, fall back to turn_off
+        try {
+          await this.hass.callService('automation', 'disable', { entity_id: entityId });
+        } catch (disableError) {
+          // Fall back to turn_off if disable doesn't work
+          await this.hass.callService('automation', 'turn_off', { entity_id: entityId });
+        }
       }
+      
+      // Refresh the automation state after service call
+      await this.hass.callService('homeassistant', 'update_entity', { entity_id: entityId });
 
       // Update local state
       automation.enabled = newEnabledState;
@@ -549,15 +607,26 @@ export class AutomationManager {
     }) as any[];
 
     if (areaId) {
-      // Need to filter by area - get entity registry and devices
+      // Need to filter by area - get automation configs, entity registry and devices
+      let automationConfigs: any = {};
       let entityRegistry: any[] = [];
       let devices: any[] = [];
       
       try {
+        // Get automation configs for area info
+        const automationsList = await hass.callWS({ type: 'automation/list' });
+        if (automationsList) {
+          automationsList.forEach((automation: any) => {
+            if (automation.automation_id) {
+              automationConfigs[automation.automation_id] = automation;
+            }
+          });
+        }
+        
         entityRegistry = await hass.callWS({ type: 'config/entity_registry/list' });
         devices = await DataService.getDevices(hass);
       } catch (error) {
-        console.warn('Failed to fetch entity registry or devices:', error);
+        console.warn('Failed to fetch automation data:', error);
       }
 
       const entityRegistryMap = new Map();
@@ -570,11 +639,17 @@ export class AutomationManager {
       let count = 0;
       for (const state of automationStates) {
         const entityId = state.entity_id;
+        const automationId = entityId.replace('automation.', '');
+        const automationConfig = automationConfigs[automationId];
         const entityReg = entityRegistryMap.get(entityId);
         
-        // Get area_id via device
+        // Get area_id - priority: automation config > entity registry > device
         let automationAreaId: string | undefined = undefined;
-        if (entityReg?.device_id) {
+        if (automationConfig?.area_id) {
+          automationAreaId = automationConfig.area_id;
+        } else if (entityReg?.area_id) {
+          automationAreaId = entityReg.area_id;
+        } else if (entityReg?.device_id) {
           const device = devices.find(d => d.id === entityReg.device_id);
           if (device?.area_id) {
             automationAreaId = device.area_id;
@@ -582,7 +657,7 @@ export class AutomationManager {
         }
         
         if (automationAreaId === areaId) {
-          const enabled = state.attributes?.enabled !== false && state.state !== 'off';
+          const enabled = state.attributes?.enabled !== false && state.state === 'on';
           if (enabled) {
             count++;
           }
@@ -593,7 +668,7 @@ export class AutomationManager {
     } else {
       // Count all enabled automations
       return automationStates.filter((state: any) => {
-        const enabled = state.attributes?.enabled !== false && state.state !== 'off';
+        const enabled = state.attributes?.enabled !== false && state.state === 'on';
         return enabled;
       }).length;
     }
