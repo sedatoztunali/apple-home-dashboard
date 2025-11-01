@@ -96,9 +96,15 @@ export class WeatherSection {
     }
     
     // Wait for card to be rendered and then try to modify shadow DOM
+    // Try multiple times as card may render asynchronously
     setTimeout(() => {
       this.makeWeatherCardTransparent(weatherCard, weatherForecast);
     }, 100);
+    
+    // Also try after a longer delay in case Home Assistant renders slowly
+    setTimeout(() => {
+      this.makeWeatherCardTransparent(weatherCard, weatherForecast);
+    }, 1000);
 
     weatherCard.appendChild(weatherForecast);
     return weatherCard;
@@ -106,19 +112,50 @@ export class WeatherSection {
 
   private makeWeatherCardTransparent(weatherCard: HTMLElement, weatherForecast: any): void {
     try {
-      // Try to access shadow DOM of weather-forecast-card
-      if (weatherForecast.shadowRoot) {
-        const cardInShadow = weatherForecast.shadowRoot.querySelector('ha-card');
-        if (cardInShadow) {
-          (cardInShadow as HTMLElement).style.cssText = 'background: transparent !important; box-shadow: none !important; border: none !important;';
-        }
-      }
-      
-      // Also try to modify the outer ha-card
+      // Update outer ha-card immediately
       weatherCard.style.cssText = 'background: transparent !important; box-shadow: none !important; overflow: visible !important; border: none !important;';
+      
+      // Try to access shadow DOM of weather-forecast-card multiple times (it may render asynchronously)
+      const tryShadowDOM = (attempt: number = 0) => {
+        if (attempt > 5) return; // Max 5 attempts
+        
+        try {
+          if (weatherForecast.shadowRoot) {
+            // Find all ha-card elements in shadow DOM
+            const cardsInShadow = weatherForecast.shadowRoot.querySelectorAll('ha-card');
+            cardsInShadow.forEach((card: any) => {
+              if (card) {
+                card.style.cssText = 'background: transparent !important; box-shadow: none !important; border: none !important;';
+              }
+            });
+            
+            // Also try to find any element with background
+            const allElements = weatherForecast.shadowRoot.querySelectorAll('*');
+            allElements.forEach((el: any) => {
+              if (el && el.style) {
+                const computedStyle = window.getComputedStyle(el);
+                if (computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' && computedStyle.backgroundColor !== 'transparent') {
+                  el.style.setProperty('background-color', 'transparent', 'important');
+                }
+              }
+            });
+          } else if (attempt < 5) {
+            // Shadow DOM not ready yet, try again
+            setTimeout(() => tryShadowDOM(attempt + 1), 200);
+          }
+        } catch (error) {
+          if (attempt < 5) {
+            setTimeout(() => tryShadowDOM(attempt + 1), 200);
+          } else {
+            console.debug('Could not modify weather card shadow DOM after multiple attempts:', error);
+          }
+        }
+      };
+      
+      // Start trying to access shadow DOM
+      tryShadowDOM();
     } catch (error) {
-      // Silently fail if we can't access shadow DOM
-      console.debug('Could not modify weather card shadow DOM:', error);
+      console.debug('Could not modify weather card:', error);
     }
   }
 

@@ -591,11 +591,14 @@ export class AutomationManager {
       this.updateCategoryCounts();
 
       // Trigger dashboard refresh to update chips and status sections
-      window.dispatchEvent(new CustomEvent('apple-home-dashboard-refresh', {
-        bubbles: true,
-        composed: true,
-        detail: { entityId: entityId }
-      }));
+      // Use setTimeout to ensure state updates are propagated
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('apple-home-dashboard-refresh', {
+          bubbles: true,
+          composed: true,
+          detail: { entityId: entityId, reason: 'automation-toggled' }
+        }));
+      }, 500);
     } catch (error) {
       console.error('Failed to toggle automation:', error);
       // Revert UI state if service call fails

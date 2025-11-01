@@ -1688,9 +1688,9 @@ export class AppleHeader {
         left: 0;
         right: 0;
         z-index: 3;
-        background: transparent;
-        border: none;
-        box-shadow: none;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
         transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
         width: calc(100% + 44px);
